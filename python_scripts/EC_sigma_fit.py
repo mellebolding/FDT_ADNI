@@ -1,10 +1,39 @@
 
 import os
+import sys
+
+import sys
+
+# Use the actual absolute path on the cluster here:
+repo_root = '/home/mbolding/FDT_ADNI'
+
+sys.path.insert(0, repo_root)
+sys.path.insert(0, f'{repo_root}/support_files')
+sys.path.insert(0, f'{repo_root}/DataLoaders')
+import sys
+print("sys.path:")
+for p in sys.path:
+    print(" ", p)
+
+
+
+print("CWD:", os.getcwd())
+print("__file__:", __file__)
+import os
+
+# Change working directory to your repo root (one level above the script folder)
+os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+print("Changed working directory to:", os.getcwd())
+
+
+
+
+from functions_FDT_numba_v8 import *
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, filtfilt, detrend
-from functions_FDT_numba_v8 import *
 from functions_FC_v3 import *
 from functions_LinHopf_Ceff_sigma_fit_v3 import LinHopf_Ceff_sigma_fitting_numba
 
@@ -26,8 +55,6 @@ from typing import Union
 from numba import njit, prange, objmode
 import time
 
- ### Append variables to npz file
-import os
 def append_to_npz(filename, **new_data):
     """
     Appends new variables to an existing .npz file or creates one if it doesn't exist.
@@ -278,10 +305,10 @@ for i in range(1,4):
     plt.legend()
 
     fig_name = f"FCmatrices_group_{group_names[COND - 1]}.png"
-    save_path = f"/home/mbolding/figures/{fig_name}"
+    save_path = f"/Result_plots/{fig_name}"
     plot_FC_matrices(FCemp_group, FCsim_group, title1="group FCemp", title2="group FCsim", save_path=save_path, size=1, dpi=300)
     fig_name = f"ECmatrix_group_{group_names[COND - 1]}.png"
-    save_path = f"/home/mbolding/figures/{fig_name}"
+    save_path = f"/Result_plots/{fig_name}"
     plot_FC_matrix(Ceff_group, title="group Ceff fitted", size=1.1, save_path=save_path,dpi=300)
     
      ## Plot sigma
