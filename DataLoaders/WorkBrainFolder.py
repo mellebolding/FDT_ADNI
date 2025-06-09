@@ -13,8 +13,8 @@ WorkBrainProducedDataFolder = WorkBrainFolder / "_Data_Produced"
 WorkBrainDataFolder.mkdir(parents=True, exist_ok=True)
 WorkBrainProducedDataFolder.mkdir(parents=True, exist_ok=True)
 
-print("Base Folder:", WorkBrainFolder)
-print("Raw Data Folder:", WorkBrainDataFolder)
-print("Produced Data Folder:", WorkBrainProducedDataFolder)
+#print("Base Folder:", WorkBrainFolder)
+#print("Raw Data Folder:", WorkBrainDataFolder)
+#print("Produced Data Folder:", WorkBrainProducedDataFolder)
 
 parcellation_folder = WorkBrainDataFolder / '_Parcellations'

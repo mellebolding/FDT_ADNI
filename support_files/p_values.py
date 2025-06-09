@@ -239,12 +239,16 @@ def plotComparisonAcrossLabels2Ax(ax, tests, custom_test=None,
 
 def plotComparisonAcrossLabels2(tests, custom_test=None,
                                 columnLables=None, graphLabel='', pairs=None,
-                                test='Mann-Whitney', comparisons_correction='BH'):
+                                test='Mann-Whitney', comparisons_correction='BH',save_path=None, dpi=300):
     fig, ax = plt.subplots()
     plotComparisonAcrossLabels2Ax(ax, tests, custom_test=custom_test,
                                   columnLables=columnLables, graphLabel=graphLabel, pairs=pairs,
                                   test=test, comparisons_correction=comparisons_correction)
-    plt.show()
+    if save_path:
+        plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
+        plt.close(fig)
+    else:
+        plt.show()
 
 
 # ----------------------------------------------------------------------------

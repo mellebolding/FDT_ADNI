@@ -125,7 +125,8 @@ def plot_FC_matrix(FC_matrix, title="Functional Connectivity Matrix", cmap="turb
     if save_path is not None:
         plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
     
-    plt.show()
+    else: plt.show()
+    plt.close()
 
 
 def plot_FC_matrices(FC1, FC2, title1="FC Matrix 1", title2="FC Matrix 2", cmap="turbo", size=1, save_path=None, dpi=300):
@@ -179,7 +180,8 @@ def plot_FC_matrices(FC1, FC2, title1="FC Matrix 1", title2="FC Matrix 2", cmap=
     if save_path is not None:
         plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
 
-    plt.show()
+    else: plt.show()
+    plt.close()
 
 def plot_avg_X_vs_N(RESULTS):
     """

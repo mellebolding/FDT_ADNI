@@ -1,35 +1,44 @@
-
 import os
 import sys
+# -----------------------------
+# 1. Set up project structure
+# -----------------------------
 
-import sys
+# Absolute path to the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Use the actual absolute path on the cluster here:
-repo_root = '/home/mbolding/FDT_ADNI'
+# Absolute path to the repo root (one level up from this script)
+repo_root = os.path.abspath(os.path.join(script_dir, '..'))
+
+# Optional: change working directory to repo root
+os.chdir(repo_root)
+#print("Changed working directory to repo root:", repo_root)
 
 sys.path.insert(0, repo_root)
-sys.path.insert(0, f'{repo_root}/support_files')
-sys.path.insert(0, f'{repo_root}/DataLoaders')
-import sys
-print("sys.path:")
-for p in sys.path:
-    print(" ", p)
+sys.path.insert(0, os.path.join(repo_root, 'support_files'))
+sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 
 
+base_folder = os.path.join(repo_root, 'ADNI-A_DATA')
+connectome_dir = os.path.join(base_folder, 'connectomes')
+results_dir = os.path.join(repo_root, 'Result_plots')
+ECgroup_subfolder = os.path.join(results_dir, 'EC_group')
+ECsub_subfolder = os.path.join(results_dir, 'EC_sub')
+FCgroup_subfolder = os.path.join(results_dir, 'FC_group')
+FCsub_subfolder = os.path.join(results_dir, 'FC_sub')
+sigma_subfolder = os.path.join(results_dir, 'sig_sub')
+sigma_group_subfolder = os.path.join(results_dir, 'sig_group')
+FDT_parcel_subfolder = os.path.join(results_dir, 'FDT_parcel')
+FDT_subject_subfolder = os.path.join(results_dir, 'FDT_sub')
+training_dir = os.path.join(results_dir, 'training_conv')
 
-print("CWD:", os.getcwd())
-print("__file__:", __file__)
-import os
 
-# Change working directory to your repo root (one level above the script folder)
-os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#print("Base Data Folder:", base_folder)
+#print("Connectome Folder:", connectome_dir)
 
-print("Changed working directory to:", os.getcwd())
-
-
-
-
+# Now you can import your module
 from functions_FDT_numba_v8 import *
+
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
@@ -54,6 +63,10 @@ import functions_boxplots_WN3_v0
 from typing import Union
 from numba import njit, prange, objmode
 import time
+import p_values as p_values  # Make sure this is working!
+import statannotations_permutation
+# import importlib
+# importlib.reload(functions_violinplots_WN3_v0)
 
 def append_to_npz(filename, **new_data):
     """
@@ -207,19 +220,19 @@ SC = sc['002_s_0413']['SC'] # Structural connectivity
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
 for subject in HC_IDs:
-    data = DL.get_subjectData(subject)
+    data = DL.get_subjectData(subject,printInfo=False)
     HC_MRI[subject] = data[subject]['timeseries']
 
 MCI_IDs = DL.get_groupSubjects('MCI')
 MCI_MRI = {}
 for subject in MCI_IDs:
-    data = DL.get_subjectData(subject)
+    data = DL.get_subjectData(subject,printInfo=False)
     MCI_MRI[subject] = data[subject]['timeseries']
 
 AD_IDs = DL.get_groupSubjects('AD')
 AD_MRI = {}
 for subject in AD_IDs:
-    data = DL.get_subjectData(subject)
+    data = DL.get_subjectData(subject,printInfo=False)
     AD_MRI[subject] = data[subject]['timeseries']
 
 # Okay this is loading in the effecetive connectivity, so we cannot use this for f_diff
@@ -248,8 +261,6 @@ group_names = ['HC', 'MCI', 'AD']
 group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
 cond_index_map = {'HC': 0, 'MCI': 1, 'AD': 2}
 I_FDT_all = np.full((3, NPARCELLS), np.nan)
-#I_FDT_all = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
-
 
 for i in range(1,4):
     COND = i
@@ -298,20 +309,28 @@ for i in range(1,4):
                                 MAXiter=10000, error_tol=1e-6, patience=5, learning_rate_factor=0.8,
                                 Ceff_norm=False, maxC=0.2)
     end_time = time.time()
-    print(f"Execution time: {end_time - start_time:.4f} seconds")
+    #print(f"Execution time: {end_time - start_time:.4f} seconds")
 
-    plt.plot(np.arange(1,len(error_iter_group)+1)*100,error_iter_group, 'o-', label='error @100 iter')
+    figure_name = f"error_iter_N{NPARCELLS}_group_{group_names[COND - 1]}.png"
+    save_path = os.path.join(training_dir, figure_name)
+    plt.figure()
+    plt.plot(np.arange(1, len(error_iter_group) + 1) * 100, error_iter_group, 'o-', label='error @100 iter')
     plt.xlabel('iter')
     plt.legend()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
 
-    fig_name = f"FCmatrices_group_{group_names[COND - 1]}.png"
-    save_path = f"/Result_plots/{fig_name}"
+    
+    fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}.png"
+    save_path = os.path.join(FCgroup_subfolder, fig_name)
     plot_FC_matrices(FCemp_group, FCsim_group, title1="group FCemp", title2="group FCsim", save_path=save_path, size=1, dpi=300)
-    fig_name = f"ECmatrix_group_{group_names[COND - 1]}.png"
-    save_path = f"/Result_plots/{fig_name}"
+    fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}.png"
+    save_path = os.path.join(ECgroup_subfolder, fig_name)
     plot_FC_matrix(Ceff_group, title="group Ceff fitted", size=1.1, save_path=save_path,dpi=300)
     
      ## Plot sigma
+    fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}.png"
+    save_path = os.path.join(sigma_group_subfolder, fig_name)
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), sigma_ini, '.--', color='gray', alpha=0.5, label='Initial guess')
     plt.plot(range(1, NPARCELLS+1), sigma_group, '.-', color='tab:blue', alpha=1, label='sigma fit normalized')
@@ -319,12 +338,13 @@ for i in range(1,4):
     plt.xlabel('Parcels')
     ticks = np.arange(1, NPARCELLS + 1)
     labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
-    plt.xticks(ticks,labels)
+    plt.xticks(ticks, labels)
     plt.legend()
-    plt.show()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
     sigma_group_2 = np.append(sigma_group, sigma_group)
     v0std = sigma_group_2
-    print(sigma_group)
+    #print(sigma_group)
 
     
     Gamma = -construct_matrix_A(avec, omega, Ceff_group, gconst)
@@ -348,7 +368,7 @@ for i in range(1,4):
 
     I_FDT_all[group_idx, :] = I_tmax_s0
 
-I_FDT_all_sub = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
+I_FDT_sub = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
 
 
 for i in range(1,4):
@@ -414,7 +434,6 @@ for i in range(1,4):
 
         sigma_vec = np.append(sigma_sub[sub], sigma_sub[sub]).copy()  # double the sigma for the x and y components
         v0std = sigma_vec[sub] 
-
     
         Gamma = (-1) * construct_matrix_A(avec, omega, Ceff_sub[sub], gconst)
         term_time = 100 * TR
@@ -434,28 +453,101 @@ for i in range(1,4):
         group_name = group_names[COND - 1]
         group_idx = cond_index_map[group_name]
 
-        I_FDT_all_sub[group_idx, sub, :] = I_tmax_s0
+        I_FDT_sub[group_idx, sub, :] = I_tmax_s0
         
-    
-        plt.plot(np.arange(1,len(error_iter_sub[sub])+1)*100,error_iter_sub[sub], 'o-', label='error @100 iter')
+
+        figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}.png"
+        save_path = os.path.join(training_dir, figure_name)
+        plt.figure()
+        plt.plot(np.arange(1, len(error_iter_sub[sub]) + 1) * 100, error_iter_sub[sub], 'o-', label='error @100 iter')
         plt.xlabel('iter')
         plt.legend()
 
-        plot_FC_matrices(FCemp_sub[sub], FCsim_sub[sub], title1=f"FCemp sub.{sub+1}", title2=f"FCsim sub.{sub+1}", size=1, dpi=300)
+        # Save and close
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.close()
 
-        plot_FC_matrix(Ceff_sub[sub], title=f"Ceff fitted sub. {sub+1}", size=1.1, dpi=300)
-    
-     ## Plot sigma
+        fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}.png"
+        save_path = os.path.join(FCsub_subfolder, fig_name)
+        plot_FC_matrices(FCemp_sub[sub], FCsim_sub[sub], title1=f"FCemp sub.{sub+1}", title2=f"FCsim sub.{sub+1}", save_path=save_path, size=1, dpi=300)
+        fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}.png"
+        save_path = os.path.join(ECsub_subfolder, fig_name)
+        plot_FC_matrix(Ceff_sub[sub], title=f"Ceff fitted sub. {sub+1}", save_path=save_path, size=1.1, dpi=300)
+
+        fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}.png"
+        save_path = os.path.join(sigma_subfolder, fig_name)
         plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
-        plt.plot(range(1, NPARCELLS+1), sigma_group, '.-', color='tab:blue', alpha=1, lw=2, label='sigma fit normalized (group)')
-        plt.plot(range(1, NPARCELLS+1), sigma_sub[sub], '.-', color='tab:red', alpha=1, label=f'sigma fit normalized (sub. {sub+1})')
+        plt.plot(range(1, NPARCELLS + 1), sigma_group, '.-', color='tab:blue', alpha=1, lw=2, label='sigma fit normalized (group)')
+        plt.plot(range(1, NPARCELLS + 1), sigma_sub[sub], '.-', color='tab:red', alpha=1, label=f'sigma fit normalized (sub. {sub+1})')
         plt.axhline(np.mean(sigma_sub[sub]), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_sub[sub]):.5f}')
         plt.xlabel('Parcels')
         ticks = np.arange(1, NPARCELLS + 1)
         labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
-        plt.xticks(ticks,labels)
+        plt.xticks(ticks, labels)
         plt.legend()
-        plt.show()
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.close()
 
 
+
+#print( I_FDT_all[2,9,:]) # group index, subject index, parcel index
+I_FDT_group_mean = np.nanmean(I_FDT_sub, axis=1)
+I_FDT_subject_mean = np.nanmean(I_FDT_sub, axis=2)
+#print(I_FDT_group_mean[0,:]) # the group mean for: group index, parcel index
+
+group_names = ['HC', 'MCI', 'AD']
+records_parcel = []
+records_subject = []
+
+for group_idx, group_name in enumerate(group_names):
+    for parcel in range(I_FDT_group_mean.shape[1]):
+        records_parcel.append({
+            "value": I_FDT_group_mean[group_idx, parcel],
+            "cond": group_name,
+            "parcel": parcel
+        })
+
+for groupidx, group_name in enumerate(group_names):
+    for subject in range(I_FDT_subject_mean.shape[1]):
+        records_subject.append({
+            "value": I_FDT_subject_mean[groupidx, subject],
+            "cond": group_name,
+            "subject": subject
+        })
+
+data_parcels = pd.DataFrame.from_records(records_parcel)
+data_subjects = pd.DataFrame.from_records(records_subject)
+
+fig, ax = plt.subplots(figsize=(10, 10))
+fig_name = f"violin_subject_N{NPARCELLS}"
+save_path = os.path.join(FDT_subject_subfolder, fig_name)
+plot_violins_HC_MCI_AD(
+    ax=ax,
+    data=data_subjects,
+    font_scale=1.4,
+    metric='I(t=tmax,s=0) [Subject mean]',
+    point_size=5,
+    xgrid=False,
+    plot_title='FDT I(tmax, 0) — Mean per subject per group',
+    saveplot=1,
+    filename=save_path,
+    dpi=300
+)
+
+resI = {
+    'HC': data_parcels[data_parcels['cond'] == 'HC']['value'].values,
+    'MCI': data_parcels[data_parcels['cond'] == 'MCI']['value'].values,
+    'AD': data_parcels[data_parcels['cond'] == 'AD']['value'].values,
+}
+
+plt.rcParams.update({'font.size': 15})
+fig_name = f"box_parcel_N{NPARCELLS}"
+save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+p_values.plotComparisonAcrossLabels2(
+    resI,
+    custom_test=statannotations_permutation.stat_permutation_test,
+    columnLables=['HC', 'MCI', 'AD'],
+    graphLabel='FDT I(tmax, 0) Parcels',
+    save_path=save_path
+)
 

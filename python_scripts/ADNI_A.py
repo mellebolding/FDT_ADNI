@@ -8,33 +8,32 @@
 # =====================================================================================
 import numpy as np
 import os, csv
+from pathlib import Path
+import sys
+# Ensure repo root is on sys.path for module imports
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, repo_root)
+
+# Import central paths from config
+from support_files.config import (
+    connectome_dir,
+    raw_data_dir,
+    produced_data_dir,
+)
 
 from DataLoaders.baseDataLoader import DataLoader
 import DataLoaders.Parcellations.Glasser379 as Glasser379
 
-from pathlib import Path
+# Make sure data folders exist
+Path(raw_data_dir).mkdir(parents=True, exist_ok=True)
+Path(produced_data_dir).mkdir(parents=True, exist_ok=True)
 
-# Define paths
-base_folder = Path(__file__).resolve().parent
-WorkBrainFolder = base_folder / "WorkBrain"
+# Set base folder for data processing
+base_folder = connectome_dir  # or use raw_data_dir if that makes more sense contextually
 
-# Convert to string to ensure compatibility
-WorkBrainDataFolder = str(WorkBrainFolder / "_Data_Raw")
-WorkBrainProducedDataFolder = str(WorkBrainFolder / "_Data_Produced")
-
-# Ensure directories exist
-Path(WorkBrainDataFolder).mkdir(parents=True, exist_ok=True)
-Path(WorkBrainProducedDataFolder).mkdir(parents=True, exist_ok=True)
-
-
-
-# ===============================================
-# ===========================
-# Important config options: filenames
-# ==========================================================================
-#from DataLoaders.WorkBrainFolder import *
-#base_folder = WorkBrainDataFolder + "ADNI-A/"
-base_folder = os.path.dirname(os.path.abspath(__file__)) + "/ADNI-A_DATA/"
+# Print for debug (optional)
+if __name__ == '__main__':
+    print("Using base folder:", base_folder)
 # ==========================================================================
 # ==========================================================================
 # ==========================================================================
@@ -44,23 +43,24 @@ def characterizeConnectivityMatrix(C):
     return np.max(C), np.min(C), np.average(C), np.std(C), np.max(np.sum(C, axis=0)), np.average(np.sum(C, axis=0))
 
 
-def checkClassifications(subjects):
+def checkClassifications(subjects,printInfo=True):
     # ============================================================================
     # This code is to check whether we have the information of the type of subject
     # They can be one of:
     # Healthy Controls (HC), Mild Cognitive Impairment (MCI), Alzheimer Disease (AD) or Significant Memory Concern (SMC)
     # ============================================================================
-    input_classification = csv.reader(open(base_folder+"/subjects.csv", 'r'))
+    input_classification = csv.reader(open(os.path.join(os.path.dirname(base_folder), "subjects.csv"), 'r'))
+
     classification = dict((rows[0],rows[1]) for rows in input_classification)
     mistery = []
     for pos, subject in enumerate(subjects):
         if subject in classification:
-            print('{}: Subject {} classified as {}'.format(pos, subject, classification[subject]))
+            if printInfo: print('{}: Subject {} classified as {}'.format(pos, subject, classification[subject]))
         else:
-            print('{}: Subject {} NOT classified'.format(pos, subject))
+            if printInfo: print('{}: Subject {} NOT classified'.format(pos, subject))
             mistery.append(subject)
-    print("Misisng {} subjects:".format(len(mistery)), mistery)
-    print()
+    if printInfo: print("Misisng {} subjects:".format(len(mistery)), mistery)
+    if printInfo: print()
     return classification
 
 
@@ -71,17 +71,18 @@ def getClassifications():
     # Healthy Controls (HC), Mild Cognitive Impairment (MCI), Alzheimer Disease (AD) or Significant Memory Concern (SMC)
     # ============================================================================
     classification = {}
-    input_classification = csv.reader(open(base_folder+"subjects.csv", 'r'))
+    input_classification = csv.reader(open(os.path.join(os.path.dirname(base_folder), "subjects.csv"), 'r'))
+
+    #input_classification = csv.reader(open(base_folder+"subjects.csv", 'r'))
     for row in input_classification:
         classification[row[0]] = row[1]
     return classification
-
 
 # =====================================================================================
 # Methods to input AD data
 # =====================================================================================
 def loadBurden(subject, modality, baseFolder, normalize=True):
-    pet_path = baseFolder + "/PET_loads/"+subject+"/PET_PVC_MG/" + modality
+    pet_path = os.path.dirname(baseFolder) + "/PET_loads/"+subject+"/PET_PVC_MG/" + modality
     RH_pet = np.loadtxt(pet_path+"/"+"L."+modality+"_load_MSMAll.pscalar.txt")
     LH_pet = np.loadtxt(pet_path+"/"+"R."+modality+"_load_MSMAll.pscalar.txt")
     subcort_pet = np.loadtxt(pet_path+"/"+modality+"_load.subcortical.txt")[-19:]
@@ -97,13 +98,16 @@ def loadBurden(subject, modality, baseFolder, normalize=True):
 def computeAvgSC_HC_Matrix(classification, baseFolder):
     HC = [subject for subject in classification.keys() if classification[subject] == 'HC']
     print("SC + HC: {} (0)".format(HC[0]))
-    sc_folder = baseFolder+'/'+HC[0]+"/DWI_processing"
+    sc_folder = os.path.join(base_folder, HC[0], "DWI_processing")
+
+    #sc_folder = baseFolder+'/'+HC[0]+"/DWI_processing"
     SC = np.loadtxt(sc_folder+"/connectome_weights.csv")
 
     sumMatrix = SC
     for subject in HC[1:]:
         print("SC + HC: {}".format(subject))
-        sc_folder = baseFolder+'/'+subject+"/DWI_processing"
+        sc_folder = os.path.join(base_folder, HC[0], "DWI_processing")
+        #sc_folder = baseFolder+'/'+subject+"/DWI_processing"
         SC = np.loadtxt(sc_folder+"/connectome_weights.csv")
         sumMatrix += SC
     return sumMatrix / len(HC)  # but we normalize it afterwards, so we probably do not need this...
@@ -111,8 +115,9 @@ def computeAvgSC_HC_Matrix(classification, baseFolder):
 
 # ===================== Load one specific subject data
 def loadSubjectData(subject, correcSCMatrix=True, normalizeBurden=True):
-    sc_folder = base_folder + 'connectomes/'+subject+"/DWI_processing/"
-    SC = np.loadtxt(sc_folder + "connectome_weights.csv")
+    sc_folder = os.path.join(base_folder, subject, "DWI_processing")
+    #sc_folder = base_folder + 'connectomes/'+subject+"/DWI_processing/"
+    SC = np.loadtxt(sc_folder + "/connectome_weights.csv")
     if correcSCMatrix:
         SCnorm = correctSC(SC)
     else:
@@ -121,7 +126,7 @@ def loadSubjectData(subject, correcSCMatrix=True, normalizeBurden=True):
     abeta_burden = loadBurden(subject, "Amyloid", base_folder, normalize=normalizeBurden)
     tau_burden = loadBurden(subject, "Tau", base_folder, normalize=normalizeBurden)
 
-    fMRI_path = base_folder+"fMRI/"+subject+"/MNINonLinear/Results/Restingstate/"
+    fMRI_path = os.path.dirname(base_folder)+"/fMRI/"+subject+"/MNINonLinear/Results/Restingstate/"
     series = np.loadtxt(fMRI_path+subject+"_Restingstate_Atlas_MSMAll_hp2000_clean.ptseries.txt")
     subcSeries = np.loadtxt(fMRI_path+subject+"_Restingstate_Atlas_MSMAll_hp2000_clean_subcort.ptseries.txt")
     fullSeries = np.concatenate((series,subcSeries))
@@ -182,9 +187,9 @@ force_Tmax = True
 
 
 # This method is to perform the timeSeries cutting when excessively long...
-def cutTimeSeriesIfNeeded(timeseries, limit_forcedTmax):
+def cutTimeSeriesIfNeeded(timeseries, limit_forcedTmax, printInfo=True):
     if force_Tmax and timeseries.shape[1] > limit_forcedTmax:
-        print(f"cutting lengthy timeseries: {timeseries.shape[1]} to {limit_forcedTmax}")
+        if printInfo: print(f"cutting lengthy timeseries: {timeseries.shape[1]} to {limit_forcedTmax}")
         timeseries = timeseries[:,0:limit_forcedTmax]
     return timeseries
 
@@ -196,12 +201,12 @@ def getCohortSubjects(cohort):
     return [s for s in classification if classification[s] == cohort]
 
 
-subjects = [os.path.basename(f.path) for f in os.scandir(base_folder+"/connectomes/") if f.is_dir()]
-classification = checkClassifications(subjects)
+subjects = [os.path.basename(f.path) for f in os.scandir(base_folder) if f.is_dir()]
+classification = checkClassifications(subjects,printInfo=False)
 HCSubjects = [s for s in classification if classification[s] == 'HC']
 ADSubjects = [s for s in classification if classification[s] == 'AD']
 MCISubjects = [s for s in classification if classification[s] == 'MCI']
-print(f"We have {len(HCSubjects)} HC, {len(MCISubjects)} MCI and {len(ADSubjects)} AD \n")
+#print(f"We have {len(HCSubjects)} HC, {len(MCISubjects)} MCI and {len(ADSubjects)} AD \n")
 # print("HCSubjects:", HCSubjects)
 # print("ADSubjects", ADSubjects)
 # print("MCISubjects", MCISubjects)
@@ -264,13 +269,13 @@ class ADNI_A(DataLoader):
     def get_classification(self):
         return classification
 
-    def get_subjectData(self, subjectID):
+    def get_subjectData(self, subjectID, printInfo=True):
         # 1st, load
         SCnorm, abeta_burden, tau_burden, timeseries = loadSubjectData(subjectID,
                                                                        correcSCMatrix=self.correcSCMatrix,
                                                                        normalizeBurden=self.normalizeBurden)
         # 2nd, cut
-        timeseries = cutTimeSeriesIfNeeded(timeseries, self.BOLD_length)[:self.N()]
+        timeseries = cutTimeSeriesIfNeeded(timeseries, self.BOLD_length,printInfo)[:self.N()]
         return {subjectID:
                     {'timeseries': timeseries,
                      'ABeta': abeta_burden,
@@ -283,7 +288,7 @@ class ADNI_A(DataLoader):
 
 
 # ================================================================================================================
-print('_Data_Raw loading done!')
+#print('_Data_Raw loading done!')
 # =========================  debug
 if __name__ == '__main__':
     DL = ADNI_A()

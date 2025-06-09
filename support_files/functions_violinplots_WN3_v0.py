@@ -95,11 +95,12 @@ def plot_violins_W_N3(ax, data,
 
     if saveplot:
         # Save plots
-        plt.savefig(filename + '.pdf', bbox_inches='tight', dpi=dpi)
-        plt.savefig(filename + '.svg', bbox_inches='tight', dpi=dpi)
+        #plt.savefig(filename + '.pdf', bbox_inches='tight', dpi=dpi)
+        #plt.savefig(filename + '.svg', bbox_inches='tight', dpi=dpi)
         plt.savefig(filename + '.png', bbox_inches='tight', dpi=dpi)
         plt.tight_layout()
-        plt.show()
+        plt.close() 
+        #plt.show()
 
 def plot_violins_HC_MCI_AD(ax, data,
                  font_scale=1.4,
@@ -192,8 +193,9 @@ def plot_violins_HC_MCI_AD(ax, data,
         ax.set_axisbelow(True)
 
     if saveplot:
-        plt.savefig(filename + '.pdf', bbox_inches='tight', dpi=dpi)
-        plt.savefig(filename + '.svg', bbox_inches='tight', dpi=dpi)
+        #plt.savefig(filename + '.pdf', bbox_inches='tight', dpi=dpi)
+        #plt.savefig(filename + '.svg', bbox_inches='tight', dpi=dpi)
         plt.savefig(filename + '.png', bbox_inches='tight', dpi=dpi)
         plt.tight_layout(pad=2.0)  # increase padding
-        plt.show()
+        #plt.show()
+        plt.close()

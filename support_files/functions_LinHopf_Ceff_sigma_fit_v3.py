@@ -156,7 +156,7 @@ def LinHopf_Ceff_sigma_fitting(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-0.02,
 def LinHopf_Ceff_sigma_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-0.02,
                                Tau=1, epsFC_Ceff=5e-3, epsCOVtau_Ceff=2e-3, epsFC_sigma=5e-3, epsCOVtau_sigma=2e-3, 
                                MAXiter=10000, error_tol=5e-4, patience=2, learning_rate_factor=0.8,
-                               Ceff_norm=False, maxC=0.2):
+                               Ceff_norm=False, maxC=0.2,print_value = False):
     """
     Fits the "averaged" G.Cij matrix AND the sigma values using the FC.
     Some parts are optimized with numba
@@ -258,14 +258,14 @@ def LinHopf_Ceff_sigma_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-
             error_iter.append(error_now)
 
             if error_old < error_now and (error_old - error_now) / error_old < -1e-3:
-                print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} | error_old < error_now --> EXIT (return previous sigma)")
+                if print_value: print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} | error_old < error_now --> EXIT (return previous sigma)")
                 Ceff_fit = 0.5 * (Ceff_previous + Ceff_new)
                 sigma_fit = 0.5 * (sigma_previous + sigma_new)
                 break
             error_tol_now = (error_old - error_now) / (abs(error_now) + 1e-8)
             if error_tol_now < error_tol:
                 if patience_sum >= patience:
-                    print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum} | Achieved convergence --> EXIT (return present sigma)")
+                    if print_value: print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum} | Achieved convergence --> EXIT (return present sigma)")
                     Ceff_fit = Ceff_new
                     sigma_fit = sigma_new
                     break
@@ -277,7 +277,7 @@ def LinHopf_Ceff_sigma_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-
                 epsCOVtau_sigma *= learning_rate_factor
             else:
                 patience_sum = 0
-            print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum}")
+            if print_value: print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum}")
             error_old = error_now
 
         ### Learning rule Ceff
@@ -298,7 +298,7 @@ def LinHopf_Ceff_sigma_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-
         sigma_new *= np.sqrt(normalization_factor)
 
     if iter == MAXiter:
-        print('Reached max. iterations:',MAXiter)
+        if print_value: print('Reached max. iterations:',MAXiter)
         Ceff_fit = Ceff_new
         sigma_fit = sigma_new
 
