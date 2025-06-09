@@ -243,7 +243,7 @@ for subject in AD_IDs:
 #print(EC_HC_data.keys()) # check the keys
 
 ### Set conditions
-NPARCELLS = 15 #tot: 379
+NPARCELLS = 16 #tot: 379
 Tau = 1
 TR = 2
 a_param = -0.02
