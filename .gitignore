@@ -1,0 +1,10 @@
+# Python virtual environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Log and error files from cluster jobs
+*.err
+*.out
