@@ -213,8 +213,8 @@ def calc_H_freq(
 DL = ADNI_A.ADNI_A()
 
 # example of individual
-sc = DL.get_subjectData('002_s_0413')
-SC = sc['002_s_0413']['SC'] # Structural connectivity
+sc = DL.get_subjectData('002_S_0413')
+SC = sc['002_S_0413']['SC'] # Structural connectivity
 
 # Loading the data for all subjects
 HC_IDs = DL.get_groupSubjects('HC')
@@ -243,7 +243,7 @@ for subject in AD_IDs:
 #print(EC_HC_data.keys()) # check the keys
 
 ### Set conditions
-NPARCELLS = 16 #tot: 379
+NPARCELLS = 17 #tot: 379
 Tau = 1
 TR = 2
 a_param = -0.02
