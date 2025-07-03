@@ -1,5 +1,6 @@
 import os
 import sys
+# updated version
 # -----------------------------
 # 1. Set up project structure
 # -----------------------------
@@ -234,8 +235,8 @@ AD_MRI = {}
 for subject in AD_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     AD_MRI[subject] = data[subject]['timeseries'].T
-print(HC_MRI.keys)
-print(HC_MRI[HC_IDs[0]].shape)
+#print(HC_MRI.keys)
+#print(HC_MRI[HC_IDs[0]].shape)
 # Okay this is loading in the effecetive connectivity, so we cannot use this for f_diff
 # we need to use the data loader to get the timeseries data
 #EC_HC_data = scipy.io.loadmat('ADNI-A_DATA/EC_filterted/HC_FDT_results_filters0109.mat')
@@ -244,7 +245,7 @@ print(HC_MRI[HC_IDs[0]].shape)
 #print(EC_HC_data.keys()) # check the keys
 
 ### Set conditions
-NPARCELLS = 3 #tot: 379
+NPARCELLS = 18 #tot: 379
 Tau = 1
 TR = 2
 a_param = -0.02
@@ -282,16 +283,16 @@ for i in range(1,4):
         f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = AD_MRI
         ID = AD_IDs
-    print('ts_gr',ts_gr[ID[0]].shape)
+    #print('ts_gr',ts_gr[ID[0]].shape)
     
     f_diff = f_diff[:NPARCELLS] # frequencies of group
     omega = 2 * np.pi * f_diff
-    print('f_diff',f_diff.shape)
+    #print('f_diff',f_diff.shape)
     ### Generates a "group" TS with the same length for all subjects
     min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
-    print('min_ntimes',min_ntimes)
+    #print('min_ntimes',min_ntimes)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    print('ts_gr_arr',ts_gr_arr.shape)
+    #print('ts_gr_arr',ts_gr_arr.shape)
     for sub in range(len(ID)):
         subj_id = ID[sub]
         ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
@@ -414,7 +415,7 @@ for i in range(1,4):
     Ceff_ini = SC_N.copy()
     sigma_mean = 0.45
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
-    print('ID len',len(ID))
+    #print('ID len',len(ID))
     Ceff_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     sigma_sub = np.zeros((len(ID), NPARCELLS))
     FCemp_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
@@ -435,7 +436,7 @@ for i in range(1,4):
                                     MAXiter=10000, error_tol=1e-4, patience=5, learning_rate_factor=0.8,
                                     Ceff_norm=False, maxC=0.2)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
-        print('len sigsub',len(sigma_sub[sub]))
+        #print('len sigsub',len(sigma_sub[sub]))
         sigma_vec = np.append(sigma_sub[sub], sigma_sub[sub]).copy()  # double the sigma for the x and y components
         v0std = sigma_vec[sub] 
     
