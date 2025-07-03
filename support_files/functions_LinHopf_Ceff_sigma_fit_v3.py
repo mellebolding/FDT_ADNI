@@ -432,6 +432,10 @@ def hopf_int(gC, f_diff, sigma, a=-0.02):
     Ayy = Axx.copy()
     Axy = -np.diag(wo)
     Ayx = np.diag(wo)
+   # print("Axx.shape =", Axx.shape)
+   # print("Axy.shape =", Axy.shape)
+   # print("Ayx.shape =", Ayx.shape)
+   # print("Ayy.shape =", Ayy.shape)
 
     A = np.block([[Axx, Axy], [Ayx, Ayy]])
 
