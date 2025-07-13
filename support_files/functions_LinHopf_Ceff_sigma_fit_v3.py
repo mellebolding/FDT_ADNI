@@ -2,6 +2,17 @@ import numpy as np
 from scipy.linalg import expm, solve_sylvester
 from scipy.signal import correlate
 
+def corrcov_py(C):
+    """
+    Compute the correlation matrix from a covariance matrix.
+    Equivalent to MATLAB's corrcov.
+    """
+    d = np.sqrt(np.diag(C))
+    corr = C / d[:, None] / d[None, :]
+    # Replace any NaNs resulting from zero-variance
+    corr[np.isnan(corr)] = 0.0
+    return corr
+
 def LinHopf_Ceff_sigma_fitting(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-0.02,
                                Tau=1, epsFC_Ceff=8e-5, epsCOVtau_Ceff=3e-5, epsFC_sigma=8e-5, epsCOVtau_sigma=3e-5, 
                                MAXiter=10000, error_tol=5e-4,
@@ -449,7 +460,8 @@ def hopf_int(gC, f_diff, sigma, a=-0.02):
     Cvth = solve_sylvester(A, A.T, -Qn)
 
     # Correlation from covariance
-    FCth = np.corrcoef(Cvth)
+    #FCth = np.corrcoef(Cvth)
+    FCth = corrcov_py(Cvth)
     FC = FCth[:N, :N].copy()
     CV = Cvth[:N, :N].copy()
 

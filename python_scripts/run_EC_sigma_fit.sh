@@ -2,7 +2,7 @@
 #SBATCH --job-name=ec_sigma_fit         # Job name
 #SBATCH --output=ec_sigma_fit.out       # Standard output log
 #SBATCH --error=ec_sigma_fit.err        # Standard error log
-#SBATCH --time=24:00:00                 # Time limit (hh:mm:ss)
+#SBATCH --time=100:00:00                 # Time limit (hh:mm:ss)
 #SBATCH --ntasks=1                      # Number of tasks (processes)
 #SBATCH --cpus-per-task=1               # Number of CPU cores per task
 #SBATCH --mem=2G                        # Memory per node (adjust as needed)
