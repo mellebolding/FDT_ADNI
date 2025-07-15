@@ -1,3 +1,5 @@
+
+
 import os
 import sys
 # updated version
@@ -31,6 +33,10 @@ sigma_subfolder = os.path.join(results_dir, 'sig_sub')
 sigma_group_subfolder = os.path.join(results_dir, 'sig_group')
 FDT_parcel_subfolder = os.path.join(results_dir, 'FDT_parcel')
 FDT_subject_subfolder = os.path.join(results_dir, 'FDT_sub')
+Inorm1_group_subfolder = os.path.join(results_dir, 'Inorm1_group')
+Inorm2_group_subfolder = os.path.join(results_dir, 'Inorm2_group')
+Inorm1_sub_subfolder = os.path.join(results_dir, 'Inorm1_sub')
+Inorm2_sub_subfolder = os.path.join(results_dir, 'Inorm2_sub')
 training_dir = os.path.join(results_dir, 'training_conv')
 
 
@@ -38,14 +44,14 @@ training_dir = os.path.join(results_dir, 'training_conv')
 #print("Connectome Folder:", connectome_dir)
 
 # Now you can import your module
-from functions_FDT_numba_v8 import *
+from functions_FDT_numba_v9 import *
 
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, filtfilt, detrend
 from functions_FC_v3 import *
-from functions_LinHopf_Ceff_sigma_fit_v3 import LinHopf_Ceff_sigma_fitting_numba
+from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
@@ -245,7 +251,7 @@ for subject in AD_IDs:
 #print(EC_HC_data.keys()) # check the keys
 
 ### Set conditions
-NPARCELLS = 379 #tot: 379
+NPARCELLS = 18 #tot: 379
 Tau = 1
 TR = 2
 a_param = -0.02
@@ -263,6 +269,8 @@ group_names = ['HC', 'MCI', 'AD']
 group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
 cond_index_map = {'HC': 0, 'MCI': 1, 'AD': 2}
 I_FDT_all = np.full((3, NPARCELLS), np.nan)
+Inorm1_tmax_s0_group = np.zeros((3, NPARCELLS))
+Inorm2_tmax_s0_group = np.zeros((3, NPARCELLS))
 
 for i in range(1,4):
     COND = i
@@ -292,11 +300,10 @@ for i in range(1,4):
     min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
     #print('min_ntimes',min_ntimes)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    print('ts_gr_arr',ts_gr_arr.shape)
+    #print('ts_gr_arr',ts_gr_arr.shape)
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        print('ts_gr', ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.shape)
-        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T 
+        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
     TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
     TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
     TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
@@ -305,17 +312,44 @@ for i in range(1,4):
     SC_N /= np.max(SC_N)
     SC_N *= 0.2
     Ceff_ini = SC_N.copy()
-    sigma_mean = 0.45
+    sigma_mean = 0.1
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
+
+    CEFF_FITTING = True
+    SIGMA_FITTING = False
+    COMPETITIVE_COUPLING = False
+    CEFF_NORMALIZATION = True
+    maxC = 0.2
+    iter_check_group = 100
+    fit_Ceff=CEFF_FITTING
+    competitive_coupling=COMPETITIVE_COUPLING
+    epsFC_Ceff = 4e-4
+    epsCOVtau_Ceff = 1e-4
+
+    fit_sigma=SIGMA_FITTING
+    sigma_reset=False
+    epsFC_sigma = 8e-5
+    epsCOVtau_sigma = 3e-5
+    
+    MAXiter = 10000
+    error_tol = 1e-3
+    patience = 5
+    learning_rate_factor = 1.0
+    Ceff_norm=CEFF_NORMALIZATION
+    maxC=maxC
+    iter_check=iter_check_group
         
     start_time = time.time()
-    Ceff_group, sigma_group, FCemp_group, FCsim_group, error_iter_group = \
-                                LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_group, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=1,
-                                epsFC_Ceff=7e-5, epsCOVtau_Ceff=1e-5, epsFC_sigma=7e-5, epsCOVtau_sigma=1e-5,
-                                MAXiter=10000, error_tol=1e-6, patience=5, learning_rate_factor=0.8,
-                                Ceff_norm=False, maxC=0.2)
+    Ceff_group, sigma_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
+                                LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_group, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+                                fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+                                fit_sigma=fit_sigma, sigma_reset=sigma_reset,
+                                epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
+                                MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
+                                Ceff_norm=Ceff_norm, maxC=maxC,
+                                iter_check=iter_check, plot_evol=True, plot_evol_last=False)
     end_time = time.time()
-    #print(f"Execution time: {end_time - start_time:.4f} seconds")
+    print(f"Execution time group: {end_time - start_time:.4f} seconds")
 
     figure_name = f"error_iter_N{NPARCELLS}_group_{group_names[COND - 1]}.png"
     save_path = os.path.join(training_dir, figure_name)
@@ -373,9 +407,15 @@ for i in range(1,4):
     #subject_idx = sub  # Already incrementing
 
     I_FDT_all[group_idx, :] = I_tmax_s0
+    Inorm1_tmax_s0_group[group_idx] = Its_norm1_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:NPARCELLS]
+    Inorm2_tmax_s0_group[group_idx] = Its_norm2_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:NPARCELLS]
+
+
+### SUBJECT LEVEL
 
 I_FDT_sub = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
-
+Inorm1_tmax_s0_sub = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
+Inorm2_tmax_s0_sub = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
 
 for i in range(1,4):
     COND = i
@@ -401,14 +441,11 @@ for i in range(1,4):
     omega = 2 * np.pi * f_diff
 
     ### Generates a "group" TS with the same length for all subjects
-    min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
+    min_ntimes = min(ts_gr[subj_id].shape[1] for subj_id in ID)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    print('ts_gr_arr',ts_gr_arr.shape)
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        print('ts_gr', ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.shape)
-        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T
-        #ts_gr_arr[sub,:,:] = ts_gr[subj_id][:NPARCELLS, :min_ntimes].copy() 
+        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:NPARCELLS, :min_ntimes].copy() 
     TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
     TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
     TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
@@ -463,7 +500,8 @@ for i in range(1,4):
         group_idx = cond_index_map[group_name]
 
         I_FDT_sub[group_idx, sub, :] = I_tmax_s0
-        
+        Inorm1_tmax_s0_sub[group_idx, sub, :] = Its_norm1_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts0)[0:NPARCELLS]
+        Inorm2_tmax_s0_sub[group_idx, sub, :] = Its_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts0)[0:NPARCELLS]        
 
         figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}.png"
         save_path = os.path.join(training_dir, figure_name)
@@ -559,4 +597,99 @@ p_values.plotComparisonAcrossLabels2(
     graphLabel='FDT I(tmax, 0) Parcels',
     save_path=save_path
 )
-print('I finished the script!')
+
+dataset = [Inorm1_tmax_s0_group[0], Inorm1_tmax_s0_group[1], Inorm1_tmax_s0_group[2]]
+labels = ['HC', 'MCI', 'AD']
+fig_name = f"Inorm1_violin_group_N{NPARCELLS}"
+save_path = os.path.join(Inorm1_group_subfolder, fig_name)
+# Light colors for the box
+box_palette = None
+# Dark colors for the dots
+swarmplot_palette = None
+plot_violins_generalized(ax, dataset, labels,
+                           y_min=0,
+                           violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
+                           font_scale=1.4,
+                           point_size=4,
+                           plot_title='Inorm1 group',
+                           y_axis_label='',
+                           show_p_values=True,
+                           xgrid=False,
+                           saveplot=True,
+                           filename=save_path,
+                           dpi=300)
+
+dataset = [Inorm2_tmax_s0_group[0], Inorm2_tmax_s0_group[1], Inorm2_tmax_s0_group[2]]
+labels = ['HC', 'MCI', 'AD']
+fig_name = f"Inorm2_violin_group_N{NPARCELLS}"
+save_path = os.path.join(Inorm2_group_subfolder, fig_name)
+plot_violins_generalized(ax, dataset, labels,
+                           y_min=0, y_max=1.05,
+                           h_line=1,
+                           violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
+                           font_scale=1.4,
+                           point_size=4,
+                           plot_title='Inorm2 group',
+                           y_axis_label='',
+                           show_p_values=True,
+                           xgrid=False,
+                           saveplot=True,
+                           filename=save_path,
+                           dpi=300)
+
+I_tmax_s0_sub_HC = I_FDT_sub[0, 0:max(group_sizes.values()), :]
+I_mean_over_sub_HC = np.nanmean(I_tmax_s0_sub_HC, axis=0)
+I_tmax_s0_sub_MCI = I_FDT_sub[1, 0:max(group_sizes.values()), :]
+I_mean_over_sub_MCI = np.nanmean(I_tmax_s0_sub_MCI, axis=0)
+I_tmax_s0_sub_AD = I_FDT_sub[2, 0:max(group_sizes.values()), :]
+I_mean_over_sub_AD = np.nanmean(I_tmax_s0_sub_AD, axis=0)
+
+Inorm1_s0_sub_HC = Inorm1_tmax_s0_sub[0, 0:max(group_sizes.values()), :]
+Inorm1_mean_over_sub_HC = np.nanmean(Inorm1_s0_sub_HC, axis=0)
+Inorm1_s0_sub_MCI = Inorm1_tmax_s0_sub[1, 0:max(group_sizes.values()), :]
+Inorm1_mean_over_sub_MCI = np.nanmean(Inorm1_s0_sub_MCI, axis=0)
+Inorm1_s0_sub_AD = Inorm1_tmax_s0_sub[2, 0:max(group_sizes.values()), :]
+Inorm1_mean_over_sub_AD = np.nanmean(Inorm1_s0_sub_AD, axis=0)
+
+Inorm2_s0_sub_HC = Inorm2_tmax_s0_sub[0, 0:max(group_sizes.values()), :]
+Inorm2_mean_over_sub_HC = np.nanmean(Inorm2_s0_sub_HC, axis=0)
+Inorm2_s0_sub_MCI = Inorm2_tmax_s0_sub[1, 0:max(group_sizes.values()), :]
+Inorm2_mean_over_sub_MCI = np.nanmean(Inorm2_s0_sub_MCI, axis=0)
+Inorm2_s0_sub_AD = Inorm2_tmax_s0_sub[2, 0:max(group_sizes.values()), :]
+Inorm2_mean_over_sub_AD = np.nanmean(Inorm2_s0_sub_AD, axis=0)
+
+dataset = [Inorm1_mean_over_sub_HC, Inorm1_mean_over_sub_MCI, Inorm1_mean_over_sub_AD]
+labels = ['HC', 'MCI', 'AD']
+fig_name = f"Inorm1_violin_sub_N{NPARCELLS}"
+save_path = os.path.join(Inorm1_sub_subfolder, fig_name)
+plot_violins_generalized(ax, dataset, labels,
+                           y_min=0, y_max=1.05,
+                           h_line=1,
+                           violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
+                           font_scale=1.4,
+                           point_size=4,
+                           plot_title='Inorm1 sub',
+                           y_axis_label='',
+                           show_p_values=True,
+                           xgrid=False,
+                           saveplot=True,
+                           filename=save_path,
+                           dpi=300)
+
+dataset = [Inorm2_mean_over_sub_HC, Inorm2_mean_over_sub_MCI, Inorm2_mean_over_sub_AD]
+labels = ['HC', 'MCI', 'AD']
+fig_name = f"Inorm2_violin_sub_N{NPARCELLS}"
+save_path = os.path.join(Inorm1_sub_subfolder, fig_name)
+plot_violins_generalized(ax, dataset, labels,
+                           y_min=0, y_max=1.05,
+                           h_line=1,
+                           violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
+                           font_scale=1.4,
+                           point_size=4,
+                           plot_title='Inorm1 sub',
+                           y_axis_label='',
+                           show_p_values=True,
+                           xgrid=False,
+                           saveplot=True,
+                           filename=save_path,
+                           dpi=300)
