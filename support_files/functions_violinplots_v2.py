@@ -33,7 +33,8 @@ def plot_violins_generalized(ax, dataset, labels,
         violin_palette = sns.color_palette("deep")[0:len(dataset)]
     if swarmplot_palette is None:
         swarmplot_palette = sns.color_palette("deep")[0:len(dataset)]
-    
+    print(data.head())
+    print(data.describe())
     violin_parts = sns.violinplot(
         y="value",
         x="cond",
@@ -102,7 +103,11 @@ def plot_violins_generalized(ax, dataset, labels,
             yposition += y_increment
     
     # Update axis limits
-    ax.set_ylim(miny, yposition)
+    #ax.set_ylim(miny, yposition)
+    if y_min is not None or y_max is not None:
+        ax.set_ylim(y_min, y_max)
+    else:
+        ax.set_ylim(miny, yposition)
     
     # Axis labels and title
     ax.set_xlabel('')

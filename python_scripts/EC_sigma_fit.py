@@ -683,7 +683,8 @@ labels = ['HC', 'MCI', 'AD']
 fig_name = f"Inorm1_violin_sub_N{NPARCELLS}"
 save_path = os.path.join(Inorm1_sub_subfolder, fig_name)
 plot_violins_generalized(ax, dataset, labels,
-                           y_min=0, y_max=1.05,
+                           y_min=0,
+                           y_max=10,
                            h_line=1,
                            violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
                            font_scale=1.4,
@@ -717,3 +718,6 @@ plot_violins_generalized(ax, dataset, labels,
 print("Inorm1_mean_over_sub_HC:", Inorm1_mean_over_sub_HC.shape, Inorm1_mean_over_sub_HC)
 print("Inorm1_mean_over_sub_MCI:", Inorm1_mean_over_sub_MCI.shape, Inorm1_mean_over_sub_MCI)
 print("Inorm1_mean_over_sub_AD:", Inorm1_mean_over_sub_AD.shape, Inorm1_mean_over_sub_AD)
+print("Inorm2_mean_over_sub_HC:", Inorm2_mean_over_sub_HC.shape, Inorm2_mean_over_sub_HC)
+print("Inorm2_mean_over_sub_MCI:", Inorm2_mean_over_sub_MCI.shape, Inorm2_mean_over_sub_MCI)
+print("Inorm2_mean_over_sub_AD:", Inorm2_mean_over_sub_AD.shape, Inorm2_mean_over_sub_AD)
