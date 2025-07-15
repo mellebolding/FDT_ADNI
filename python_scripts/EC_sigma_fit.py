@@ -7,7 +7,7 @@ import sys
 # 1. Set up project structure
 # -----------------------------
 
-# Absolute path to the current script
+# Absolute :path to the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Absolute path to the repo root (one level up from this script)
@@ -343,11 +343,11 @@ for i in range(1,4):
     Ceff_group, sigma_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
                                 LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_group, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
                                 fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
-                                fit_sigma=fit_sigma, sigma_reset=sigma_reset,
+                                fit_sigma=False, sigma_reset=sigma_reset,
                                 epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
                                 MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
                                 Ceff_norm=Ceff_norm, maxC=maxC,
-                                iter_check=iter_check, plot_evol=True, plot_evol_last=False)
+                                iter_check=iter_check, plot_evol=False, plot_evol_last=False)
     end_time = time.time()
     print(f"Execution time group: {end_time - start_time:.4f} seconds")
 
@@ -471,13 +471,17 @@ for i in range(1,4):
 
         TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
-        Ceff_sub[sub], sigma_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux = \
-                                    LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_sub, Ceff_group, NPARCELLS, TR, f_diff, sigma_group, Tau=1,
-                                    epsFC_Ceff=7e-5, epsCOVtau_Ceff=1e-5, epsFC_sigma=7e-5, epsCOVtau_sigma=1e-5,
-                                    MAXiter=10000, error_tol=1e-4, patience=5, learning_rate_factor=0.8,
-                                    Ceff_norm=False, maxC=0.2)
+        Ceff_sub[sub], sigma_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
+                                            LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_sub, Ceff_group, NPARCELLS, TR, f_diff, sigma_group, Tau=Tau,
+                                            fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+                                            fit_sigma=False, sigma_reset=sigma_reset,
+                                            epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
+                                            MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
+                                            Ceff_norm=Ceff_norm, maxC=maxC,
+                                            iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
-        #print('len sigsub',len(sigma_sub[sub]))
+        #errorFC_iter_sub[sub, :len(errorFC_iter_sub_aux)] = errorFC_iter_sub_aux
+        #errorCOVtau_iter_sub[sub, :len(errorCOVtau_iter_sub_aux)] = errorCOVtau_iter_sub_aux#print('len sigsub',len(sigma_sub[sub]))
         sigma_vec = np.append(sigma_sub[sub], sigma_sub[sub]).copy()  # double the sigma for the x and y components
         v0std = sigma_vec[sub] 
     
