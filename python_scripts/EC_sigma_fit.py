@@ -245,7 +245,7 @@ for subject in AD_IDs:
 #print(EC_HC_data.keys()) # check the keys
 
 ### Set conditions
-NPARCELLS = 18 #tot: 379
+NPARCELLS = 379 #tot: 379
 Tau = 1
 TR = 2
 a_param = -0.02
@@ -292,10 +292,11 @@ for i in range(1,4):
     min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
     #print('min_ntimes',min_ntimes)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    #print('ts_gr_arr',ts_gr_arr.shape)
+    print('ts_gr_arr',ts_gr_arr.shape)
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
+        print('ts_gr', ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.shape)
+        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T 
     TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
     TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
     TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
@@ -400,11 +401,14 @@ for i in range(1,4):
     omega = 2 * np.pi * f_diff
 
     ### Generates a "group" TS with the same length for all subjects
-    min_ntimes = min(ts_gr[subj_id].shape[1] for subj_id in ID)
+    min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
+    print('ts_gr_arr',ts_gr_arr.shape)
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:NPARCELLS, :min_ntimes].copy() 
+        print('ts_gr', ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.shape)
+        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T
+        #ts_gr_arr[sub,:,:] = ts_gr[subj_id][:NPARCELLS, :min_ntimes].copy() 
     TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
     TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
     TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
@@ -555,4 +559,4 @@ p_values.plotComparisonAcrossLabels2(
     graphLabel='FDT I(tmax, 0) Parcels',
     save_path=save_path
 )
-
+print('I finished the script!')
