@@ -670,6 +670,7 @@ Inorm1_mean_over_sub_MCI = np.nanmean(Inorm1_s0_sub_MCI, axis=0)
 Inorm1_s0_sub_AD = Inorm1_tmax_s0_sub[2, 0:max(group_sizes.values()), :]
 Inorm1_mean_over_sub_AD = np.nanmean(Inorm1_s0_sub_AD, axis=0)
 print('Inorm1_mean_over_sub_HC', Inorm1_mean_over_sub_HC.shape)
+print('Inorm1_mean_over_sub_HC', Inorm1_mean_over_sub_HC)
 Inorm2_s0_sub_HC = Inorm2_tmax_s0_sub[0, 0:max(group_sizes.values()), :]
 Inorm2_mean_over_sub_HC = np.nanmean(Inorm2_s0_sub_HC, axis=0)
 Inorm2_s0_sub_MCI = Inorm2_tmax_s0_sub[1, 0:max(group_sizes.values()), :]
@@ -698,7 +699,7 @@ plot_violins_generalized(ax, dataset, labels,
 dataset = [Inorm2_mean_over_sub_HC, Inorm2_mean_over_sub_MCI, Inorm2_mean_over_sub_AD]
 labels = ['HC', 'MCI', 'AD']
 fig_name = f"Inorm2_violin_sub_N{NPARCELLS}"
-save_path = os.path.join(Inorm1_sub_subfolder, fig_name)
+save_path = os.path.join(Inorm2_sub_subfolder, fig_name)
 plot_violins_generalized(ax, dataset, labels,
                            y_min=0, y_max=1.05,
                            h_line=1,
@@ -712,3 +713,7 @@ plot_violins_generalized(ax, dataset, labels,
                            saveplot=True,
                            filename=save_path,
                            dpi=300)
+
+print("Inorm1_mean_over_sub_HC:", Inorm1_mean_over_sub_HC.shape, Inorm1_mean_over_sub_HC)
+print("Inorm1_mean_over_sub_MCI:", Inorm1_mean_over_sub_MCI.shape, Inorm1_mean_over_sub_MCI)
+print("Inorm1_mean_over_sub_AD:", Inorm1_mean_over_sub_AD.shape, Inorm1_mean_over_sub_AD)
