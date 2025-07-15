@@ -33,8 +33,7 @@ def plot_violins_generalized(ax, dataset, labels,
         violin_palette = sns.color_palette("deep")[0:len(dataset)]
     if swarmplot_palette is None:
         swarmplot_palette = sns.color_palette("deep")[0:len(dataset)]
-    print(data.head())
-    print(data.describe())
+
     violin_parts = sns.violinplot(
         y="value",
         x="cond",
@@ -128,8 +127,8 @@ def plot_violins_generalized(ax, dataset, labels,
         ax.set_axisbelow(True)
     
     if saveplot:
-        plt.savefig(filename + '.pdf', bbox_inches='tight', dpi=dpi)
-        plt.savefig(filename + '.svg', bbox_inches='tight', dpi=dpi)
+        #plt.savefig(filename + '.pdf', bbox_inches='tight', dpi=dpi)
+        #plt.savefig(filename + '.svg', bbox_inches='tight', dpi=dpi)
         plt.savefig(filename + '.png', bbox_inches='tight', dpi=dpi)
         plt.tight_layout()
-        plt.show()
+        #plt.show()

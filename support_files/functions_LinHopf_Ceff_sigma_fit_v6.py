@@ -123,14 +123,14 @@ def LinHopf_Ceff_sigma_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-
             error_iter.append(error_now)
 
             if  error_old < error_now:
-                print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} | error_old < error_now --> EXIT (return previous sigma)")
+                #print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} | error_old < error_now --> EXIT (return previous sigma)")
                 Ceff_fit = Ceff_previous
                 sigma_fit = sigma_previous
                 break
             error_tol_now = (error_old - error_now) / error_now
             if error_tol_now < error_tol or np.abs(error_tol_old - error_tol_now) < error_tol/10:
                 if patience_sum >= patience:
-                    print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum} | Achieved convergence --> EXIT (return present sigma)")
+                    #print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum} | Achieved convergence --> EXIT (return present sigma)")
                     Ceff_fit = Ceff_new
                     sigma_fit = sigma_new
                     break
@@ -142,7 +142,7 @@ def LinHopf_Ceff_sigma_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-
                 epsCOVtau_sigma *= learning_rate_factor
             else:
                 patience_sum = 0
-            print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum}")
+            #print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum}")
             error_old = error_now
             error_tol_old = error_tol_now
 
@@ -195,7 +195,7 @@ def LinHopf_Ceff_sigma_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-
             sigma_new *= np.sqrt(normalization_factor)
 
     if iter == MAXiter:
-        print('Reached max. iterations:',MAXiter)
+        #print('Reached max. iterations:',MAXiter)
         Ceff_fit = Ceff_new
         sigma_fit = sigma_new
 
