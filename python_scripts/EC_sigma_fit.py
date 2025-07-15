@@ -617,6 +617,7 @@ p_values.plotComparisonAcrossLabels2(
     save_path=save_path
 )
 
+fig, ax = plt.subplots(figsize=(10, 10))
 dataset = [Inorm1_tmax_s0_group[0], Inorm1_tmax_s0_group[1], Inorm1_tmax_s0_group[2]]
 labels = ['HC', 'MCI', 'AD']
 fig_name = f"Inorm1_violin_group_N{NPARCELLS}"
@@ -638,6 +639,7 @@ plot_violins_generalized(ax, dataset, labels,
                            filename=save_path,
                            dpi=300)
 
+fig, ax = plt.subplots(figsize=(10, 10))
 dataset = [Inorm2_tmax_s0_group[0], Inorm2_tmax_s0_group[1], Inorm2_tmax_s0_group[2]]
 labels = ['HC', 'MCI', 'AD']
 fig_name = f"Inorm2_violin_group_N{NPARCELLS}"
@@ -678,6 +680,7 @@ Inorm2_mean_over_sub_MCI = np.nanmean(Inorm2_s0_sub_MCI, axis=0)
 Inorm2_s0_sub_AD = Inorm2_tmax_s0_sub[2, 0:max(group_sizes.values()), :]
 Inorm2_mean_over_sub_AD = np.nanmean(Inorm2_s0_sub_AD, axis=0)
 
+fig, ax = plt.subplots(figsize=(10, 10))
 dataset = [Inorm1_mean_over_sub_HC, Inorm1_mean_over_sub_MCI, Inorm1_mean_over_sub_AD]
 labels = ['HC', 'MCI', 'AD']
 fig_name = f"Inorm1_violin_sub_N{NPARCELLS}"
@@ -697,6 +700,7 @@ plot_violins_generalized(ax, dataset, labels,
                            filename=save_path,
                            dpi=300)
 
+fig, ax = plt.subplots(figsize=(10, 10))
 dataset = [Inorm2_mean_over_sub_HC, Inorm2_mean_over_sub_MCI, Inorm2_mean_over_sub_AD]
 labels = ['HC', 'MCI', 'AD']
 fig_name = f"Inorm2_violin_sub_N{NPARCELLS}"
