@@ -669,7 +669,7 @@ Inorm1_s0_sub_MCI = Inorm1_tmax_s0_sub[1, 0:max(group_sizes.values()), :]
 Inorm1_mean_over_sub_MCI = np.nanmean(Inorm1_s0_sub_MCI, axis=0)
 Inorm1_s0_sub_AD = Inorm1_tmax_s0_sub[2, 0:max(group_sizes.values()), :]
 Inorm1_mean_over_sub_AD = np.nanmean(Inorm1_s0_sub_AD, axis=0)
-
+print('Inorm1_mean_over_sub_HC', Inorm1_mean_over_sub_HC.shape)
 Inorm2_s0_sub_HC = Inorm2_tmax_s0_sub[0, 0:max(group_sizes.values()), :]
 Inorm2_mean_over_sub_HC = np.nanmean(Inorm2_s0_sub_HC, axis=0)
 Inorm2_s0_sub_MCI = Inorm2_tmax_s0_sub[1, 0:max(group_sizes.values()), :]
