@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import expm, solve_sylvester
 from scipy.signal import correlate
-from IPython.display import display, clear_output
+#from IPython.display import display, clear_output
 
 def LinHopf_Ceff_sigma_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-0.02, Tau=1,
                                      fit_Ceff=True, competitive_coupling=False,

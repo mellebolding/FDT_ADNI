@@ -332,8 +332,8 @@ for i in range(1,4):
 
     CEFF_FITTING = True
     SIGMA_FITTING = False
-    if SIGMA_FITTING: noise = 'hetero'
-    else: noise = 'homo'
+    if SIGMA_FITTING: NOISE_TYPE = 'hetero'
+    else: NOISE_TYPE = 'homo'
     COMPETITIVE_COUPLING = False
     CEFF_NORMALIZATION = True
     maxC = 0.2
@@ -368,7 +368,7 @@ for i in range(1,4):
     end_time = time.time()
     print(f"Execution time group: {end_time - start_time:.4f} seconds")
 
-    figure_name = f"error_iter_N{NPARCELLS}_group_{group_names[COND - 1]}_{noise}.png"
+    figure_name = f"error_iter_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(training_dir, figure_name)
     plt.figure()
     plt.plot(np.arange(1, len(error_iter_group) + 1) * 100, error_iter_group, 'o-', label='error @100 iter')
@@ -378,15 +378,15 @@ for i in range(1,4):
     plt.close()
 
     
-    fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}_{noise}.png"
+    fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(FCgroup_subfolder, fig_name)
     plot_FC_matrices(FCemp_group, FCsim_group, title1="group FCemp", title2="group FCsim", save_path=save_path, size=1, dpi=300)
-    fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}_{noise}.png"
+    fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(ECgroup_subfolder, fig_name)
     plot_FC_matrix(Ceff_group, title="group Ceff fitted", size=1.1, save_path=save_path,dpi=300)
     
      ## Plot sigma
-    fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}_{noise}.png"
+    fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(sigma_group_subfolder, fig_name)
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), sigma_ini, '.--', color='gray', alpha=0.5, label='Initial guess')
@@ -524,7 +524,7 @@ for i in range(1,4):
         Inorm1_tmax_s0_sub[group_idx, sub, :] = Its_norm1_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts0)[0:NPARCELLS]
         Inorm2_tmax_s0_sub[group_idx, sub, :] = Its_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts0)[0:NPARCELLS]        
 
-        figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{noise}.png"
+        figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
         save_path = os.path.join(training_dir, figure_name)
         plt.figure()
         plt.plot(np.arange(1, len(error_iter_sub[sub]) + 1) * 100, error_iter_sub[sub], 'o-', label='error @100 iter')
@@ -535,14 +535,14 @@ for i in range(1,4):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
 
-        fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_noise.png"
+        fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
         save_path = os.path.join(FCsub_subfolder, fig_name)
         plot_FC_matrices(FCemp_sub[sub], FCsim_sub[sub], title1=f"FCemp sub.{sub+1}", title2=f"FCsim sub.{sub+1}", save_path=save_path, size=1, dpi=300)
-        fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{noise}.png"
+        fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
         save_path = os.path.join(ECsub_subfolder, fig_name)
         plot_FC_matrix(Ceff_sub[sub], title=f"Ceff fitted sub. {sub+1}", save_path=save_path, size=1.1, dpi=300)
 
-        fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{noise}.png"
+        fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
         save_path = os.path.join(sigma_subfolder, fig_name)
         plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
         plt.plot(range(1, NPARCELLS + 1), sigma_group, '.-', color='tab:blue', alpha=1, lw=2, label='sigma fit normalized (group)')
@@ -587,7 +587,7 @@ data_parcels = pd.DataFrame.from_records(records_parcel)
 data_subjects = pd.DataFrame.from_records(records_subject)
 
 fig, ax = plt.subplots(figsize=(10, 10))
-fig_name = f"violin_subject_N{NPARCELLS}_{noise}"
+fig_name = f"violin_subject_N{NPARCELLS}_{NOISE_TYPE}"
 save_path = os.path.join(FDT_subject_subfolder, fig_name)
 plot_violins_HC_MCI_AD(
     ax=ax,
@@ -609,7 +609,7 @@ resI = {
 }
 
 plt.rcParams.update({'font.size': 15})
-fig_name = f"box_parcel_N{NPARCELLS}_{noise}"
+fig_name = f"box_parcel_N{NPARCELLS}_{NOISE_TYPE}"
 save_path = os.path.join(FDT_parcel_subfolder, fig_name)
 p_values.plotComparisonAcrossLabels2(
     resI,
@@ -622,7 +622,7 @@ p_values.plotComparisonAcrossLabels2(
 fig, ax = plt.subplots(figsize=(10, 10))
 dataset = [Inorm1_tmax_s0_group[0], Inorm1_tmax_s0_group[1], Inorm1_tmax_s0_group[2]]
 labels = ['HC', 'MCI', 'AD']
-fig_name = f"Inorm1_violin_group_N{NPARCELLS}_{noise}"
+fig_name = f"Inorm1_violin_group_N{NPARCELLS}_{NOISE_TYPE}"
 save_path = os.path.join(Inorm1_group_subfolder, fig_name)
 # Light colors for the box
 box_palette = None
@@ -644,7 +644,7 @@ plot_violins_generalized(ax, dataset, labels,
 fig, ax = plt.subplots(figsize=(10, 10))
 dataset = [Inorm2_tmax_s0_group[0], Inorm2_tmax_s0_group[1], Inorm2_tmax_s0_group[2]]
 labels = ['HC', 'MCI', 'AD']
-fig_name = f"Inorm2_violin_group_N{NPARCELLS}_{noise}"
+fig_name = f"Inorm2_violin_group_N{NPARCELLS}_{NOISE_TYPE}"
 save_path = os.path.join(Inorm2_group_subfolder, fig_name)
 plot_violins_generalized(ax, dataset, labels,
                            y_min=0, y_max=1.05,
@@ -683,7 +683,7 @@ Inorm2_mean_over_sub_AD = np.nanmean(Inorm2_s0_sub_AD, axis=0)
 fig, ax = plt.subplots(figsize=(10, 10))
 dataset = [Inorm1_mean_over_sub_HC, Inorm1_mean_over_sub_MCI, Inorm1_mean_over_sub_AD]
 labels = ['HC', 'MCI', 'AD']
-fig_name = f"Inorm1_violin_sub_N{NPARCELLS}_{noise}"
+fig_name = f"Inorm1_violin_sub_N{NPARCELLS}_{NOISE_TYPE}"
 save_path = os.path.join(Inorm1_sub_subfolder, fig_name)
 plot_violins_generalized(ax, dataset, labels,
                            y_min=0,
@@ -703,7 +703,7 @@ plot_violins_generalized(ax, dataset, labels,
 fig, ax = plt.subplots(figsize=(10, 10))
 dataset = [Inorm2_mean_over_sub_HC, Inorm2_mean_over_sub_MCI, Inorm2_mean_over_sub_AD]
 labels = ['HC', 'MCI', 'AD']
-fig_name = f"Inorm2_violin_sub_N{NPARCELLS}_{noise}"
+fig_name = f"Inorm2_violin_sub_N{NPARCELLS}_{NOISE_TYPE}"
 save_path = os.path.join(Inorm2_sub_subfolder, fig_name)
 plot_violins_generalized(ax, dataset, labels,
                            y_min=0, y_max=1.05,
