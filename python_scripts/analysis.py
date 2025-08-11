@@ -23,26 +23,27 @@ from scipy.linalg import solve_continuous_lyapunov
 
 ### Loads data from npz file ######################################
 
-def load_appended_records(filepath, filter_key=None, filter_value=None, verbose=False):
+import os
+import numpy as np
+
+def load_appended_records(filepath, filters=None, verbose=False):
     """
-    Loads all appended records from an .npz file created by `append_record_to_npz`,
-    with optional filtering.
+    Loads appended records from an .npz file created by `append_record_to_npz`,
+    with optional multi-key filtering.
 
     Parameters
     ----------
     filepath : str
         Path to the .npz file.
-    filter_key : str or None
-        Key to filter records on (e.g., 'level', 'condition').
-    filter_value : any or None
-        Value the key must match to include the record.
+    filters : dict or None
+        Dictionary of key-value pairs to match (e.g., {'level': 'group', 'condition': 'COND_A'}).
     verbose : bool
-        If True, print debug info.
+        If True, prints debug info.
 
     Returns
     -------
     list[dict]
-        List of matching records (each a dict).
+        List of matching records.
     """
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"File '{filepath}' not found.")
@@ -50,17 +51,21 @@ def load_appended_records(filepath, filter_key=None, filter_value=None, verbose=
     with np.load(filepath, allow_pickle=True) as data:
         if "records" not in data:
             raise KeyError(f"'records' key not found in {filepath}")
-        records = list(data["records"])  # Convert numpy array to list of dicts
+        records = list(data["records"])
 
-    if filter_key is not None and filter_value is not None:
-        records = [rec for rec in records if rec.get(filter_key) == filter_value]
+    if filters:
+        records = [
+            rec for rec in records
+            if all(rec.get(k) == v for k, v in filters.items())
+        ]
 
     if verbose:
-        print(f"[load] Loaded {len(records)} record(s) from '{filepath}'.")
+        print(f"[load] Loaded {len(records)} matching record(s) from '{filepath}'.")
         if records:
-            print(f"[load] Example keys: {list(records[0].keys())}")
+            print(f"[load] Keys in first record: {list(records[0].keys())}")
 
     return records
+
 
 ###################################################################
 
@@ -130,9 +135,12 @@ filepath = os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TY
 all_records = load_appended_records(filepath, verbose=True)
 
 # Load only group-level records
-group_records = load_appended_records(filepath, filter_key="level", filter_value="group")
-for rec in group_records:
-    print(rec["sigma"], rec["Ceff"], rec["omega"])
+group_cond_records = load_appended_records(
+    filepath,
+    filters={'level': 'group', 'condition': 1},
+    verbose=True
+)
+print(group_cond_records["sigma"])
 
 # Load only subject "sub-01"
 subject_records = load_appended_records(filepath, filter_key="subject", filter_value="sub-01")
