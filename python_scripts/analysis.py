@@ -1,4 +1,17 @@
 import os
+import sys
+
+# Absolute :path to the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Absolute path to the repo root (one level up from this script)
+repo_root = os.path.abspath(os.path.join(script_dir, '..'))
+
+os.chdir(repo_root)
+
+sys.path.insert(0, repo_root)
+sys.path.insert(0, os.path.join(repo_root, 'support_files'))
+sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 import numpy as np
 from functions_FDT_numba_v9 import *
 from numba import njit, prange, objmode
