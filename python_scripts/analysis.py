@@ -87,6 +87,7 @@ def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, g
     I_FDT_all = np.full((3, Ndim), np.nan)
     Inorm1_tmax_s0_group = np.zeros((3, Ndim))
     Inorm2_tmax_s0_group = np.zeros((3, Ndim))
+    print(avec.shape)
     for COND in range(1, 4):
 
         sigma_group_2 = np.append(sigma_group[COND-1], sigma_group[COND-1])
@@ -131,6 +132,9 @@ AD_group_sig = get_field(all_records, "sigma", filters={"level": "group", "condi
 AD_group_Ceff = get_field(all_records, "Ceff", filters={"level": "group", "condition": "3"})
 AD_group_omega = get_field(all_records, "omega", filters={"level": "group", "condition": "3"})
 
+print(AD_group_omega.shape)
+print(AD_group_Ceff.shape)
+print(avec.shape)
 sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
 Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
 omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
