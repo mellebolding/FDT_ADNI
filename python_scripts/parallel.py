@@ -453,7 +453,7 @@ for i in range(1,4):
 
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        frqs = ts_gr_arr[sub,:,:].copy()  # time series for the subject
+        frqs = ts_gr_arr[sub,:,:].copy().T  # time series for the subject
         f_diff = calc_H_freq(frqs, 3000, filterps.FiltPowSpetraVersion.v2021)
         omega = 2 * np.pi * f_diff[:NPARCELLS]
         #f_diff = f_diff[:NPARCELLS] # frequencies of group
