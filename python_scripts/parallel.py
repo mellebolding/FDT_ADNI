@@ -271,7 +271,7 @@ for subject in AD_IDs:
     AD_MRI[subject] = data[subject]['timeseries'].T
 
 ### Set conditions
-NPARCELLS = 180 #tot: 379
+NPARCELLS = 18 #tot: 379
 Tau = 1
 TR = 2
 a_param = -0.02
