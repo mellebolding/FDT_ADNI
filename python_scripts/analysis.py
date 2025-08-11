@@ -88,7 +88,7 @@ def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, g
     I_FDT_all = np.full((3, Ndim), np.nan)
     Inorm1_tmax_s0_group = np.zeros((3, Ndim))
     Inorm2_tmax_s0_group = np.zeros((3, Ndim))
-    print(avec.shape)
+    #print(avec.shape)
     for COND in range(1, 4):
 
         sigma_group_2 = np.append(sigma_group[COND-1], sigma_group[COND-1])
