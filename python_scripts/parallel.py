@@ -406,7 +406,7 @@ for COND in range(1,4):
     Ceff_sigma_subfolder,
     f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
     level="group",
-    condition=f"{group_names[COND - 1]}",
+    condition=f"{COND}",
     sigma=sigma_group,
     Ceff=Ceff_group,
     omega=omega)
@@ -508,7 +508,7 @@ for i in range(1,4):
         Ceff_sigma_subfolder,
         f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
         level="subject",
-        condition=f"{group_names[COND - 1]}",
+        condition=f"{COND}",
         subject=f"S{sub}",
         sigma=sigma_sub[sub],
         Ceff=Ceff_sub[sub],
