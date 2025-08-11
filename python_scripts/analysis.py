@@ -140,7 +140,8 @@ group_cond_records = load_appended_records(
     filters={'level': 'group', 'condition': 1},
     verbose=True
 )
-print(group_cond_records["sigma"])
+for rec in group_cond_records:
+    print(f"Sigma: {rec['sigma']}, Ceff: {rec['Ceff']}")
 
 # Load only subject "sub-01"
 subject_records = load_appended_records(filepath, filter_key="subject", filter_value="sub-01")
