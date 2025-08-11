@@ -81,59 +81,35 @@ def get_field(records, field, filters=None):
 ###################################################################
 
 def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
-    """
-    Calculate FDT group Itmax norm1 and norm2.
-    
-    Parameters:
-    - sigma_group: Standard deviation for the group.
-    - Ceff_group: Effective connectivity for the group.
-    - omega: Frequency array.
-    - avec: Coefficient vector.
-    - gconst: Constant for the integration.
-    - v0bias: Initial bias for velocity.
-    - tfinal: Final time for integration.
-    - dt: Time step for integration.
-    - group_names: Names of the groups.
-    - cond_index_map: Mapping of condition names to indices.
-    - I_FDT_all: Array to store FDT results.
-    - Inorm1_tmax_s0_group: Array to store norm1 results.
-    - Inorm2_tmax_s0_group: Array to store norm2 results.
-    - COND: Current condition index.
-
-    Returns:
-    None
-    """
     
     Ndim = len(omega)
     avec = a_param * np.ones(Ndim)
-    group_names = ['HC', 'MCI', 'AD']
-    
-    # Duplicate sigma_group for two groups
-    sigma_group_2 = np.append(sigma_group, sigma_group)
-    v0std = sigma_group_2
+    I_FDT_all = np.full((3, Ndim), np.nan)
+    Inorm1_tmax_s0_group = np.zeros((3, Ndim))
+    Inorm2_tmax_s0_group = np.zeros((3, Ndim))
+    for COND in range(1, 4):
 
-    
-    Gamma = -construct_matrix_A(avec, omega, Ceff_group, gconst)
-
-    v0 = v0std * np.random.standard_normal(Ndim) + v0bias
-    vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_group_2, initcond=v0, duration=tfinal, integstep=dt)
-
-    v0 = vsim[:,-1]
-    vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_group_2, initcond=v0, duration=tfinal, integstep=dt)
+        sigma_group_2 = np.append(sigma_group[COND-1], sigma_group[COND-1])
+        v0std = sigma_group_2
         
-    D = np.diag(sigma_group_2**2 * np.ones(Ndim))
-    V_0 = solve_continuous_lyapunov(Gamma, D)
+        Gamma = -construct_matrix_A(avec, omega[COND-1], Ceff_group[COND-1], gconst)
+
+        v0 = v0std * np.random.standard_normal(Ndim) + v0bias
+        vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_group_2, initcond=v0, duration=tfinal, integstep=dt)
+
+        v0 = vsim[:,-1]
+        vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_group_2, initcond=v0, duration=tfinal, integstep=dt)
+            
+        D = np.diag(sigma_group_2**2 * np.ones(Ndim))
+        V_0 = solve_continuous_lyapunov(Gamma, D)
 
 
-    I_tmax_s0 = Its_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:Ndim]
+        I_tmax_s0 = Its_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:Ndim]
 
-    group_name = group_names[COND - 1]
-    group_idx = cond_index_map[group_name]
-    #subject_idx = sub  # Already incrementing
 
-    I_FDT_all[group_idx, :] = I_tmax_s0
-    Inorm1_tmax_s0_group[group_idx] = Its_norm1_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:Ndim]
-    Inorm2_tmax_s0_group[group_idx] = Its_norm2_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:Ndim]
+        I_FDT_all[COND-1, :] = I_tmax_s0
+        Inorm1_tmax_s0_group[COND-1] = Its_norm1_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:Ndim]
+        Inorm2_tmax_s0_group[COND-1] = Its_norm2_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:Ndim]
 
     return I_FDT_all, Inorm1_tmax_s0_group, Inorm2_tmax_s0_group
 
@@ -145,10 +121,20 @@ all_records = load_appended_records(
     filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
 )
 
-# Now you can query without reloading from disk:
 HC_group_sig = get_field(all_records, "sigma", filters={"level": "group", "condition": "1"})
-print(HC_group_sig)
-subject_01    = [rec for rec in all_records if rec['subject'] == 'sub-01']
+HC_group_Ceff = get_field(all_records, "Ceff", filters={"level": "group", "condition": "1"})
+HC_group_omega = get_field(all_records, "omega", filters={"level": "group", "condition": "1"})
+MCI_group_sig = get_field(all_records, "sigma", filters={"level": "group", "condition": "2"})
+MCI_group_Ceff = get_field(all_records, "Ceff", filters={"level": "group", "condition": "2"})
+MCI_group_omega = get_field(all_records, "omega", filters={"level": "group", "condition": "2"})
+AD_group_sig = get_field(all_records, "sigma", filters={"level": "group", "condition": "3"})
+AD_group_Ceff = get_field(all_records, "Ceff", filters={"level": "group", "condition": "3"})
+AD_group_omega = get_field(all_records, "omega", filters={"level": "group", "condition": "3"})
 
-# Load only subject "sub-01"
-#subject_records = load_appended_records(filepath, filter_key="subject", filter_value="sub-01")
+sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
+Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
+omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
+
+x,y,z = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+
+print("x: ",x, "\ny: ",y, "\nz: ",z)
