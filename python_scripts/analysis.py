@@ -129,19 +129,15 @@ def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, g
 NPARCELLS = 18
 NOISE_TYPE = "HOMO"
 
-filepath = os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
-
 # Load all records
-all_records = load_appended_records(filepath, verbose=True)
-
-# Load only group-level records
-group_cond_records = load_appended_records(
-    filepath,
-    filters={'level': 'group', 'condition': '1'},
-    verbose=True
+all_records = load_appended_records(
+    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
 )
-for rec in group_cond_records:
-    print(f"Sigma: {rec['sigma']}, Ceff: {rec['Ceff']}")
+
+# Now you can query without reloading from disk:
+HC_group = [rec for rec in all_records if rec['level'] == 'group' and rec['condition'] == '1']
+print(HC_group["sigma"])
+subject_01    = [rec for rec in all_records if rec['subject'] == 'sub-01']
 
 # Load only subject "sub-01"
 #subject_records = load_appended_records(filepath, filter_key="subject", filter_value="sub-01")
