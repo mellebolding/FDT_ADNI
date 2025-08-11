@@ -1,37 +1,6 @@
 # parallel and restricted version of EC_sigma_fit.py (using concurrent.futures)
 # Idea: one file to get both parcel and subject results (i.e. Ceff and sigma, optionally), the subects will be parallelized
 
-import os
-import sys
-from functions_FDT_numba_v9 import *
-import scipy.io
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.signal import butter, filtfilt
-from scipy.signal import detrend as scipy_detrend
-from functions_FC_v3 import *
-from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
-import matplotlib.pyplot as plt
-import matplotlib.ticker as tck
-from scipy.linalg import expm
-import pandas as pd
-import scipy.integrate as integrate
-from scipy.linalg import solve_continuous_lyapunov
-from DataLoaders.baseDataLoader import DataLoader
-import ADNI_A
-from functions_FDT_numba_v8 import *
-from functions_boxplots_WN3_v0 import *
-from functions_violinplots_WN3_v0 import *
-from functions_violinplots_v2 import *
-from functions_FDT_numba_v8 import construct_matrix_A, Integrate_Langevin_ND_Optimized, closest_valid_M
-import filterps
-import functions_boxplots_WN3_v0
-from typing import Union
-from numba import njit, prange, objmode
-import time
-import p_values as p_values
-import statannotations_permutation
-
 # Absolute :path to the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -77,6 +46,37 @@ os.makedirs(Inorm2_group_subfolder, exist_ok=True)
 os.makedirs(Inorm1_sub_subfolder, exist_ok=True)
 os.makedirs(Inorm2_sub_subfolder, exist_ok=True)
 os.makedirs(training_dir, exist_ok=True)
+
+import os
+import sys
+from functions_FDT_numba_v9 import *
+import scipy.io
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import butter, filtfilt
+from scipy.signal import detrend as scipy_detrend
+from functions_FC_v3 import *
+from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
+import matplotlib.pyplot as plt
+import matplotlib.ticker as tck
+from scipy.linalg import expm
+import pandas as pd
+import scipy.integrate as integrate
+from scipy.linalg import solve_continuous_lyapunov
+from DataLoaders.baseDataLoader import DataLoader
+import ADNI_A
+from functions_FDT_numba_v8 import *
+from functions_boxplots_WN3_v0 import *
+from functions_violinplots_WN3_v0 import *
+from functions_violinplots_v2 import *
+from functions_FDT_numba_v8 import construct_matrix_A, Integrate_Langevin_ND_Optimized, closest_valid_M
+import filterps
+import functions_boxplots_WN3_v0
+from typing import Union
+from numba import njit, prange, objmode
+import time
+import p_values as p_values
+import statannotations_permutation
 
 def append_to_npz(filename, **new_data):
     """
