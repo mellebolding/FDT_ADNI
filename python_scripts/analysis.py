@@ -82,7 +82,7 @@ def get_field(records, field, filters=None):
 
 def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
     
-    Ndim = len(omega)
+    Ndim = len(omega[1,:])
     avec = a_param * np.ones(Ndim)
     print(avec)
     I_FDT_all = np.full((3, Ndim), np.nan)
