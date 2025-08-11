@@ -66,6 +66,17 @@ def load_appended_records(filepath, filters=None, verbose=False):
 
     return records
 
+def get_field(records, field, filters=None):
+    """
+    Extract list of values for `field` from records,
+    optionally filtering by `filters` dict.
+    """
+    if filters:
+        filtered = [r for r in records if all(r.get(k) == v for k, v in filters.items())]
+    else:
+        filtered = records
+    return [r.get(field) for r in filtered]
+
 
 ###################################################################
 
@@ -135,8 +146,8 @@ all_records = load_appended_records(
 )
 
 # Now you can query without reloading from disk:
-HC_group = [rec for rec in all_records if rec['level'] == 'group' and rec['condition'] == '1']
-print(HC_group["sigma"])
+HC_group_sig = get_field(all_records, "sigma", filters={"level": "group", "condition": "1"})
+print(HC_group_sig)
 subject_01    = [rec for rec in all_records if rec['subject'] == 'sub-01']
 
 # Load only subject "sub-01"
