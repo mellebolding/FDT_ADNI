@@ -96,13 +96,13 @@ def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, g
         
         Gamma = -construct_matrix_A(avec, omega[COND-1], Ceff_group[COND-1], gconst)
 
-        v0 = v0std * np.random.standard_normal(Ndim) + v0bias
+        v0 = v0std * np.random.standard_normal(2*Ndim) + v0bias
         vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_group_2, initcond=v0, duration=tfinal, integstep=dt)
 
         v0 = vsim[:,-1]
         vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_group_2, initcond=v0, duration=tfinal, integstep=dt)
             
-        D = np.diag(sigma_group_2**2 * np.ones(Ndim))
+        D = np.diag(sigma_group_2**2 * np.ones(2*Ndim))
         V_0 = solve_continuous_lyapunov(Gamma, D)
 
 
