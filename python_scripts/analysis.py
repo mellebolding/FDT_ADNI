@@ -135,7 +135,7 @@ AD_group_omega = np.array(get_field(all_records, "omega", filters={"level": "gro
 
 print(AD_group_omega.shape)
 print(AD_group_Ceff.shape)
-print(avec.shape)
+#print(avec.shape)
 sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
 Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
 omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
