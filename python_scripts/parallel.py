@@ -1,11 +1,5 @@
-
-
-import os
-import sys
-# updated version
-# -----------------------------
-# 1. Set up project structure
-# -----------------------------
+# parallel and restricted version of EC_sigma_fit.py (using concurrent.futures)
+# Idea: one file to get both parcel and subject results (i.e. Ceff and sigma, optionally), the subects will be parallelized
 
 # Absolute :path to the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -13,9 +7,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 # Absolute path to the repo root (one level up from this script)
 repo_root = os.path.abspath(os.path.join(script_dir, '..'))
 
-# Optional: change working directory to repo root
 os.chdir(repo_root)
-#print("Changed working directory to repo root:", repo_root)
 
 sys.path.insert(0, repo_root)
 sys.path.insert(0, os.path.join(repo_root, 'support_files'))
@@ -25,6 +17,7 @@ sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 base_folder = os.path.join(repo_root, 'ADNI-A_DATA')
 connectome_dir = os.path.join(base_folder, 'connectomes')
 results_dir = os.path.join(repo_root, 'Result_plots')
+Ceff_sigma_subfolder = os.path.join(results_dir, 'Ceff_sigma_results')
 ECgroup_subfolder = os.path.join(results_dir, 'EC_group')
 ECsub_subfolder = os.path.join(results_dir, 'EC_sub')
 FCgroup_subfolder = os.path.join(results_dir, 'FC_group')
@@ -42,6 +35,7 @@ os.makedirs(results_dir, exist_ok=True)
 os.makedirs(ECgroup_subfolder, exist_ok=True)
 os.makedirs(ECsub_subfolder, exist_ok=True)
 os.makedirs(FCgroup_subfolder, exist_ok=True)
+os.makedirs(Ceff_sigma_subfolder, exist_ok=True)
 os.makedirs(FCsub_subfolder, exist_ok=True)
 os.makedirs(sigma_subfolder, exist_ok=True)
 os.makedirs(sigma_group_subfolder, exist_ok=True)
@@ -53,20 +47,16 @@ os.makedirs(Inorm1_sub_subfolder, exist_ok=True)
 os.makedirs(Inorm2_sub_subfolder, exist_ok=True)
 os.makedirs(training_dir, exist_ok=True)
 
-
-#print("Base Data Folder:", base_folder)
-#print("Connectome Folder:", connectome_dir)
-
-# Now you can import your module
+import os
+import sys
 from functions_FDT_numba_v9 import *
-
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import butter, filtfilt, detrend
+from scipy.signal import butter, filtfilt
+from scipy.signal import detrend as scipy_detrend
 from functions_FC_v3 import *
 from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
-
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
 from scipy.linalg import expm
@@ -85,10 +75,8 @@ import functions_boxplots_WN3_v0
 from typing import Union
 from numba import njit, prange, objmode
 import time
-import p_values as p_values  # Make sure this is working!
+import p_values as p_values
 import statannotations_permutation
-# import importlib
-# importlib.reload(functions_violinplots_WN3_v0)
 
 def append_to_npz(filename, **new_data):
     """
@@ -110,8 +98,34 @@ def append_to_npz(filename, **new_data):
     # Save back to file
     np.savez(filename, **existing_data)
 
-### z-scoring data
-from scipy.signal import detrend as scipy_detrend
+
+def append_record_to_npz(folder, filename, **record):
+    """
+    Appends a record (dict) to a 'records' array in a .npz file located in `folder`.
+    Creates the folder and file if they don't exist.
+
+    Parameters
+    ----------
+    folder : str
+        Path to the subfolder where the file will be saved.
+    filename : str
+        Name of the .npz file (e.g., 'Ceff_sigma_results.npz').
+    record : dict
+        Arbitrary key-value pairs to store (arrays, strings, numbers, etc.).
+    """
+    os.makedirs(folder, exist_ok=True)  # ensure subfolder exists
+    filepath = os.path.join(folder, filename)
+
+    if os.path.exists(filepath):
+        existing_data = dict(np.load(filepath, allow_pickle=True))
+        records = list(existing_data.get("records", []))
+    else:
+        records = []
+
+    records.append(record)
+    np.savez(filepath, records=np.array(records, dtype=object))
+
+
 def zscore_time_series(data, mode='parcel', detrend=False):
     """
     Optionally detrend and z-score the time series either parcel-wise or globally.
@@ -167,8 +181,6 @@ def zscore_time_series(data, mode='parcel', detrend=False):
     std[std == 0] = 1.0  # avoid division by zero
     return (data - mean) / std
 
-### Filter data
-from scipy.signal import filtfilt, detrend as scipy_detrend
 def filter_time_series(data, bfilt, afilt, detrend=True):
     """
     Optionally detrend and filter time series using filtfilt.
@@ -206,6 +218,7 @@ def filter_time_series(data, bfilt, afilt, detrend=True):
     else:
         raise ValueError("Input data must be 2D or 3D.")
     return filtered_data
+
 def calc_H_freq(
         all_HC_fMRI: Union[np.ndarray, dict], 
         tr: float, 
@@ -230,14 +243,14 @@ def calc_H_freq(
         return f_diff 
 
 
-### ADNI Loading the data and data loader
+###### Loading the data ######
 DL = ADNI_A.ADNI_A()
 
 # example of individual
-sc = DL.get_subjectData('002_S_0413')
-SC = sc['002_S_0413']['SC'] # Structural connectivity
+subdata = DL.get_subjectData('002_S_0413')
+SC = subdata['002_S_0413']['SC'] # Structural connectivity
 
-# Loading the data for all subjects
+# Loading the timeseries data for all subjects and dividing them into groups
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
 for subject in HC_IDs:
@@ -255,14 +268,6 @@ AD_MRI = {}
 for subject in AD_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     AD_MRI[subject] = data[subject]['timeseries'].T
-#print(HC_MRI.keys)
-#print(HC_MRI[HC_IDs[0]].shape)
-# Okay this is loading in the effecetive connectivity, so we cannot use this for f_diff
-# we need to use the data loader to get the timeseries data
-#EC_HC_data = scipy.io.loadmat('ADNI-A_DATA/EC_filterted/HC_FDT_results_filters0109.mat')
-#EC_MCI_data = scipy.io.loadmat('ADNI-A_DATA/EC_filterted/MCI_FDT_results_filters0109.mat')
-#EC_AD_data = scipy.io.loadmat('ADNI-A_DATA/EC_filterted/AD_FDT_results_filters0109.mat')
-#print(EC_HC_data.keys()) # check the keys
 
 ### Set conditions
 NPARCELLS = 180 #tot: 379
@@ -278,6 +283,7 @@ t0 = 0
 tfinal = 200
 dt = 0.01
 times = np.arange(t0, tfinal+dt, dt)
+sigma_mean = 0.45
 
 group_names = ['HC', 'MCI', 'AD']
 group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
@@ -286,35 +292,30 @@ I_FDT_all = np.full((3, NPARCELLS), np.nan)
 Inorm1_tmax_s0_group = np.zeros((3, NPARCELLS))
 Inorm2_tmax_s0_group = np.zeros((3, NPARCELLS))
 
-for i in range(1,4):
-    COND = i
+
+### Group level
+for COND in range(1,4):
     if COND == 1: ## --> HC
-        #Ceffgroup = EC_HC_data['Ceff_subjects']
         f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = HC_MRI
         ID = HC_IDs
 
     elif COND == 2: ## --> MCI
-        #Ceffgroup = EC_MCI_data['Ceff_subjects']
         f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = MCI_MRI
         ID = MCI_IDs
 
     elif COND == 3: ## --> AD
-        #Ceffgroup = EC_AD_data['Ceff_subjects']
         f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = AD_MRI
         ID = AD_IDs
-    #print('ts_gr',ts_gr[ID[0]].shape)
     
     f_diff = f_diff[:NPARCELLS] # frequencies of group
     omega = 2 * np.pi * f_diff
-    #print('f_diff',f_diff.shape)
+
     ### Generates a "group" TS with the same length for all subjects
     min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
-    #print('min_ntimes',min_ntimes)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    #print('ts_gr_arr',ts_gr_arr.shape)
     for sub in range(len(ID)):
         subj_id = ID[sub]
         ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
@@ -326,7 +327,6 @@ for i in range(1,4):
     SC_N /= np.max(SC_N)
     SC_N *= 0.2
     Ceff_ini = SC_N.copy()
-    sigma_mean = 0.1
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
 
     CEFF_FITTING = True
@@ -354,7 +354,7 @@ for i in range(1,4):
     Ceff_norm=CEFF_NORMALIZATION
     maxC=maxC
     iter_check=iter_check_group
-        
+
     start_time = time.time()
     Ceff_group, sigma_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
                                 LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_group, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
@@ -367,6 +367,7 @@ for i in range(1,4):
     end_time = time.time()
     print(f"Execution time group: {end_time - start_time:.4f} seconds")
 
+    ## ploting the error iter
     figure_name = f"error_iter_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(training_dir, figure_name)
     plt.figure()
@@ -376,15 +377,15 @@ for i in range(1,4):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-    
+    ## plotting the FC and Ceff matrices
     fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(FCgroup_subfolder, fig_name)
     plot_FC_matrices(FCemp_group, FCsim_group, title1="group FCemp", title2="group FCsim", save_path=save_path, size=1, dpi=300)
     fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(ECgroup_subfolder, fig_name)
     plot_FC_matrix(Ceff_group, title="group Ceff fitted", size=1.1, save_path=save_path,dpi=300)
-    
-     ## Plot sigma
+
+    ## plot the sigma
     fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(sigma_group_subfolder, fig_name)
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
@@ -398,63 +399,39 @@ for i in range(1,4):
     plt.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
-    sigma_group_2 = np.append(sigma_group, sigma_group)
-    v0std = sigma_group_2
-    #print(sigma_group)
 
-    
-    Gamma = -construct_matrix_A(avec, omega, Ceff_group, gconst)
-
-    v0 = v0std * np.random.standard_normal(Ndim) + v0bias
-    vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_group_2, initcond=v0, duration=tfinal, integstep=dt)
-
-    v0 = vsim[:,-1]
-    vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_group_2, initcond=v0, duration=tfinal, integstep=dt)
-        
-    D = np.diag(sigma_group_2**2 * np.ones(Ndim))
-    V_0 = solve_continuous_lyapunov(Gamma, D)
-
-    tmax = 100
-    ts0 = 0
-    I_tmax_s0 = Its_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:NPARCELLS]
-
-    group_name = group_names[COND - 1]
-    group_idx = cond_index_map[group_name]
-    #subject_idx = sub  # Already incrementing
-
-    I_FDT_all[group_idx, :] = I_tmax_s0
-    Inorm1_tmax_s0_group[group_idx] = Its_norm1_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:NPARCELLS]
-    Inorm2_tmax_s0_group[group_idx] = Its_norm2_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:NPARCELLS]
+    ## save the results
+    append_record_to_npz(
+    Ceff_sigma_subfolder,
+    f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
+    level="group",
+    condition=f"{group_names[COND - 1]}",
+    sigma=sigma_group,
+    Ceff=Ceff_group,
+    omega=omega)
 
 
-### SUBJECT LEVEL
-
-I_FDT_sub = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
-Inorm1_tmax_s0_sub = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
-Inorm2_tmax_s0_sub = np.full((3, max(group_sizes.values()), NPARCELLS), np.nan)
-
+### subject level
+# Note: The subject level calculations are done in parallel for each condition
 for i in range(1,4):
     COND = i
     if COND == 1: ## --> HC
-        #Ceffgroup = EC_HC_data['Ceff_subjects']
-        f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+        #f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = HC_MRI
         ID = HC_IDs
 
     elif COND == 2: ## --> MCI
-        #Ceffgroup = EC_MCI_data['Ceff_subjects']
-        f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+        #f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = MCI_MRI
         ID = MCI_IDs
 
     elif COND == 3: ## --> AD
-        #Ceffgroup = EC_AD_data['Ceff_subjects']
-        f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+        #f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = AD_MRI
         ID = AD_IDs
 
-    f_diff = f_diff[:NPARCELLS] # frequencies of group
-    omega = 2 * np.pi * f_diff
+    #f_diff = f_diff[:NPARCELLS] # frequencies of group
+    #omega = 2 * np.pi * f_diff
 
     ### Generates a "group" TS with the same length for all subjects
     min_ntimes = min(ts_gr[subj_id].shape[1] for subj_id in ID)
@@ -466,13 +443,7 @@ for i in range(1,4):
     TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
     TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
 
-    SC_N = SC[:NPARCELLS, :NPARCELLS]
-    SC_N /= np.max(SC_N)
-    SC_N *= 0.2
-    Ceff_ini = SC_N.copy()
-    sigma_mean = 0.45
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
-    #print('ID len',len(ID))
     Ceff_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     sigma_sub = np.zeros((len(ID), NPARCELLS))
     FCemp_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
@@ -481,9 +452,10 @@ for i in range(1,4):
 
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        #Ceff = Ceffgroup[sub][:NPARCELLS,:NPARCELLS] # effecitve connectivity
-        f_diff = f_diff[:NPARCELLS] # frequencies of group
-        omega = 2 * np.pi * f_diff
+        f_diff = calc_H_freq(ts_gr_arr[sub,:,:], 3000, filterps.FiltPowSpetraVersion.v2021)
+        omega = 2 * np.pi * f_diff[:NPARCELLS]
+        #f_diff = f_diff[:NPARCELLS] # frequencies of group
+        #omega = 2 * np.pi * f_diff
 
         TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
@@ -496,32 +468,6 @@ for i in range(1,4):
                                             Ceff_norm=Ceff_norm, maxC=maxC,
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
-        #errorFC_iter_sub[sub, :len(errorFC_iter_sub_aux)] = errorFC_iter_sub_aux
-        #errorCOVtau_iter_sub[sub, :len(errorCOVtau_iter_sub_aux)] = errorCOVtau_iter_sub_aux#print('len sigsub',len(sigma_sub[sub]))
-        sigma_vec = np.append(sigma_sub[sub], sigma_sub[sub]).copy()  # double the sigma for the x and y components
-        v0std = sigma_vec[sub] 
-    
-        Gamma = (-1) * construct_matrix_A(avec, omega, Ceff_sub[sub], gconst)
-        term_time = 100 * TR
-        v0 = v0std * np.random.standard_normal(Ndim) + v0bias
-        vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_vec, initcond=v0, duration=term_time, integstep=dt)
-
-        v0 = vsim[:,-1]
-        vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_vec, initcond=v0, duration=tfinal, integstep=dt)
-        
-        D = np.diag(sigma_vec**2 * np.ones(Ndim))
-        V_0 = solve_continuous_lyapunov(Gamma, D)
-
-        tmax = 100
-        ts0 = 0
-        I_tmax_s0 = Its_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts0)[0:NPARCELLS]
-
-        group_name = group_names[COND - 1]
-        group_idx = cond_index_map[group_name]
-
-        I_FDT_sub[group_idx, sub, :] = I_tmax_s0
-        Inorm1_tmax_s0_sub[group_idx, sub, :] = Its_norm1_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts0)[0:NPARCELLS]
-        Inorm2_tmax_s0_sub[group_idx, sub, :] = Its_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts0)[0:NPARCELLS]        
 
         figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
         save_path = os.path.join(training_dir, figure_name)
@@ -555,166 +501,13 @@ for i in range(1,4):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
 
-
-
-#print( I_FDT_all[2,9,:]) # group index, subject index, parcel index
-I_FDT_group_mean = np.nanmean(I_FDT_sub, axis=1)
-I_FDT_subject_mean = np.nanmean(I_FDT_sub, axis=2)
-#print(I_FDT_group_mean[0,:]) # the group mean for: group index, parcel index
-
-group_names = ['HC', 'MCI', 'AD']
-records_parcel = []
-records_subject = []
-
-for group_idx, group_name in enumerate(group_names):
-    for parcel in range(I_FDT_group_mean.shape[1]):
-        records_parcel.append({
-            "value": I_FDT_group_mean[group_idx, parcel],
-            "cond": group_name,
-            "parcel": parcel
-        })
-
-for groupidx, group_name in enumerate(group_names):
-    for subject in range(I_FDT_subject_mean.shape[1]):
-        records_subject.append({
-            "value": I_FDT_subject_mean[groupidx, subject],
-            "cond": group_name,
-            "subject": subject
-        })
-
-data_parcels = pd.DataFrame.from_records(records_parcel)
-data_subjects = pd.DataFrame.from_records(records_subject)
-
-fig, ax = plt.subplots(figsize=(10, 10))
-fig_name = f"violin_subject_N{NPARCELLS}_{NOISE_TYPE}"
-save_path = os.path.join(FDT_subject_subfolder, fig_name)
-plot_violins_HC_MCI_AD(
-    ax=ax,
-    data=data_subjects,
-    font_scale=1.4,
-    metric='I(t=tmax,s=0) [Subject mean]',
-    point_size=5,
-    xgrid=False,
-    plot_title='FDT I(tmax, 0) — Mean per subject per group',
-    saveplot=1,
-    filename=save_path,
-    dpi=300
-)
-
-resI = {
-    'HC': data_parcels[data_parcels['cond'] == 'HC']['value'].values,
-    'MCI': data_parcels[data_parcels['cond'] == 'MCI']['value'].values,
-    'AD': data_parcels[data_parcels['cond'] == 'AD']['value'].values,
-}
-
-plt.rcParams.update({'font.size': 15})
-fig_name = f"box_parcel_N{NPARCELLS}_{NOISE_TYPE}"
-save_path = os.path.join(FDT_parcel_subfolder, fig_name)
-p_values.plotComparisonAcrossLabels2(
-    resI,
-    custom_test=statannotations_permutation.stat_permutation_test,
-    columnLables=['HC', 'MCI', 'AD'],
-    graphLabel='FDT I(tmax, 0) Parcels',
-    save_path=save_path
-)
-
-fig, ax = plt.subplots(figsize=(10, 10))
-dataset = [Inorm1_tmax_s0_group[0], Inorm1_tmax_s0_group[1], Inorm1_tmax_s0_group[2]]
-labels = ['HC', 'MCI', 'AD']
-fig_name = f"Inorm1_violin_group_N{NPARCELLS}_{NOISE_TYPE}"
-save_path = os.path.join(Inorm1_group_subfolder, fig_name)
-# Light colors for the box
-box_palette = None
-# Dark colors for the dots
-swarmplot_palette = None
-plot_violins_generalized(ax, dataset, labels,
-                           y_min=0,
-                           violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
-                           font_scale=1.4,
-                           point_size=4,
-                           plot_title='Inorm1 group',
-                           y_axis_label='',
-                           show_p_values=True,
-                           xgrid=False,
-                           saveplot=True,
-                           filename=save_path,
-                           dpi=300)
-
-fig, ax = plt.subplots(figsize=(10, 10))
-dataset = [Inorm2_tmax_s0_group[0], Inorm2_tmax_s0_group[1], Inorm2_tmax_s0_group[2]]
-labels = ['HC', 'MCI', 'AD']
-fig_name = f"Inorm2_violin_group_N{NPARCELLS}_{NOISE_TYPE}"
-save_path = os.path.join(Inorm2_group_subfolder, fig_name)
-plot_violins_generalized(ax, dataset, labels,
-                           y_min=0, y_max=1.05,
-                           h_line=1,
-                           violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
-                           font_scale=1.4,
-                           point_size=4,
-                           plot_title='Inorm2 group',
-                           y_axis_label='',
-                           show_p_values=True,
-                           xgrid=False,
-                           saveplot=True,
-                           filename=save_path,
-                           dpi=300)
-
-I_tmax_s0_sub_HC = I_FDT_sub[0, 0:max(group_sizes.values()), :]
-I_mean_over_sub_HC = np.nanmean(I_tmax_s0_sub_HC, axis=0)
-I_tmax_s0_sub_MCI = I_FDT_sub[1, 0:max(group_sizes.values()), :]
-I_mean_over_sub_MCI = np.nanmean(I_tmax_s0_sub_MCI, axis=0)
-I_tmax_s0_sub_AD = I_FDT_sub[2, 0:max(group_sizes.values()), :]
-I_mean_over_sub_AD = np.nanmean(I_tmax_s0_sub_AD, axis=0)
-
-Inorm1_s0_sub_HC = Inorm1_tmax_s0_sub[0, 0:max(group_sizes.values()), :]
-Inorm1_mean_over_sub_HC = np.nanmean(Inorm1_s0_sub_HC, axis=0)
-Inorm1_s0_sub_MCI = Inorm1_tmax_s0_sub[1, 0:max(group_sizes.values()), :]
-Inorm1_mean_over_sub_MCI = np.nanmean(Inorm1_s0_sub_MCI, axis=0)
-Inorm1_s0_sub_AD = Inorm1_tmax_s0_sub[2, 0:max(group_sizes.values()), :]
-Inorm1_mean_over_sub_AD = np.nanmean(Inorm1_s0_sub_AD, axis=0)
-Inorm2_s0_sub_HC = Inorm2_tmax_s0_sub[0, 0:max(group_sizes.values()), :]
-Inorm2_mean_over_sub_HC = np.nanmean(Inorm2_s0_sub_HC, axis=0)
-Inorm2_s0_sub_MCI = Inorm2_tmax_s0_sub[1, 0:max(group_sizes.values()), :]
-Inorm2_mean_over_sub_MCI = np.nanmean(Inorm2_s0_sub_MCI, axis=0)
-Inorm2_s0_sub_AD = Inorm2_tmax_s0_sub[2, 0:max(group_sizes.values()), :]
-Inorm2_mean_over_sub_AD = np.nanmean(Inorm2_s0_sub_AD, axis=0)
-
-fig, ax = plt.subplots(figsize=(10, 10))
-dataset = [Inorm1_mean_over_sub_HC, Inorm1_mean_over_sub_MCI, Inorm1_mean_over_sub_AD]
-labels = ['HC', 'MCI', 'AD']
-fig_name = f"Inorm1_violin_sub_N{NPARCELLS}_{NOISE_TYPE}"
-save_path = os.path.join(Inorm1_sub_subfolder, fig_name)
-plot_violins_generalized(ax, dataset, labels,
-                           y_min=0,
-                           y_max=10,
-                           h_line=1,
-                           violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
-                           font_scale=1.4,
-                           point_size=4,
-                           plot_title='Inorm1 sub',
-                           y_axis_label='',
-                           show_p_values=True,
-                           xgrid=False,
-                           saveplot=True,
-                           filename=save_path,
-                           dpi=300)
-
-fig, ax = plt.subplots(figsize=(10, 10))
-dataset = [Inorm2_mean_over_sub_HC, Inorm2_mean_over_sub_MCI, Inorm2_mean_over_sub_AD]
-labels = ['HC', 'MCI', 'AD']
-fig_name = f"Inorm2_violin_sub_N{NPARCELLS}_{NOISE_TYPE}"
-save_path = os.path.join(Inorm2_sub_subfolder, fig_name)
-plot_violins_generalized(ax, dataset, labels,
-                           y_min=0, y_max=1.05,
-                           h_line=1,
-                           violin_palette=box_palette, swarmplot_palette=swarmplot_palette,
-                           font_scale=1.4,
-                           point_size=4,
-                           plot_title='Inorm1 sub',
-                           y_axis_label='',
-                           show_p_values=True,
-                           xgrid=False,
-                           saveplot=True,
-                           filename=save_path,
-                           dpi=300)
-
+        ## save the results
+        append_record_to_npz(
+        Ceff_sigma_subfolder,
+        f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
+        level="subject",
+        condition=f"{group_names[COND - 1]}",
+        subject=f"S{sub}",
+        sigma=sigma_sub[sub],
+        Ceff=Ceff_sub[sub],
+        omega=omega)
