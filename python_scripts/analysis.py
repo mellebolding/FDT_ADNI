@@ -12,7 +12,7 @@ os.chdir(repo_root)
 sys.path.insert(0, repo_root)
 sys.path.insert(0, os.path.join(repo_root, 'support_files'))
 sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
-
+results_dir = os.path.join(repo_root, 'Result_plots')
 Ceff_sigma_subfolder = os.path.join(results_dir, 'Ceff_sigma_results')
 import numpy as np
 from functions_FDT_numba_v9 import *
