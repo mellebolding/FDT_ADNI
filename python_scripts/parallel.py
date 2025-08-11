@@ -1,6 +1,7 @@
 # parallel and restricted version of EC_sigma_fit.py (using concurrent.futures)
 # Idea: one file to get both parcel and subject results (i.e. Ceff and sigma, optionally), the subects will be parallelized
-
+import os
+import sys
 # Absolute :path to the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
