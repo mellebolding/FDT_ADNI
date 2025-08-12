@@ -151,7 +151,7 @@ omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
     
     Ndim = omega_subs[0].shape[1]
-    max_len_subs = max(s[0] for s in omega_subs)
+    max_len_subs = max(a.shape[0] for a in omega_subs)
     print("max_len_subs: ", max_len_subs)
     print("Ndim: ", Ndim)
     avec = a_param * np.ones(Ndim)
