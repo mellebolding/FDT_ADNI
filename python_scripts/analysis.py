@@ -189,10 +189,14 @@ Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
 omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 
 # group analysis
-x,y,z = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-
-#print("x: ",x, "\ny: ",y, "\nz: ",z)
+I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
 
 # subject analysis
-xsub, ysub, zsub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-#print("xsub: ", xsub.shape, xsub, "\nysub: ", ysub.shape, ysub, "\nzsub: ", zsub.shape, zsub)
+I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+
+print("I_tmax_group.shape", I_tmax_group.shape, 
+      "I_norm1_group.shape", I_norm1_group.shape, 
+      "I_norm2_group.shape", I_norm2_group.shape,
+      "I_tmax_sub.shape", I_tmax_sub.shape,
+      "I_norm1_sub.shape", I_norm1_sub.shape,
+      "I_norm2_sub.shape", I_norm2_sub.shape)
