@@ -260,3 +260,5 @@ plot_violins_HC_MCI_AD(
     filename=save_path,
     dpi=300
 )
+print(records_subject)
+print(data_subjects)
