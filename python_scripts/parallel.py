@@ -459,8 +459,10 @@ for i in range(1,4):
     FCemp_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     FCsim_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     error_iter_sub = np.ones((len(ID), 200)) * np.nan
-
+    
     frqs = ts_gr_arr[:,:,:].copy().T  # time series for the subject
+    print(f"frqs shape: {frqs.shape}")
+    print(f"ts_gr:", ts_gr.shape)
     f_diff = calc_H_freq(frqs, 3000, filterps.FiltPowSpetraVersion.v2021)[1]
     print(f_diff.shape, f_diff)
     omega = 2 * np.pi * f_diff[:,:NPARCELLS]
