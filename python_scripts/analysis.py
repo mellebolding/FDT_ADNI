@@ -28,7 +28,7 @@ from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
 from scipy.linalg import solve_continuous_lyapunov
 import pandas as pd
 import matplotlib.pyplot as plt
-from functions_violinplots import plot_violins_HC_MCI_AD
+from functions_violinplots_v2 import plot_violins_HC_MCI_AD
 
 ### Loads data from npz file ######################################
 def load_appended_records(filepath, filters=None, verbose=False):
