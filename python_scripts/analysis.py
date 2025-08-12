@@ -14,12 +14,21 @@ sys.path.insert(0, os.path.join(repo_root, 'support_files'))
 sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 results_dir = os.path.join(repo_root, 'Result_plots')
 Ceff_sigma_subfolder = os.path.join(results_dir, 'Ceff_sigma_results')
+FDT_parcel_subfolder = os.path.join(results_dir, 'FDT_parcel')
+FDT_subject_subfolder = os.path.join(results_dir, 'FDT_sub')
+Inorm1_group_subfolder = os.path.join(results_dir, 'Inorm1_group')
+Inorm2_group_subfolder = os.path.join(results_dir, 'Inorm2_group')
+Inorm1_sub_subfolder = os.path.join(results_dir, 'Inorm1_sub')
+Inorm2_sub_subfolder = os.path.join(results_dir, 'Inorm2_sub')
 import numpy as np
 from functions_FDT_numba_v9 import *
 from numba import njit, prange, objmode
 from functions_FC_v3 import *
 from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
 from scipy.linalg import solve_continuous_lyapunov
+import pandas as pd
+import matplotlib.pyplot as plt
+from functions_violinplots import plot_violins_HC_MCI_AD
 
 ### Loads data from npz file ######################################
 def load_appended_records(filepath, filters=None, verbose=False):
@@ -200,3 +209,50 @@ print("I_tmax_group.shape", I_tmax_group.shape,
       "I_tmax_sub.shape", I_tmax_sub.shape,
       "I_norm1_sub.shape", I_norm1_sub.shape,
       "I_norm2_sub.shape", I_norm2_sub.shape)
+
+
+group_names = ['HC', 'MCI', 'AD']
+records_parcel = []
+records_subject = []
+
+I_tmax_group_mean = np.nanmean(I_tmax_group, axis=1)
+I_norm1_group_mean = np.nanmean(I_norm1_group, axis=1)
+I_norm2_group_mean = np.nanmean(I_norm2_group, axis=1)
+I_tmax_sub_mean = np.nanmean(I_tmax_sub, axis=2)
+I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
+I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
+
+for group_idx, group_name in enumerate(group_names):
+    for parcel in range(I_tmax_group_mean.shape[1]):
+        records_parcel.append({
+            "value": I_tmax_group_mean[group_idx, parcel],
+            "cond": group_name,
+            "parcel": parcel
+        })
+
+for groupidx, group_name in enumerate(group_names):
+    for subject in range(I_tmax_sub_mean.shape[1]):
+        records_subject.append({
+            "value": I_tmax_sub_mean[groupidx, subject],
+            "cond": group_name,
+            "subject": subject
+        })
+
+data_parcels = pd.DataFrame.from_records(records_parcel)
+data_subjects = pd.DataFrame.from_records(records_subject)
+
+fig, ax = plt.subplots(figsize=(10, 10))
+fig_name = f"violin_subject_N{NPARCELLS}_{NOISE_TYPE}"
+save_path = os.path.join(FDT_subject_subfolder, fig_name)
+plot_violins_HC_MCI_AD(
+    ax=ax,
+    data=data_subjects,
+    font_scale=1.4,
+    metric='I(t=tmax,s=0) [Subject mean]',
+    point_size=5,
+    xgrid=False,
+    plot_title='FDT I(tmax, 0) — Mean per subject per group',
+    saveplot=1,
+    filename=save_path,
+    dpi=300
+)
