@@ -246,6 +246,7 @@ def plotComparisonAcrossLabels2(tests, custom_test=None,
                                   test=test, comparisons_correction=comparisons_correction)
     if save_path:
         plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
+        plt.show()
         plt.close(fig)
     else:
         plt.show()
