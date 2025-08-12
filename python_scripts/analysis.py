@@ -217,7 +217,7 @@ records_subject = []
 
 print("I_tmax_sub", I_tmax_sub, "I_norm1_sub", I_norm1_sub, "I_norm2_sub", I_norm2_sub)
 
-I_tmax_group_mean = np.nanmean(I_tmax_group, axis=1)
+I_tmax_group_mean = np.nanmean(I_tmax_group, axis=1) # this are 3 numbers..
 I_norm1_group_mean = np.nanmean(I_norm1_group, axis=1)
 I_norm2_group_mean = np.nanmean(I_norm2_group, axis=1)
 I_tmax_sub_mean = np.nanmean(I_tmax_sub, axis=2)
@@ -225,11 +225,11 @@ I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
 I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
 
 print("I_tmax_sub_mean", I_tmax_sub_mean)
-print("I_tmax_group_mean", I_tmax_group_mean)
+print("I_tmax_group_mean", I_tmax_group)
 for group_idx, group_name in enumerate(group_names):
-    for parcel in range(I_tmax_group_mean.shape[0]):
+    for parcel in range(I_tmax_group.shape[0]):
         records_parcel.append({
-            "value": I_tmax_group_mean[group_idx, parcel],
+            "value": I_tmax_group[group_idx, parcel],
             "cond": group_name,
             "parcel": parcel
         })
