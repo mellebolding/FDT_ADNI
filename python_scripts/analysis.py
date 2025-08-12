@@ -367,7 +367,7 @@ I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Cef
 #fig, ax = plt.subplots(figsize=(14, 4))
 #ax.bar(range(1,NPARCELLS+1), Inorm2_i, width=0.6, alpha=alpha_i, label=f'{cond_i} {label_i}')
 
-def figures_barplot_parcels(option):
+def figures_barplot_parcels(option,I_tmax_group):
     if option == 'I_tmax':
         I_tmax_group = I_tmax_group
     elif option == 'I_norm1':
@@ -395,8 +395,8 @@ def figures_barplot_parcels(option):
     
     plt.show()
 
-figures_barplot_parcels('I_tmax')
-figures_barplot_parcels('I_norm1')
-figures_barplot_parcels('I_norm2')
+figures_barplot_parcels('I_tmax',I_tmax_group)
+figures_barplot_parcels('I_norm1', I_norm1_group)
+figures_barplot_parcels('I_norm2', I_norm2_group)
 
 
