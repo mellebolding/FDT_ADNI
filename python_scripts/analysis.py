@@ -225,7 +225,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             resI_norm1,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel='FDT I(tmax, 0) Norm1 Parcels',
+            graphLabel='FDT I Norm1 Parcels',
             save_path=save_path
         )
         plt.rcParams.update({'font.size': 15})
@@ -235,7 +235,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             resI_norm2,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel='FDT I(tmax, 0) Norm2 Parcels',
+            graphLabel='FDT I Norm2 Parcels',
             save_path=save_path
         )
 
@@ -291,10 +291,10 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             ax=ax,
             data=data_subjects_norm1,
             font_scale=1.4,
-            metric='I(t=tmax,s=0) Norm1 [Subject mean]',
+            metric='I Norm1 [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title='FDT I(tmax, 0) Norm1 — Mean per subject per group',
+            plot_title='FDT I Norm1 — Mean per subject per group',
             saveplot=1,
             filename=save_path,
             dpi=300
@@ -306,10 +306,10 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             ax=ax,
             data=data_subjects_norm2,
             font_scale=1.4,
-            metric='I(t=tmax,s=0) Norm2 [Subject mean]',
+            metric='I Norm2 [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title='FDT I(tmax, 0) Norm2 — Mean per subject per group',
+            plot_title='FDT I Norm2 — Mean per subject per group',
             saveplot=1,
             filename=save_path,
             dpi=300
@@ -364,8 +364,22 @@ I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Cef
 figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 
+#fig, ax = plt.subplots(figsize=(14, 4))
+#ax.bar(range(1,NPARCELLS+1), Inorm2_i, width=0.6, alpha=alpha_i, label=f'{cond_i} {label_i}')
 
+colors = ['tab:blue', 'tab:orange', 'tab:green']
 
+plt.figure(figsize=(12, 6))
+bottom = np.zeros(18)  # start at zero for stacking
+for i in range(3):
+    plt.bar(range(18), I_tmax_group[i], bottom=bottom, color=colors[i], label=f'Group {i+1}')
+    bottom += I_tmax_group[i]
 
+plt.xlabel('Parcel')
+plt.ylabel('Value')
+plt.title('Stacked Bars per Parcel')
+plt.legend()
+plt.tight_layout()
+plt.show()
 
 
