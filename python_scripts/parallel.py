@@ -344,7 +344,6 @@ for COND in range(1,4):
         ts_gr = AD_MRI
         ID = AD_IDs
     
-    print(f"f_diff shape: {f_diff.shape}, f_diff: {f_diff}")
     f_diff = f_diff[:NPARCELLS] # frequencies of group
     omega = 2 * np.pi * f_diff
 
