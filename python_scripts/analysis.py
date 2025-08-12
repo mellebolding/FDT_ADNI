@@ -401,7 +401,9 @@ I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Cef
 # this file: https://github.com/PennLINC/xcp_d/blob/main/xcp_d/data/atlases/atlas-Glasser/atlas-Glasser_dseg.tsv
 # 
 
-df = pd.read_csv('atlas-Glasser_dseg.tsv', sep='\t')
+tsv_path = os.path.join(repo_root, 'ADNI-A_DATA', 'atlas-Glasser_dseg.tsv')
+
+df = pd.read_csv(tsv_path, sep='\t')
 
 # Now you can access your data via the DataFrame `df`
 print(df.head())
