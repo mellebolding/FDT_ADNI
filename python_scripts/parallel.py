@@ -1,6 +1,7 @@
 # parallel and restricted version of EC_sigma_fit.py (using concurrent.futures)
 # Idea: one file to get both parcel and subject results (i.e. Ceff and sigma, optionally), the subects will be parallelized
 import os
+os.environ['MPLCONFIGDIR'] = '/tmp/matplotlib-config'
 import sys
 # Absolute :path to the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -278,7 +279,7 @@ for subject in AD_IDs:
 
 
 ### Set conditions
-NPARCELLS = 18 #tot: 379
+NPARCELLS = 198 #tot: 379
 Tau = 1
 TR = 2
 a_param = -0.02

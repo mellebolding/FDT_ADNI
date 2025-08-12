@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=ec_sigma_fit         # Job name
-#SBATCH --output=ec_sigma_fit.out       # Standard output log
-#SBATCH --error=ec_sigma_fit.err        # Standard error log
-#SBATCH --time=100:00:00                 # Time limit (hh:mm:ss)
+#SBATCH --job-name=parallel         # Job name
+#SBATCH --output=parallel.out       # Standard output log
+#SBATCH --error=parallel.err        # Standard error log
+#SBATCH --time=200:00:00                 # Time limit (hh:mm:ss)
 #SBATCH --ntasks=1                      # Number of tasks (processes)
 #SBATCH --cpus-per-task=1               # Number of CPU cores per task
 #SBATCH --mem=2G                        # Memory per node (adjust as needed)
@@ -15,5 +15,5 @@ source /home/cluster/melle/FDT_ADNI/venv/bin/activate
 cd /home/cluster/melle/FDT_ADNI/python_scripts
 
 # Run your Python script
-python EC_sigma_fit.py
+python parallel.py
 
