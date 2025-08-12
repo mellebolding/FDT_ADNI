@@ -299,6 +299,7 @@ I_FDT_all = np.full((3, NPARCELLS), np.nan)
 Inorm1_tmax_s0_group = np.zeros((3, NPARCELLS))
 Inorm2_tmax_s0_group = np.zeros((3, NPARCELLS))
 
+clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
 
 ### Group level
 for COND in range(1,4):
@@ -408,8 +409,7 @@ for COND in range(1,4):
     plt.close()
 
     ## save the results
-    clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
-
+    
     append_record_to_npz(
     Ceff_sigma_subfolder,
     f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
@@ -479,7 +479,7 @@ for i in range(1,4):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
-        print(f"Subject {subj_id} cond: {COND}, sigma shape: {sigma_sub[sub]}")
+        #print(f"Subject {subj_id} cond: {COND}, sigma shape: {sigma_sub[sub]}")
         figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
         save_path = os.path.join(training_dir, figure_name)
         plt.figure()
