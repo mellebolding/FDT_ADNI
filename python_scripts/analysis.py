@@ -22,10 +22,6 @@ from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
 from scipy.linalg import solve_continuous_lyapunov
 
 ### Loads data from npz file ######################################
-
-import os
-import numpy as np
-
 def load_appended_records(filepath, filters=None, verbose=False):
     """
     Loads appended records from an .npz file created by `append_record_to_npz`,
@@ -84,11 +80,10 @@ def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, g
     
     Ndim = len(omega[1,:])
     avec = a_param * np.ones(Ndim)
-    print(avec)
     I_FDT_all = np.full((3, Ndim), np.nan)
     Inorm1_tmax_s0_group = np.zeros((3, Ndim))
     Inorm2_tmax_s0_group = np.zeros((3, Ndim))
-    #print(avec.shape)
+
     for COND in range(1, 4):
 
         sigma_group_2 = np.append(sigma_group[COND-1], sigma_group[COND-1])
@@ -123,6 +118,7 @@ all_records = load_appended_records(
     filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
 )
 
+# Extract group-level data
 HC_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "1"}))
 HC_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "1"}))
 HC_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "1"}))
@@ -133,13 +129,66 @@ AD_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group
 AD_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "3"}))
 AD_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "3"}))
 
-print(AD_group_omega.shape)
-print(AD_group_Ceff.shape)
-#print(avec.shape)
 sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
 Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
 omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
 
+# Extract subject-level data
+HC_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "1"}))
+HC_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "1"}))
+HC_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "1"}))
+MCI_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "2"}))
+MCI_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "2"}))
+MCI_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "2"}))
+AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "3"}))
+AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "3"}))
+AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "3"}))
+
+sigma_subs = np.array([HC_subs_sig, MCI_subs_sig, AD_subs_sig])
+Ceff_subs = np.array([HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff])
+omega_subs = np.array([HC_subs_omega, MCI_subs_omega, AD_subs_omega])
+
+def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
+    
+    Ndim = omega_subs[0].shape[1]
+    max_len_subs = max(s[0] for s in omega_subs)
+    print("max_len_subs: ", max_len_subs)
+    print("Ndim: ", Ndim)
+    avec = a_param * np.ones(Ndim)
+    I_FDT_all = np.full((3, max_len_subs,Ndim), np.nan)
+    Inorm1_tmax_s0_subs = np.full((3, max_len_subs,Ndim), np.nan)
+    Inorm2_tmax_s0_subs = np.full((3, max_len_subs,Ndim), np.nan)
+    
+    for COND in range(1, 4):
+        for sub in range(sigma_subs[COND-1].shape[0]):
+
+            sigma_subs_2 = np.append(sigma_subs[COND-1, sub, :], sigma_subs[COND-1, sub, :])
+            v0std = sigma_subs_2
+            
+            Gamma = -construct_matrix_A(avec, omega[COND-1, sub, :], Ceff_subs[COND-1, sub, :], gconst)
+
+            v0 = v0std * np.random.standard_normal(2*Ndim) + v0bias
+            vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_subs_2, initcond=v0, duration=tfinal, integstep=dt)
+
+            v0 = vsim[:,-1]
+            vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_subs_2, initcond=v0, duration=tfinal, integstep=dt)
+                
+            D = np.diag(sigma_subs_2**2 * np.ones(2*Ndim))
+            V_0 = solve_continuous_lyapunov(Gamma, D)
+
+
+            I_tmax_s0 = Its_Langevin_ND(Gamma, sigma_subs_2, V_0, tmax, ts0)[0:Ndim]
+
+
+            I_FDT_all[COND-1, sub, :] = I_tmax_s0
+            Inorm1_tmax_s0_subs[COND-1, sub, :] = Its_norm1_Langevin_ND(Gamma, sigma_subs_2, V_0, tmax, ts0)[0:Ndim]
+            Inorm2_tmax_s0_subs[COND-1, sub, :] = Its_norm2_Langevin_ND(Gamma, sigma_subs_2, V_0, tmax, ts0)[0:Ndim]
+    return I_FDT_all, Inorm1_tmax_s0_subs, Inorm2_tmax_s0_subs
+# group analysis
 x,y,z = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
 
 print("x: ",x, "\ny: ",y, "\nz: ",z)
+
+# subject analysis
+xsub, ysub, zsub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+print("xsub: ", xsub, "\nysub: ", ysub, "\nzsub: ", zsub)
