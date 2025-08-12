@@ -191,4 +191,4 @@ print("x: ",x, "\ny: ",y, "\nz: ",z)
 
 # subject analysis
 xsub, ysub, zsub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-print("xsub: ", xsub, "\nysub: ", ysub, "\nzsub: ", zsub)
+print("xsub: ", xsub.shape, xsub, "\nysub: ", ysub.shape, ysub, "\nzsub: ", zsub.shape, zsub)
