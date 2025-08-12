@@ -162,7 +162,6 @@ def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, 
 NPARCELLS = 18
 NOISE_TYPE = "HOMO"
 
-
 # Load all records
 all_records = load_appended_records(
     filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
@@ -205,77 +204,173 @@ I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_gro
 # subject analysis
 I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
 
-print("I_tmax_group.shape", I_tmax_group.shape, 
-      "I_norm1_group.shape", I_norm1_group.shape, 
-      "I_norm2_group.shape", I_norm2_group.shape,
-      "I_tmax_sub.shape", I_tmax_sub.shape,
-      "I_norm1_sub.shape", I_norm1_sub.shape,
-      "I_norm2_sub.shape", I_norm2_sub.shape)
+def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
+    group_names = ['HC', 'MCI', 'AD']
+    records_parcel_Itmax = []
+    records_parcel_norm1 = []
+    records_parcel_norm2 = []
+    records_subject_Itmax = []
+    records_subject_norm1 = []
+    records_subject_norm2 = []
+
+    if group:
+        I_tmax_group = I_tmax
+        I_norm1_group = I_norm1
+        I_norm2_group = I_norm2
+
+        for group_idx, group_name in enumerate(group_names):
+            for parcel in range(I_tmax_group.shape[0]):
+                records_parcel_Itmax.append({
+                "value": I_tmax_group[group_idx, parcel],
+                "cond": group_name,
+                "parcel": parcel
+                })
+                records_parcel_norm1.append({
+                "value": I_norm1_group[group_idx, parcel],
+                "cond": group_name,
+                "parcel": parcel
+                })
+                records_parcel_norm2.append({
+                "value": I_norm2_group[group_idx, parcel],
+                "cond": group_name,
+                "parcel": parcel
+                })
+        data_parcels_Itmax = pd.DataFrame.from_records(records_parcel_Itmax)
+        data_parcels_norm1 = pd.DataFrame.from_records(records_parcel_norm1)
+        data_parcels_norm2 = pd.DataFrame.from_records(records_parcel_norm2)
+        resI_Itmax = {
+            'HC': data_parcels_Itmax[data_parcels_Itmax['cond'] == 'HC']['value'].values,
+            'MCI': data_parcels_Itmax[data_parcels_Itmax['cond'] == 'MCI']['value'].values,
+            'AD': data_parcels_Itmax[data_parcels_Itmax['cond'] == 'AD']['value'].values,
+        }
+        resI_norm1 = {
+            'HC': data_parcels_norm1[data_parcels_norm1['cond'] == 'HC']['value'].values,
+            'MCI': data_parcels_norm1[data_parcels_norm1['cond'] == 'MCI']['value'].values,
+            'AD': data_parcels_norm1[data_parcels_norm1['cond'] == 'AD']['value'].values,
+        }
+        resI_norm2 = {
+            'HC': data_parcels_norm2[data_parcels_norm2['cond'] == 'HC']['value'].values,
+            'MCI': data_parcels_norm2[data_parcels_norm2['cond'] == 'MCI']['value'].values,
+            'AD': data_parcels_norm2[data_parcels_norm2['cond'] == 'AD']['value'].values,
+        }
+
+        plt.rcParams.update({'font.size': 15})
+        fig_name = f"box_parcel_Itmax_N{NPARCELLS}_{NOISE_TYPE}"
+        save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+        p_values.plotComparisonAcrossLabels2(
+            resI_Itmax,
+            custom_test=statannotations_permutation.stat_permutation_test,
+            columnLables=['HC', 'MCI', 'AD'],
+            graphLabel='FDT I(tmax, 0) Parcels',
+            save_path=save_path
+        )
+        plt.rcParams.update({'font.size': 15})
+        fig_name = f"box_parcel_norm1_N{NPARCELLS}_{NOISE_TYPE}"
+        save_path = os.path.join(Inorm1_group_subfolder, fig_name)
+        p_values.plotComparisonAcrossLabels2(
+            resI_norm1,
+            custom_test=statannotations_permutation.stat_permutation_test,
+            columnLables=['HC', 'MCI', 'AD'],
+            graphLabel='FDT I(tmax, 0) Norm1 Parcels',
+            save_path=save_path
+        )
+        plt.rcParams.update({'font.size': 15})
+        fig_name = f"box_parcel_norm2_N{NPARCELLS}_{NOISE_TYPE}"
+        save_path = os.path.join(Inorm2_group_subfolder, fig_name)
+        p_values.plotComparisonAcrossLabels2(
+            resI_norm2,
+            custom_test=statannotations_permutation.stat_permutation_test,
+            columnLables=['HC', 'MCI', 'AD'],
+            graphLabel='FDT I(tmax, 0) Norm2 Parcels',
+            save_path=save_path
+        )
+
+    if subject:
+        I_tmax_sub = I_tmax
+        I_norm1_sub = I_norm1
+        I_norm2_sub = I_norm2
+        I_tmax_sub_mean = np.nanmean(I_tmax_sub, axis=2)
+        I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
+        I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
+
+        for groupidx, group_name in enumerate(group_names):
+            for subject in range(I_tmax_sub_mean.shape[1]):
+                records_subject_Itmax.append({
+                    "value": I_tmax_sub_mean[groupidx, subject],
+                    "cond": group_name,
+                    "subject": subject
+                })
+                records_subject_norm1.append({
+                    "value": I_norm1_sub_mean[groupidx, subject],
+                    "cond": group_name,
+                    "subject": subject
+                })
+                records_subject_norm2.append({
+                    "value": I_norm2_sub_mean[groupidx, subject],
+                    "cond": group_name,
+                    "subject": subject
+                })
+        
+        data_subjects_Itmax = pd.DataFrame.from_records(records_subject_Itmax)
+        data_subjects_norm1 = pd.DataFrame.from_records(records_subject_norm1)
+        data_subjects_norm2 = pd.DataFrame.from_records(records_subject_norm2)
+
+        fig, ax = plt.subplots(figsize=(10, 10))
+        fig_name = f"violin_subject_N{NPARCELLS}_{NOISE_TYPE}"
+        save_path = os.path.join(FDT_subject_subfolder, fig_name)
+        plot_violins_HC_MCI_AD(
+            ax=ax,
+            data=data_subjects_Itmax,
+            font_scale=1.4,
+            metric='I(t=tmax,s=0) [Subject mean]',
+            point_size=5,
+            xgrid=False,
+            plot_title='FDT I(tmax, 0) — Mean per subject per group',
+            saveplot=1,
+            filename=save_path,
+            dpi=300
+        )
+        fig, ax = plt.subplots(figsize=(10, 10))
+        fig_name = f"violin_subject_norm1_N{NPARCELLS}_{NOISE_TYPE}"
+        save_path = os.path.join(Inorm1_sub_subfolder, fig_name)
+        plot_violins_HC_MCI_AD(
+            ax=ax,
+            data=data_subjects_norm1,
+            font_scale=1.4,
+            metric='I(t=tmax,s=0) Norm1 [Subject mean]',
+            point_size=5,
+            xgrid=False,
+            plot_title='FDT I(tmax, 0) Norm1 — Mean per subject per group',
+            saveplot=1,
+            filename=save_path,
+            dpi=300
+        )
+        fig, ax = plt.subplots(figsize=(10, 10))
+        fig_name = f"violin_subject_norm2_N{NPARCELLS}_{NOISE_TYPE}"
+        save_path = os.path.join(Inorm2_sub_subfolder, fig_name)
+        plot_violins_HC_MCI_AD(
+            ax=ax,
+            data=data_subjects_norm2,
+            font_scale=1.4,
+            metric='I(t=tmax,s=0) Norm2 [Subject mean]',
+            point_size=5,
+            xgrid=False,
+            plot_title='FDT I(tmax, 0) Norm2 — Mean per subject per group',
+            saveplot=1,
+            filename=save_path,
+            dpi=300
+        )
+
+figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+
+#print("I_tmax_sub", I_tmax_sub, "I_norm1_sub", I_norm1_sub, "I_norm2_sub", I_norm2_sub)
 
 
-group_names = ['HC', 'MCI', 'AD']
-records_parcel = []
-records_subject = []
 
-print("I_tmax_sub", I_tmax_sub, "I_norm1_sub", I_norm1_sub, "I_norm2_sub", I_norm2_sub)
+#print("I_tmax_sub_mean", I_tmax_sub_mean)
+#print("I_tmax_group_mean", I_tmax_group)
 
-I_tmax_group_mean = np.nanmean(I_tmax_group, axis=1) # this are 3 numbers..
-I_norm1_group_mean = np.nanmean(I_norm1_group, axis=1)
-I_norm2_group_mean = np.nanmean(I_norm2_group, axis=1)
-I_tmax_sub_mean = np.nanmean(I_tmax_sub, axis=2)
-I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
-I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
 
-print("I_tmax_sub_mean", I_tmax_sub_mean)
-print("I_tmax_group_mean", I_tmax_group)
-for group_idx, group_name in enumerate(group_names):
-    for parcel in range(I_tmax_group.shape[0]):
-        records_parcel.append({
-            "value": I_tmax_group[group_idx, parcel],
-            "cond": group_name,
-            "parcel": parcel
-        })
 
-for groupidx, group_name in enumerate(group_names):
-    for subject in range(I_tmax_sub_mean.shape[1]):
-        records_subject.append({
-            "value": I_tmax_sub_mean[groupidx, subject],
-            "cond": group_name,
-            "subject": subject
-        })
 
-data_parcels = pd.DataFrame.from_records(records_parcel)
-data_subjects = pd.DataFrame.from_records(records_subject)
 
-fig, ax = plt.subplots(figsize=(10, 10))
-fig_name = f"violin_subject_N{NPARCELLS}_{NOISE_TYPE}"
-save_path = os.path.join(FDT_subject_subfolder, fig_name)
-plot_violins_HC_MCI_AD(
-    ax=ax,
-    data=data_subjects,
-    font_scale=1.4,
-    metric='I(t=tmax,s=0) [Subject mean]',
-    point_size=5,
-    xgrid=False,
-    plot_title='FDT I(tmax, 0) — Mean per subject per group',
-    saveplot=1,
-    filename=save_path,
-    dpi=300
-)
-
-resI = {
-    'HC': data_parcels[data_parcels['cond'] == 'HC']['value'].values,
-    'MCI': data_parcels[data_parcels['cond'] == 'MCI']['value'].values,
-    'AD': data_parcels[data_parcels['cond'] == 'AD']['value'].values,
-}
-
-plt.rcParams.update({'font.size': 15})
-fig_name = f"box_parcel_N{NPARCELLS}_{NOISE_TYPE}"
-save_path = os.path.join(FDT_parcel_subfolder, fig_name)
-p_values.plotComparisonAcrossLabels2(
-    resI,
-    custom_test=statannotations_permutation.stat_permutation_test,
-    columnLables=['HC', 'MCI', 'AD'],
-    graphLabel='FDT I(tmax, 0) Parcels',
-    save_path=save_path
-)
