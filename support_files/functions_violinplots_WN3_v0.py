@@ -193,7 +193,7 @@ def plot_violins_HC_MCI_AD(ax, data,
         ax.set_axisbelow(True)
 
     if saveplot:
-        #plt.savefig(filename + '.pdf', bbox_inches='tight', dpi=dpi)
+        plt.savefig(filename + '.pdf', bbox_inches='tight', dpi=dpi)
         #plt.savefig(filename + '.svg', bbox_inches='tight', dpi=dpi)
         plt.savefig(filename + '.png', bbox_inches='tight', dpi=dpi)
         plt.tight_layout(pad=2.0)  # increase padding
