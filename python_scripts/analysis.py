@@ -157,52 +157,6 @@ def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, 
             Inorm1_tmax_s0_subs[COND-1, sub, :] = Its_norm1_Langevin_ND(Gamma, sigma_subs_2, V_0, tmax, ts0)[0:Ndim]
             Inorm2_tmax_s0_subs[COND-1, sub, :] = Its_norm2_Langevin_ND(Gamma, sigma_subs_2, V_0, tmax, ts0)[0:Ndim]
     return I_FDT_all, Inorm1_tmax_s0_subs, Inorm2_tmax_s0_subs
-####################################################################
-
-NPARCELLS = 18
-NOISE_TYPE = "HOMO"
-
-# Load all records
-all_records = load_appended_records(
-    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
-)
-
-# Extract group-level data
-HC_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "1"}))
-HC_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "1"}))
-HC_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "1"}))
-MCI_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "2"}))
-MCI_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "2"}))
-MCI_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "2"}))
-AD_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "3"}))
-AD_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "3"}))
-AD_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "3"}))
-
-sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
-Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
-omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
-
-# Extract subject-level data
-HC_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "1"}))
-HC_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "1"}))
-HC_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "1"}))
-MCI_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "2"}))
-MCI_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "2"}))
-MCI_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "2"}))
-AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "3"}))
-AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "3"}))
-AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "3"}))
-
-# lists, as the arrays are not the same length
-sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
-Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
-omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
-
-# group analysis
-I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-
-# subject analysis
-I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
 
 def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
     group_names = ['HC', 'MCI', 'AD']
@@ -360,15 +314,56 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             filename=save_path,
             dpi=300
         )
+####################################################################
+
+NPARCELLS = 18
+NOISE_TYPE = "HOMO"
+
+# Load all records
+all_records = load_appended_records(
+    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
+)
+
+# Extract group-level data
+HC_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "1"}))
+HC_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "1"}))
+HC_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "1"}))
+MCI_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "2"}))
+MCI_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "2"}))
+MCI_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "2"}))
+AD_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "3"}))
+AD_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "3"}))
+AD_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "3"}))
+
+sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
+Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
+omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
+
+# Extract subject-level data
+HC_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "1"}))
+HC_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "1"}))
+HC_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "1"}))
+MCI_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "2"}))
+MCI_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "2"}))
+MCI_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "2"}))
+AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "3"}))
+AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "3"}))
+AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "3"}))
+
+# lists, as the arrays are not the same length
+sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
+Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
+omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
+
+# group analysis
+I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+
+# subject analysis
+I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
 
 figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 
-#print("I_tmax_sub", I_tmax_sub, "I_norm1_sub", I_norm1_sub, "I_norm2_sub", I_norm2_sub)
-
-
-
-#print("I_tmax_sub_mean", I_tmax_sub_mean)
-#print("I_tmax_group_mean", I_tmax_group)
 
 
 
