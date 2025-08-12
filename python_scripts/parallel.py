@@ -465,12 +465,12 @@ for i in range(1,4):
     #print(f"frqs shape: {frqs.shape}")
     #print(f"ts_gr:", ts_gr.shape)
     f_diff = calc_H_freq(ts_gr, 3000, filterps.FiltPowSpetraVersion.v2021)[1]
+    f_diff = f_diff[:,:NPARCELLS]  # frequencies of group
 
 
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        f_diff = f_diff[sub,:NPARCELLS] # frequencies of group
-        omega = 2 * np.pi * f_diff
+        omega = 2 * np.pi * f_diff[sub,:]
         print("omega shape:", omega.shape, "f_diff shape:", f_diff.shape)
 
         #f_diff = f_diff[:NPARCELLS] # frequencies of group
@@ -479,7 +479,7 @@ for i in range(1,4):
         TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
         Ceff_sub[sub], sigma_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
-                                            LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_sub, Ceff_group, NPARCELLS, TR, f_diff, sigma_group, Tau=Tau,
+                                            LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_sub, Ceff_group, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=False, sigma_reset=sigma_reset,
                                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
