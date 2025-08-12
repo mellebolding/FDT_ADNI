@@ -384,7 +384,7 @@ def figures_barplot_parcels(option,I_tmax_group):
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     bottom = np.zeros(18)  # start at zero for stacking
     for i in range(3):
-        plt.bar(range(18), I_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]} I(tmax, 0)', alpha=0.7)
+        plt.bar(range(18), I_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.7)
         bottom += I_group[i]
 
     plt.xlabel('Parcel')
