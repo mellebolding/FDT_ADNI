@@ -367,20 +367,36 @@ I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Cef
 #fig, ax = plt.subplots(figsize=(14, 4))
 #ax.bar(range(1,NPARCELLS+1), Inorm2_i, width=0.6, alpha=alpha_i, label=f'{cond_i} {label_i}')
 
-colors = ['tab:blue', 'tab:orange', 'tab:green']
+def figures_barplot_parcels(option):
+    if option == 'I_tmax':
+        I_tmax_group = I_tmax_group
+    elif option == 'I_norm1':
+        I_tmax_group = I_norm1_group
+    elif option == 'I_norm2':
+        I_tmax_group = I_norm2_group
+    else:
+        raise ValueError("Invalid option. Choose from 'I_tmax', 'I_norm1', or 'I_norm2'.")
 
-plt.figure(figsize=(12, 6))
-bottom = np.zeros(18)  # start at zero for stacking
-for i in range(3):
-    plt.bar(range(18), I_tmax_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]} I(tmax, 0)', alpha=0.7)
-    bottom += I_tmax_group[i]
+    colors = ['tab:blue', 'tab:orange', 'tab:green']
 
-plt.xlabel('Parcel')
-plt.ylabel('Value')
-plt.title('Stacked Bars per Parcel')
-plt.legend()
-plt.tight_layout()
-plt.show()
+    plt.figure(figsize=(12, 6))
+    fig_name = f"barplot_parcel_{option}_N{NPARCELLS}_{NOISE_TYPE}"
+    save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+    bottom = np.zeros(18)  # start at zero for stacking
+    for i in range(3):
+        plt.bar(range(18), I_tmax_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]} I(tmax, 0)', alpha=0.7)
+        bottom += I_tmax_group[i]
 
-print(I_tmax_group)
+    plt.xlabel('Parcel')
+    plt.ylabel('Value')
+    plt.title('Stacked Bars per Parcel')
+    plt.legend()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    
+    plt.show()
+
+figures_barplot_parcels('I_tmax')
+figures_barplot_parcels('I_norm1')
+figures_barplot_parcels('I_norm2')
+
 
