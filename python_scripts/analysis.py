@@ -144,7 +144,7 @@ AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subjec
 AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "3"}))
 AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "3"}))
 
-print("HC_group_omega:", HC_group_omega.shape, HC_group_omega)
+print("HC_subs_omega:", HC_subs_omega.shape, HC_subs_omega)
 print("MCI_subs_omega:", MCI_subs_omega.shape, MCI_subs_omega)
 print("AD_subs_omega:", AD_subs_omega.shape, AD_subs_omega)
 sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
