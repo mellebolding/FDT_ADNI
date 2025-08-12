@@ -291,6 +291,31 @@ tfinal = 200
 dt = 0.01
 times = np.arange(t0, tfinal+dt, dt)
 sigma_mean = 0.45
+CEFF_FITTING = True
+SIGMA_FITTING = False
+if SIGMA_FITTING: NOISE_TYPE = 'hetero'
+else: NOISE_TYPE = 'homo'
+COMPETITIVE_COUPLING = False
+CEFF_NORMALIZATION = True
+maxC = 0.2
+iter_check_group = 100
+fit_Ceff=CEFF_FITTING
+competitive_coupling=COMPETITIVE_COUPLING
+epsFC_Ceff = 4e-4
+epsCOVtau_Ceff = 1e-4
+
+fit_sigma=SIGMA_FITTING
+sigma_reset=False
+epsFC_sigma = 8e-5
+epsCOVtau_sigma = 3e-5
+    
+MAXiter = 10000
+error_tol = 1e-3
+patience = 5
+learning_rate_factor = 1.0
+Ceff_norm=CEFF_NORMALIZATION
+maxC=maxC
+iter_check=iter_check_group
 
 group_names = ['HC', 'MCI', 'AD']
 group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
@@ -337,31 +362,7 @@ for COND in range(1,4):
     Ceff_ini = SC_N.copy()
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
 
-    CEFF_FITTING = True
-    SIGMA_FITTING = False
-    if SIGMA_FITTING: NOISE_TYPE = 'hetero'
-    else: NOISE_TYPE = 'homo'
-    COMPETITIVE_COUPLING = False
-    CEFF_NORMALIZATION = True
-    maxC = 0.2
-    iter_check_group = 100
-    fit_Ceff=CEFF_FITTING
-    competitive_coupling=COMPETITIVE_COUPLING
-    epsFC_Ceff = 4e-4
-    epsCOVtau_Ceff = 1e-4
-
-    fit_sigma=SIGMA_FITTING
-    sigma_reset=False
-    epsFC_sigma = 8e-5
-    epsCOVtau_sigma = 3e-5
     
-    MAXiter = 10000
-    error_tol = 1e-3
-    patience = 5
-    learning_rate_factor = 1.0
-    Ceff_norm=CEFF_NORMALIZATION
-    maxC=maxC
-    iter_check=iter_check_group
 
     start_time = time.time()
     Ceff_group, sigma_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
