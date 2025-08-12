@@ -144,12 +144,12 @@ AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subjec
 AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "3"}))
 AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "3"}))
 
+print("HC_group_omega:", HC_group_omega.shape, HC_group_omega)
 print("MCI_subs_omega:", MCI_subs_omega.shape, MCI_subs_omega)
+print("AD_subs_omega:", AD_subs_omega.shape, AD_subs_omega)
 sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
 Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
 omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
-print("sigma_subs: ", sigma_subs[0].shape, sigma_subs[1].shape, sigma_subs[2].shape)
-print("sigma_subs: ", sigma_subs[0], sigma_subs[1], sigma_subs[2])
 
 def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
     
