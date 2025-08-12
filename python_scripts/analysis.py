@@ -225,8 +225,9 @@ I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
 I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
 
 print("I_tmax_sub_mean", I_tmax_sub_mean)
+print("I_tmax_group_mean", I_tmax_group_mean)
 for group_idx, group_name in enumerate(group_names):
-    for parcel in range(I_tmax_group_mean.shape[1]):
+    for parcel in range(I_tmax_group_mean.shape[0]):
         records_parcel.append({
             "value": I_tmax_group_mean[group_idx, parcel],
             "cond": group_name,
