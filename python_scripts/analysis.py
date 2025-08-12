@@ -215,6 +215,8 @@ group_names = ['HC', 'MCI', 'AD']
 records_parcel = []
 records_subject = []
 
+print("I_tmax_sub", I_tmax_sub, "I_norm1_sub", I_norm1_sub, "I_norm2_sub", I_norm2_sub)
+
 I_tmax_group_mean = np.nanmean(I_tmax_group, axis=1)
 I_norm1_group_mean = np.nanmean(I_norm1_group, axis=1)
 I_norm2_group_mean = np.nanmean(I_norm2_group, axis=1)
