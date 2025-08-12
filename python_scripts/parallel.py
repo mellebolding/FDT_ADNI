@@ -471,6 +471,8 @@ for i in range(1,4):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
+        print(f"Subject {subj_id} - Ceff shape: {Ceff_sub[sub].shape}, sigma shape: {sigma_sub[sub].shape}, "
+              f"FCemp shape: {FCemp_sub[sub].shape}, FCsim shape: {FCsim_sub[sub].shape}")
         figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
         save_path = os.path.join(training_dir, figure_name)
         plt.figure()
