@@ -375,7 +375,7 @@ for COND in range(1,4):
                                 Ceff_norm=Ceff_norm, maxC=maxC,
                                 iter_check=iter_check, plot_evol=False, plot_evol_last=False)
     end_time = time.time()
-    print(f"Execution time group: {end_time - start_time:.4f} seconds")
+    #print(f"Execution time group: {end_time - start_time:.4f} seconds")
 
     ## ploting the error iter
     figure_name = f"error_iter_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
@@ -441,9 +441,6 @@ for i in range(1,4):
         ts_gr = AD_MRI
         ID = AD_IDs
 
-    #f_diff = f_diff[:NPARCELLS] # frequencies of group
-    #omega = 2 * np.pi * f_diff
-
     ### Generates a "group" TS with the same length for all subjects
     min_ntimes = min(ts_gr[subj_id].shape[1] for subj_id in ID)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
@@ -460,21 +457,14 @@ for i in range(1,4):
     FCemp_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     FCsim_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     error_iter_sub = np.ones((len(ID), 200)) * np.nan
-    
-    #frqs = ts_gr_arr[:,:,:].copy().T  # time series for the subject
-    #print(f"frqs shape: {frqs.shape}")
-    #print(f"ts_gr:", ts_gr.shape)
+
     f_diff = calc_H_freq(ts_gr, 3000, filterps.FiltPowSpetraVersion.v2021)[1]
-    f_diff = f_diff[:,:NPARCELLS]  # frequencies of group
+    f_diff = f_diff[:,:NPARCELLS]  # frequencies of subjects
 
 
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        omega = 2 * np.pi * f_diff[sub,:]
-        #print("omega shape:", omega.shape, "f_diff shape:", f_diff.shape)
-
-        #f_diff = f_diff[:NPARCELLS] # frequencies of group
-        #omega = 2 * np.pi * f_diff
+        omega = 2 * np.pi * f_diff[sub,:] # omega per subject
 
         TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
@@ -488,7 +478,6 @@ for i in range(1,4):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
-        #print(f"Subject {subj_id} cond: {COND}, sigma shape: {sigma_sub[sub]}")
         figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
         save_path = os.path.join(training_dir, figure_name)
         plt.figure()
