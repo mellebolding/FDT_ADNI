@@ -29,6 +29,8 @@ from scipy.linalg import solve_continuous_lyapunov
 import pandas as pd
 import matplotlib.pyplot as plt
 from functions_violinplots_WN3_v0 import plot_violins_HC_MCI_AD
+import p_values as p_values  # Make sure this is working!
+import statannotations_permutation
 
 ### Loads data from npz file ######################################
 def load_appended_records(filepath, filters=None, verbose=False):
@@ -260,5 +262,20 @@ plot_violins_HC_MCI_AD(
     filename=save_path,
     dpi=300
 )
-print(records_subject)
-print(data_subjects)
+
+resI = {
+    'HC': data_parcels[data_parcels['cond'] == 'HC']['value'].values,
+    'MCI': data_parcels[data_parcels['cond'] == 'MCI']['value'].values,
+    'AD': data_parcels[data_parcels['cond'] == 'AD']['value'].values,
+}
+
+plt.rcParams.update({'font.size': 15})
+fig_name = f"box_parcel_N{NPARCELLS}_{NOISE_TYPE}"
+save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+p_values.plotComparisonAcrossLabels2(
+    resI,
+    custom_test=statannotations_permutation.stat_permutation_test,
+    columnLables=['HC', 'MCI', 'AD'],
+    graphLabel='FDT I(tmax, 0) Parcels',
+    save_path=save_path
+)
