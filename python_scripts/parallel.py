@@ -276,6 +276,7 @@ for subject in AD_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     AD_MRI[subject] = data[subject]['timeseries'].T
 
+print(AD_MRI[AD_IDs[0]].keys())
 ### Set conditions
 NPARCELLS = 18 #tot: 379
 Tau = 1
