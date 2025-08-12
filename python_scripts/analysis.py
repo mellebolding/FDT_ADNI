@@ -372,7 +372,7 @@ colors = ['tab:blue', 'tab:orange', 'tab:green']
 plt.figure(figsize=(12, 6))
 bottom = np.zeros(18)  # start at zero for stacking
 for i in range(3):
-    plt.bar(range(18), I_tmax_group[i], bottom=bottom, color=colors[i], label=f'Group {i+1}')
+    plt.bar(range(18), I_tmax_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]} I(tmax, 0)', alpha=0.7)
     bottom += I_tmax_group[i]
 
 plt.xlabel('Parcel')
