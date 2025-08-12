@@ -464,7 +464,7 @@ for i in range(1,4):
     #frqs = ts_gr_arr[:,:,:].copy().T  # time series for the subject
     #print(f"frqs shape: {frqs.shape}")
     #print(f"ts_gr:", ts_gr.shape)
-    f_diff = calc_H_freq(ts_gr, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
+    f_diff = calc_H_freq(ts_gr, 3000, filterps.FiltPowSpetraVersion.v2021)[1]
     print(f_diff.shape, f_diff)
     omega = 2 * np.pi * f_diff[:,:NPARCELLS]
     print(omega.shape, f_diff.shape)
