@@ -162,10 +162,10 @@ def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, 
     for COND in range(1, 4):
         for sub in range(sigma_subs[COND-1].shape[0]):
 
-            sigma_subs_2 = np.append(sigma_subs[COND-1, sub, :], sigma_subs[COND-1, sub, :])
+            sigma_subs_2 = np.append(sigma_subs[COND-1][sub, :], sigma_subs[COND-1][sub, :])
             v0std = sigma_subs_2
             
-            Gamma = -construct_matrix_A(avec, omega[COND-1, sub, :], Ceff_subs[COND-1, sub, :], gconst)
+            Gamma = -construct_matrix_A(avec, omega_subs[COND-1][sub, :], Ceff_subs[COND-1][sub, :], gconst)
 
             v0 = v0std * np.random.standard_normal(2*Ndim) + v0bias
             vsim, noise = Integrate_Langevin_ND_Optimized(Gamma, sigma_subs_2, initcond=v0, duration=tfinal, integstep=dt)
