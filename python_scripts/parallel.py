@@ -329,17 +329,17 @@ clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
 ### Group level
 for COND in range(1,4):
     if COND == 1: ## --> HC
-        f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+        f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
         ts_gr = HC_MRI
         ID = HC_IDs
 
     elif COND == 2: ## --> MCI
-        f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+        f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
         ts_gr = MCI_MRI
         ID = MCI_IDs
 
     elif COND == 3: ## --> AD
-        f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+        f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
         ts_gr = AD_MRI
         ID = AD_IDs
     
@@ -460,11 +460,15 @@ for i in range(1,4):
     FCsim_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     error_iter_sub = np.ones((len(ID), 200)) * np.nan
 
+    frqs = ts_gr_arr[:,:,:].copy().T  # time series for the subject
+    f_diff = calc_H_freq(frqs, 3000, filterps.FiltPowSpetraVersion.v2021)[1]
+    omega = 2 * np.pi * f_diff[:NPARCELLS]
+    print(omega.shape, f_diff.shape)
+    print(omega)
+
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        frqs = ts_gr_arr[sub,:,:].copy().T  # time series for the subject
-        f_diff = calc_H_freq(frqs, 3000, filterps.FiltPowSpetraVersion.v2021)
-        omega = 2 * np.pi * f_diff[:NPARCELLS]
+        omega_sub = omega[sub,:]
         #f_diff = f_diff[:NPARCELLS] # frequencies of group
         #omega = 2 * np.pi * f_diff
 
