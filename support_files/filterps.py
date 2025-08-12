@@ -133,7 +133,7 @@ def filt_pow_spetra_multiple_subjects(
             f_diff_sub[s] = freqs[max_idx]
         
         f_diff = np.mean(f_diff_sub, axis=0)
-        return f_diff
+        return f_diff, f_diff_sub
     
     elif version == FiltPowSpetraVersion.v2015:
         PowSpect_filt_narrow = np.zeros((n_subjects, int(np.floor(tmax / 2)), n_nodes))
