@@ -369,11 +369,11 @@ I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Cef
 
 def figures_barplot_parcels(option,I_tmax_group):
     if option == 'I_tmax':
-        I_tmax_group = I_tmax_group
+        I_group = I_tmax_group
     elif option == 'I_norm1':
-        I_tmax_group = I_norm1_group
+        I_group = I_norm1_group
     elif option == 'I_norm2':
-        I_tmax_group = I_norm2_group
+        I_group = I_norm2_group
     else:
         raise ValueError("Invalid option. Choose from 'I_tmax', 'I_norm1', or 'I_norm2'.")
 
@@ -384,12 +384,12 @@ def figures_barplot_parcels(option,I_tmax_group):
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     bottom = np.zeros(18)  # start at zero for stacking
     for i in range(3):
-        plt.bar(range(18), I_tmax_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]} I(tmax, 0)', alpha=0.7)
-        bottom += I_tmax_group[i]
+        plt.bar(range(18), I_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]} I(tmax, 0)', alpha=0.7)
+        bottom += I_group[i]
 
     plt.xlabel('Parcel')
-    plt.ylabel('Value')
-    plt.title('Stacked Bars per Parcel')
+    plt.ylabel(f'{option}')
+    plt.title(f'{option} for Parcels')
     plt.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     
