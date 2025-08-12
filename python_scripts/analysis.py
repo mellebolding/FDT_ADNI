@@ -314,6 +314,33 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             filename=save_path,
             dpi=300
         )
+
+def figures_barplot_parcels(option,I_tmax_group):
+    if option == 'I_tmax':
+        I_group = I_tmax_group
+    elif option == 'I_norm1':
+        I_group = I_norm1_group
+    elif option == 'I_norm2':
+        I_group = I_norm2_group
+    else:
+        raise ValueError("Invalid option. Choose from 'I_tmax', 'I_norm1', or 'I_norm2'.")
+
+    colors = ['tab:blue', 'tab:orange', 'tab:green']
+
+    plt.figure(figsize=(12, 6))
+    fig_name = f"barplot_parcel_{option}_N{NPARCELLS}_{NOISE_TYPE}"
+    save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+    bottom = np.zeros(18)  # start at zero for stacking
+    for i in range(3):
+        plt.bar(range(18), I_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.7)
+        bottom += I_group[i]
+
+    plt.xlabel('Parcel')
+    plt.ylabel(f'{option}')
+    plt.title(f'{option} for Parcels')
+    plt.legend()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
 ####################################################################
 
 NPARCELLS = 18
@@ -364,39 +391,14 @@ I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Cef
 #figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 #figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 
-#fig, ax = plt.subplots(figsize=(14, 4))
-#ax.bar(range(1,NPARCELLS+1), Inorm2_i, width=0.6, alpha=alpha_i, label=f'{cond_i} {label_i}')
+#figures_barplot_parcels('I_tmax',I_tmax_group)
+#figures_barplot_parcels('I_norm1', I_norm1_group)
+#figures_barplot_parcels('I_norm2', I_norm2_group)
 
-def figures_barplot_parcels(option,I_tmax_group):
-    if option == 'I_tmax':
-        I_group = I_tmax_group
-    elif option == 'I_norm1':
-        I_group = I_norm1_group
-    elif option == 'I_norm2':
-        I_group = I_norm2_group
-    else:
-        raise ValueError("Invalid option. Choose from 'I_tmax', 'I_norm1', or 'I_norm2'.")
+##### RESTING STATE NETWORKS #####
 
-    colors = ['tab:blue', 'tab:orange', 'tab:green']
-
-    plt.figure(figsize=(12, 6))
-    fig_name = f"barplot_parcel_{option}_N{NPARCELLS}_{NOISE_TYPE}"
-    save_path = os.path.join(FDT_parcel_subfolder, fig_name)
-    bottom = np.zeros(18)  # start at zero for stacking
-    for i in range(3):
-        plt.bar(range(18), I_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.7)
-        bottom += I_group[i]
-
-    plt.xlabel('Parcel')
-    plt.ylabel(f'{option}')
-    plt.title(f'{option} for Parcels')
-    plt.legend()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    
-    plt.show()
-
-figures_barplot_parcels('I_tmax',I_tmax_group)
-figures_barplot_parcels('I_norm1', I_norm1_group)
-figures_barplot_parcels('I_norm2', I_norm2_group)
+# Im going to assume that the first parcel is R_V1_ROI and then go from
+# this file: https://github.com/PennLINC/xcp_d/blob/main/xcp_d/data/atlases/atlas-Glasser/atlas-Glasser_dseg.tsv
+# 
 
 
