@@ -471,7 +471,7 @@ for i in range(1,4):
     for sub in range(len(ID)):
         subj_id = ID[sub]
         omega = 2 * np.pi * f_diff[sub,:]
-        print("omega shape:", omega.shape, "f_diff shape:", f_diff.shape)
+        #print("omega shape:", omega.shape, "f_diff shape:", f_diff.shape)
 
         #f_diff = f_diff[:NPARCELLS] # frequencies of group
         #omega = 2 * np.pi * f_diff
