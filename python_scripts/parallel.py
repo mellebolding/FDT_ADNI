@@ -99,6 +99,12 @@ def append_to_npz(filename, **new_data):
     # Save back to file
     np.savez(filename, **existing_data)
 
+def clear_npz_file(folder, filename):
+    os.makedirs(folder, exist_ok=True)
+    filepath = os.path.join(folder, filename)
+    # Save an empty records array, overwriting any existing file
+    np.savez(filepath, records=np.array([], dtype=object))
+
 
 def append_record_to_npz(folder, filename, **record):
     """
@@ -402,6 +408,8 @@ for COND in range(1,4):
     plt.close()
 
     ## save the results
+    clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
+
     append_record_to_npz(
     Ceff_sigma_subfolder,
     f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
