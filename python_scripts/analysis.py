@@ -391,6 +391,61 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS):
         )
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+
+def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS):
+    """
+    Visualizes the group differences in I(tmax, 0) on a brain map.
+    """
+    nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
+    parcel_img = nib.load(nii_path)
+    parcel_data = parcel_img.get_fdata()
+    group_map = np.zeros_like(parcel_data)
+
+    group_values = I_tmax_group[COND,:]
+
+    for i in range(NPARCELLS):
+        group_map[parcel_data == i + 1] = group_values[i]
+
+    group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
+    fsaverage = datasets.fetch_surf_fsaverage()
+
+    texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
+    texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
+
+    vmin = np.min(group_values)
+    vmax = np.max(group_values)
+
+    fig = plt.figure(figsize=(10, 5))
+    fig_name = f"left_right_brain{name}_N{NPARCELLS}_{NOISE_TYPE}"
+    save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+
+    ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+    plotting.plot_surf_stat_map(fsaverage.pial_left, texture_left,
+                                hemi='left', view='lateral',
+                                colorbar=False, cmap='viridis',
+                                bg_map=fsaverage.sulc_left,
+                                vmin=vmin, vmax=vmax,
+                                axes=ax1, title='Left', darkness=None)
+
+    ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+    plotting.plot_surf_stat_map(fsaverage.pial_right, texture_right,
+                                hemi='right', view='lateral',
+                                colorbar=False, cmap='viridis',
+                                bg_map=fsaverage.sulc_right,
+                                vmin=vmin, vmax=vmax,
+                                axes=ax2, title='Right', darkness=None)
+
+    norm = Normalize(vmin=vmin, vmax=vmax)
+    sm = ScalarMappable(cmap='viridis', norm=norm)
+    sm.set_array([])
+
+    # Define position: [left, bottom, width, height] in figure coordinates (0 to 1)
+    cbar_ax = fig.add_axes([0.47, 0.25, 0.02, 0.5])  # adjust as needed
+    # Create the colorbar manually in that position
+    cbar = plt.colorbar(sm, cax=cbar_ax)
+    # cbar.set_label("Group Difference")
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
 ####################################################################
 
 NPARCELLS = 18
@@ -445,60 +500,7 @@ RSNs = {
 
 ###### VISUALIZATION ######
 
-def left_right_brain_map(name,I_tmax_group,NPARCELLS):
-    """
-    Visualizes the group differences in I(tmax, 0) on a brain map.
-    """
-    nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
-    parcel_img = nib.load(nii_path)
-    parcel_data = parcel_img.get_fdata()
-    group_map = np.zeros_like(parcel_data)
-
-    group_values = I_tmax_group[0,:]
-
-    for i in range(NPARCELLS):
-        group_map[parcel_data == i + 1] = group_values[i]
-
-    group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
-    fsaverage = datasets.fetch_surf_fsaverage()
-
-    texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
-    texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
-
-    vmin = np.min(group_values)
-    vmax = np.max(group_values)
-
-    fig = plt.figure(figsize=(10, 5))
-    fig_name = f"left_right_brain{name}_N{NPARCELLS}_{NOISE_TYPE}"
-    save_path = os.path.join(FDT_subject_subfolder, fig_name)
-
-    ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-    plotting.plot_surf_stat_map(fsaverage.pial_left, texture_left,
-                                hemi='left', view='lateral',
-                                colorbar=False, cmap='viridis',
-                                bg_map=fsaverage.sulc_left,
-                                vmin=vmin, vmax=vmax,
-                                axes=ax1, title='Left', darkness=None)
-
-    ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-    plotting.plot_surf_stat_map(fsaverage.pial_right, texture_right,
-                                hemi='right', view='lateral',
-                                colorbar=False, cmap='viridis',
-                                bg_map=fsaverage.sulc_right,
-                                vmin=vmin, vmax=vmax,
-                                axes=ax2, title='Right', darkness=None)
-
-    norm = Normalize(vmin=vmin, vmax=vmax)
-    sm = ScalarMappable(cmap='viridis', norm=norm)
-    sm.set_array([])
-
-    # Define position: [left, bottom, width, height] in figure coordinates (0 to 1)
-    cbar_ax = fig.add_axes([0.47, 0.25, 0.02, 0.5])  # adjust as needed
-    # Create the colorbar manually in that position
-    cbar = plt.colorbar(sm, cax=cbar_ax)
-    # cbar.set_label("Group Difference")
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
-
-left_right_brain_map('I_tmax', I_tmax_group, NPARCELLS)
+left_right_brain_map('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
+left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
+left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
 
