@@ -279,7 +279,7 @@ for subject in AD_IDs:
 
 
 ### Set conditions
-NPARCELLS = 198 #tot: 379
+NPARCELLS = 379 #tot: 379
 Tau = 1
 TR = 2
 a_param = -0.02
@@ -294,7 +294,7 @@ dt = 0.01
 times = np.arange(t0, tfinal+dt, dt)
 sigma_mean = 0.45
 CEFF_FITTING = True
-SIGMA_FITTING = False
+SIGMA_FITTING = True
 if SIGMA_FITTING: NOISE_TYPE = 'hetero'
 else: NOISE_TYPE = 'homo'
 COMPETITIVE_COUPLING = False
@@ -443,11 +443,11 @@ for i in range(1,4):
         ID = AD_IDs
 
     ### Generates a "group" TS with the same length for all subjects
-    min_ntimes = min(ts_gr[subj_id].shape[1] for subj_id in ID)
+    min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:NPARCELLS, :min_ntimes].copy() 
+        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
     TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
     TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
     TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
