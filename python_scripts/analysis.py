@@ -453,7 +453,7 @@ RSNs = {
 #plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS=NPARCELLS)
 #plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS=NPARCELLS)
 
-def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, NPARCELLS):
+def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS):
     subjects_per_group = [17, 9, 10]   # number of valid subjects per group
 
     nodes_in_range = [n for n in RSN if n < NPARCELLS]
@@ -483,13 +483,13 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, NPARCELLS):
 
     # Plot
     fig, ax = plt.subplots(figsize=(12, 6))
-    fig_name = f"barplot_{RSN}_sub_{I_tmax_sub}_N{NPARCELLS}_{NOISE_TYPE}"
+    fig_name = f"barplot_{nameRSN}_sub_{nameI}_N{NPARCELLS}_{NOISE_TYPE}"
     save_path = os.path.join(FDT_subject_subfolder, fig_name)
     ax.bar(range(len(means)), means, color=bar_colors)
     ax.set_xticks(range(len(means)))
     ax.set_xticklabels(labels, rotation=90)
-    ax.set_ylabel('Mean I_tmax')
-    ax.set_title(f'Mean I_tmax for {RSN} RSN — All Groups')
+    ax.set_ylabel(f'Mean {nameI}')
+    ax.set_title(f'Mean {nameI} for {nameRSN} RSN')
 
     # Group separators
     for g, (start, end) in enumerate(group_avg_positions):
@@ -507,4 +507,4 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, NPARCELLS):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-plot_means_per_subjects_per_RSN(SomMot, 'I_tmax_sub', NPARCELLS)
+plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
