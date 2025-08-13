@@ -253,6 +253,8 @@ def X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega_group, a_param=-0.0
 
 X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0)
 
+print("X_I_tmax_group: ", X_I_tmax_group
+      , "X_Inorm1_group: ", X_Inorm1_group, "X_Inorm2_group: ", X_Inorm2_group)
 append_record_to_npz(
     FDT_values_subfolder,
     f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz",
