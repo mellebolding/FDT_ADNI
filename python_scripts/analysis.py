@@ -638,3 +638,6 @@ cbar.set_label("Group Difference")
 
 plt.tight_layout()
 plt.show()
+
+print("Unique labels in final image:", np.unique(labeled_img))
+print("Non-zero voxel count:", np.count_nonzero(labeled_img))
