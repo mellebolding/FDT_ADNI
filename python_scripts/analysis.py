@@ -536,7 +536,7 @@ for g in range(3):
     group_map = np.zeros_like(parcel_data)
     
     # Only fill the first 18 parcels, leave the rest as 0
-    for i, val in enumerate(group_values_test[g]):
+    for i, val in enumerate(group_values[g]):
         group_map[parcel_data == (i + 1)] = val
     
     group_maps.append(group_map)
