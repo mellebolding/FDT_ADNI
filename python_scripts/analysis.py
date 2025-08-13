@@ -453,59 +453,56 @@ RSNs = {
 #plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS=NPARCELLS)
 #plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS=NPARCELLS)
 
-  # (group, subject, parcel)
-subjects_per_group = [17, 9, 10]   # number of valid subjects per group
+def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, NPARCELLS):
+    subjects_per_group = [17, 9, 10]   # number of valid subjects per group
 
-# Example RSN mapping (shortened for test)
-N_parcels_test = 18  # only include nodes < N_parcels_test
+    nodes_in_range = [n for n in RSN if n < NPARCELLS]
 
-nodes_in_range = [n for n in SomMot if n < N_parcels_test]
+    group_names = ['HC', 'MCI', 'AD']
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # distinct for each group
 
-group_names = ['HC', 'MCI', 'AD']
-colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # distinct for each group
+    means = []
+    labels = []
+    bar_colors = []
+    group_avg_positions = []
+    group_avg_values = []
 
-means = []
-labels = []
-bar_colors = []
-group_avg_positions = []
-group_avg_values = []
+    pos = 0
+    for g, group in enumerate(group_names):
+        n_subs = subjects_per_group[g]
+        group_vals = []
+        for s in range(n_subs):
+            mean_val = np.nanmean(I_tmax_sub[g, s, nodes_in_range])
+            means.append(mean_val)
+            group_vals.append(mean_val)
+            labels.append(f'{group}_S{s+1}')
+            bar_colors.append(colors[g])
+        group_avg_values.append(np.nanmean(group_vals))
+        group_avg_positions.append((pos, pos + n_subs - 1))
+        pos += n_subs
 
-pos = 0
-for g, group in enumerate(group_names):
-    n_subs = subjects_per_group[g]
-    group_vals = []
-    for s in range(n_subs):
-        mean_val = np.nanmean(I_tmax_sub[g, s, nodes_in_range])
-        means.append(mean_val)
-        group_vals.append(mean_val)
-        labels.append(f'{group}_S{s+1}')
-        bar_colors.append(colors[g])
-    group_avg_values.append(np.nanmean(group_vals))
-    group_avg_positions.append((pos, pos + n_subs - 1))
-    pos += n_subs
+    # Plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+    fig_name = f"barplot_{RSN}_sub_{I_tmax_sub}_N{NPARCELLS}_{NOISE_TYPE}"
+    save_path = os.path.join(FDT_subject_subfolder, fig_name)
+    ax.bar(range(len(means)), means, color=bar_colors)
+    ax.set_xticks(range(len(means)))
+    ax.set_xticklabels(labels, rotation=90)
+    ax.set_ylabel('Mean I_tmax')
+    ax.set_title(f'Mean I_tmax for SomMot RSN — All Groups')
 
-# Plot
-fig, ax = plt.subplots(figsize=(12, 6))
-ax.bar(range(len(means)), means, color=bar_colors)
-ax.set_xticks(range(len(means)))
-ax.set_xticklabels(labels, rotation=90)
-ax.set_ylabel('Mean I_tmax')
-ax.set_title(f'Mean I_tmax for SomMot RSN — All Groups')
-
-# Group separators
-for g, (start, end) in enumerate(group_avg_positions):
-    width = (end - start) + 0.8   # span exactly over all subject bars
-    ax.bar(
-        start - 0.8/2,            # left edge aligns with first subject bar
-        group_avg_values[g],            # height
-        width=width,                     # covers the group’s bars
-        color=colors[g],
-        alpha=0.5,                       # transparency
-        edgecolor='black',
-        linewidth=1,
-        align='edge'                     # align by left edge, not center
-    )
-
-ax.legend()
-plt.tight_layout()
-plt.show()
+    # Group separators
+    for g, (start, end) in enumerate(group_avg_positions):
+        width = (end - start) + 0.8   # span exactly over all subject bars
+        ax.bar(
+            start - 0.8/2,            # left edge aligns with first subject bar
+            group_avg_values[g],            # height
+            width=width,                     # covers the group’s bars
+            color=colors[g],
+            alpha=0.6,                       # transparency
+            edgecolor='black',
+            linewidth=1,
+            align='edge'                     # align by left edge, not center
+        )
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
