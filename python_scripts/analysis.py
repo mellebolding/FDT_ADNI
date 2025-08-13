@@ -403,6 +403,7 @@ I_norm1_sub = np.array(get_field(all_values, "I_norm1", filters={"level": "subje
 I_norm2_sub = np.array(get_field(all_values, "I_norm2", filters={"level": "subject"}))
 
 print(I_norm1_group.shape)
+
 figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 #figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 
