@@ -399,11 +399,59 @@ I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Cef
 
 # Im going to assume that the first parcel is R_V1_ROI and then go from
 # this file: https://github.com/PennLINC/xcp_d/blob/main/xcp_d/data/atlases/atlas-Glasser/atlas-Glasser_dseg.tsv
-# 
 
-tsv_path = os.path.join(repo_root, 'ADNI-A_DATA', 'atlas-Glasser_dseg.tsv')
+# tsv_path = os.path.join(repo_root, 'ADNI-A_DATA', 'atlas-Glasser_dseg.tsv')
 
-df = pd.read_csv(tsv_path, sep='\t')
+# df = pd.read_csv(tsv_path, sep='\t')
 
-# Now you can access your data via the DataFrame `df`
-print(df.head())
+# # Now you can access your data via the DataFrame `df`
+# print(df.head())
+
+SomMot = [7, 8, 23, 35, 38, 39, 40, 42, 50, 52, 54, 55, 56, 98, 99, 100, 101, 102, 103, 104, 105, 106, 114, 123, 124, 167, 172, 173, 174, 187, 188, 191, 203, 207, 215, 218, 219, 220, 221, 230, 232, 233, 234, 235, 279, 280, 281, 282, 283, 284, 303, 347, 352, 353, 354]
+Vis = [0, 1, 2, 3, 4, 5, 6, 12, 15, 17, 18, 19, 20, 21, 22, 118, 119, 120, 125, 126, 141, 142, 145, 151, 152, 153, 154, 155, 156, 157, 158, 159, 162, 180, 181, 182, 183, 184, 185, 186, 192, 195, 198, 199, 200, 201, 202, 300, 322, 331, 332, 333, 335, 337, 338, 339, 342]
+Def = [25, 27, 29, 30, 32, 33, 34, 60, 63, 64, 65, 67, 68, 70, 71, 73, 74, 75, 86, 87, 93, 122, 127, 128, 129, 130, 131, 148, 149, 150, 160, 175, 176, 177, 205, 209, 210, 212, 213, 214, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 254, 255, 256, 266, 268, 273, 277, 286, 291, 298, 299, 302, 304, 305, 306, 307, 308, 309, 311, 313, 318, 321, 328, 329, 330, 334, 340, 341, 344, 349, 355, 356, 359]
+DorsAttn = [9, 16, 26, 28, 41, 44, 45, 46, 47, 48, 49, 51, 53, 79, 95, 115, 116, 135, 136, 137, 139, 140, 144, 189, 190, 196, 197, 224, 225, 226, 227, 228, 229, 231, 259, 275, 276, 295, 296, 315, 316, 317, 319, 320, 324, 325, 336]
+Cont = [13, 14, 57, 61, 62, 66, 69, 72, 76, 78, 80, 81, 82, 83, 84, 90, 94, 96, 97, 110, 132, 143, 161, 169, 170, 178, 179, 193, 194, 208, 237, 252, 253, 258, 260, 261, 262, 263, 264, 265, 270, 274, 290, 312, 323, 350]
+Limbic = [88, 89, 91, 92, 117, 121, 133, 134, 163, 164, 165, 171, 267, 269, 271, 272, 297, 301, 310, 314, 343, 345, 351]
+SalVentAttn = [10, 11, 24, 31, 36, 37, 43, 58, 59, 77, 85, 107, 108, 109, 111, 112, 113, 138, 146, 147, 166, 168, 204, 206, 211, 216, 217, 222, 223, 236, 238, 239, 257, 278, 285, 287, 288, 289, 292, 293, 294, 326, 327, 346, 348, 357, 358]
+
+RSNs = {
+    'SomMot': SomMot,
+    'Vis': Vis,
+    'Def': Def,
+    'DorsAttn': DorsAttn,
+    'Cont': Cont,
+    'Limbic': Limbic,
+    'SalVentAttn': SalVentAttn
+}
+group_names = ['HC', 'MCI', 'AD']
+
+# Compute mean per RSN for each group
+means_per_RSN = []
+for g in range(I_tmax_group.shape[0]):
+    RSN_means = []
+    for rsn_name, nodes in RSNs.items():
+        if nodes:  # avoid empty lists
+            RSN_means.append(np.nanmean(I_tmax_group[g, nodes]))
+        else:
+            RSN_means.append(np.nan)
+    means_per_RSN.append(RSN_means)
+
+means_per_group = np.array(means_per_RSN)
+
+# Plot
+fig, ax = plt.subplots(figsize=(10, 6))
+x = np.arange(len(RSNs))
+width = 0.25
+
+for i, group in enumerate(group_names):
+    ax.bar(x + i*width - width, means_per_group[i], width, label=group)
+
+ax.set_xticks(x)
+ax.set_xticklabels(RSNs.keys(), rotation=45)
+ax.set_ylabel('Mean I_tmax')
+ax.set_title('Mean I_tmax per RSN (first 18 parcels)')
+ax.legend()
+
+plt.tight_layout()
+plt.show()
