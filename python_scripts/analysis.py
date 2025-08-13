@@ -431,16 +431,6 @@ I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Cef
 
 ##### RESTING STATE NETWORKS #####
 
-# Im going to assume that the first parcel is R_V1_ROI and then go from
-# this file: https://github.com/PennLINC/xcp_d/blob/main/xcp_d/data/atlases/atlas-Glasser/atlas-Glasser_dseg.tsv
-
-# tsv_path = os.path.join(repo_root, 'ADNI-A_DATA', 'atlas-Glasser_dseg.tsv')
-
-# df = pd.read_csv(tsv_path, sep='\t')
-
-# # Now you can access your data via the DataFrame `df`
-# print(df.head())
-
 SomMot = [7, 8, 23, 35, 38, 39, 40, 42, 50, 52, 54, 55, 56, 98, 99, 100, 101, 102, 103, 104, 105, 106, 114, 123, 124, 167, 172, 173, 174, 187, 188, 191, 203, 207, 215, 218, 219, 220, 221, 230, 232, 233, 234, 235, 279, 280, 281, 282, 283, 284, 303, 347, 352, 353, 354]
 Vis = [0, 1, 2, 3, 4, 5, 6, 12, 15, 17, 18, 19, 20, 21, 22, 118, 119, 120, 125, 126, 141, 142, 145, 151, 152, 153, 154, 155, 156, 157, 158, 159, 162, 180, 181, 182, 183, 184, 185, 186, 192, 195, 198, 199, 200, 201, 202, 300, 322, 331, 332, 333, 335, 337, 338, 339, 342]
 Def = [25, 27, 29, 30, 32, 33, 34, 60, 63, 64, 65, 67, 68, 70, 71, 73, 74, 75, 86, 87, 93, 122, 127, 128, 129, 130, 131, 148, 149, 150, 160, 175, 176, 177, 205, 209, 210, 212, 213, 214, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 254, 255, 256, 266, 268, 273, 277, 286, 291, 298, 299, 302, 304, 305, 306, 307, 308, 309, 311, 313, 318, 321, 328, 329, 330, 334, 340, 341, 344, 349, 355, 356, 359]
@@ -459,7 +449,46 @@ RSNs = {
     'SalVentAttn': SalVentAttn
 }
 
-plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS=NPARCELLS)
-plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS=NPARCELLS)
-plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS=NPARCELLS)
+#plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS=NPARCELLS)
+#plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS=NPARCELLS)
+#plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS=NPARCELLS)
 
+  # (group, subject, parcel)
+subjects_per_group = [17, 9, 10]   # number of valid subjects per group
+
+# Example RSN mapping (shortened for test)
+N_parcels_test = 18  # only include nodes < N_parcels_test
+
+nodes_in_range = [n for n in SomMot if n < N_parcels_test]
+
+group_names = ['HC', 'MCI', 'AD']
+colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # distinct for each group
+
+means = []
+labels = []
+bar_colors = []
+
+for g, group in enumerate(group_names):
+    n_subs = subjects_per_group[g]
+    for s in range(n_subs):
+        mean_val = np.nanmean(I_tmax_sub[g, s, nodes_in_range])
+        means.append(mean_val)
+        labels.append(f'{group}_S{s+1}')
+        bar_colors.append(colors[g])
+
+# Plot
+fig, ax = plt.subplots(figsize=(12, 6))
+ax.bar(range(len(means)), means, color=bar_colors)
+ax.set_xticks(range(len(means)))
+ax.set_xticklabels(labels, rotation=90)
+ax.set_ylabel('Mean I_tmax')
+ax.set_title(f'Mean I_tmax for SomMot RSN — All Groups')
+
+# Group separators
+sep = 0
+for n in subjects_per_group[:-1]:
+    sep += n
+    ax.axvline(sep - 0.5, color='k', linestyle='--', alpha=0.5)
+
+plt.tight_layout()
+plt.show()
