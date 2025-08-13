@@ -395,12 +395,12 @@ NOISE_TYPE = "HOMO"
 all_values = load_appended_records(
     filepath=os.path.join(FDT_values_subfolder, f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz")
 )
-I_tmax_group = np.sqeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "group"})),axis=0)
-I_norm1_group = np.sqeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "group"})), axis=0)
-I_norm2_group = np.sqeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "group"})), axis=0)
-I_tmax_sub = np.sqeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "subject"})), axis=0)
-I_norm1_sub = np.sqeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "subject"})), axis=0)
-I_norm2_sub = np.sqeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
+I_tmax_group = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "group"})),axis=0)
+I_norm1_group = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "group"})), axis=0)
+I_norm2_group = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "group"})), axis=0)
+I_tmax_sub = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "subject"})), axis=0)
+I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "subject"})), axis=0)
+I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 
 print(I_norm1_group.shape)
 
