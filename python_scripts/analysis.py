@@ -526,6 +526,7 @@ nii_path = os.path.join(repo_root, 'ADNI-A_DATA', 'glasser360MNI.nii.gz')
 parcel_img = nib.load(nii_path)  
 parcel_data = parcel_img.get_fdata().astype(int)
 
+print(parcel_data)
 # Your group-level values (one per parcel)
 # e.g., 360 parcels for Glasser360
 group_values = I_tmax_group
@@ -570,7 +571,7 @@ plotting.plot_surf_stat_map(
     colorbar=False, cmap='viridis',
     bg_map=fsaverage.sulc_left,
     vmin=vmin, vmax=vmax,
-    axes=ax1, title='Left'
+    axes=ax1, title='Left', darkness=None
 )
 
 # Right hemisphere
@@ -581,7 +582,7 @@ plotting.plot_surf_stat_map(
     colorbar=False, cmap='viridis',
     bg_map=fsaverage.sulc_right,
     vmin=vmin, vmax=vmax,
-    axes=ax2, title='Right'
+    axes=ax2, title='Right', darkness=None
 )
 
 # -----------------------
