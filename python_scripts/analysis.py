@@ -524,7 +524,16 @@ from matplotlib.colors import Normalize
 # For example, your parcellation NIfTI (replace with your file)
 nii_path = os.path.join(repo_root, 'ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
 parcel_img = nib.load(nii_path)  
-parcel_data = np.asanyarray(parcel_img.dataobj)
+parcel_data = parcel_img.get_fdata(dtype=np.int32, casting='unsafe')  # force int32
+
+# Alternative: read directly from dataobj
+# parcel_data = np.array(parcel_img.dataobj, dtype=np.int32)
+
+# Check unique labels
+labels = np.unique(parcel_data)
+print(f"Unique labels in the parcellation: {labels}")
+print(f"Shape: {parcel_data.shape}, Non-zero voxels: {np.count_nonzero(parcel_data)}")
+#parcel_data = np.asanyarray(parcel_img.dataobj)
 #parcel_data = parcel_img.get_fdata()
 
 
