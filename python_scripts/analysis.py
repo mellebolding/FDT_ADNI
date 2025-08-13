@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.join(repo_root, 'support_files'))
 sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 results_dir = os.path.join(repo_root, 'Result_plots')
 Ceff_sigma_subfolder = os.path.join(results_dir, 'Ceff_sigma_results')
+FDT_values_subfolder = os.path.join(results_dir, 'FDT_values')
 FDT_parcel_subfolder = os.path.join(results_dir, 'FDT_parcel')
 FDT_subject_subfolder = os.path.join(results_dir, 'FDT_sub')
 Inorm1_group_subfolder = os.path.join(results_dir, 'Inorm1_group')
@@ -83,6 +84,33 @@ def get_field(records, field, filters=None):
     else:
         filtered = records
     return [r.get(field) for r in filtered]
+
+def append_record_to_npz(folder, filename, **record):
+    """
+    Appends a record (dict) to a 'records' array in a .npz file located in `folder`.
+    Creates the folder and file if they don't exist.
+
+    Parameters
+    ----------
+    folder : str
+        Path to the subfolder where the file will be saved.
+    filename : str
+        Name of the .npz file (e.g., 'Ceff_sigma_results.npz').
+    record : dict
+        Arbitrary key-value pairs to store (arrays, strings, numbers, etc.).
+    """
+    os.makedirs(folder, exist_ok=True)  # ensure subfolder exists
+    filepath = os.path.join(folder, filename)
+
+    if os.path.exists(filepath):
+        existing_data = dict(np.load(filepath, allow_pickle=True))
+        records = list(existing_data.get("records", []))
+    else:
+        records = []
+
+    records.append(record)
+    np.savez(filepath, records=np.array(records, dtype=object))
+
 
 
 ###################################################################
@@ -438,7 +466,7 @@ NOISE_TYPE = "HOMO"
 all_records = load_appended_records(
     filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
 )
-
+print('done loading')
 # Extract group-level data
 HC_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "1"}))
 HC_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "1"}))
@@ -475,6 +503,23 @@ I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_gro
 
 # subject analysis
 I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+
+append_record_to_npz(
+    FDT_values_subfolder,
+    f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz",
+    level="subject",
+    I_tmax = I_tmax_sub,
+    I_norm1 = I_norm1_sub,
+    I_norm2 = I_norm2_sub
+)
+append_record_to_npz(
+    FDT_values_subfolder,
+    f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz",
+    level="group",
+    I_tmax = I_tmax_group,
+    I_norm1 = I_norm1_group,
+    I_norm2 = I_norm2_group
+)
 
 #figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 #figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
@@ -518,126 +563,55 @@ import nibabel as nib
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 
-# -----------------------
-# Load your parcellation
-# -----------------------
-# For example, your parcellation NIfTI (replace with your file)
 nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
 parcel_img = nib.load(nii_path)
-parcel_data = parcel_img.get_fdata().astype(int)
-affine = parcel_img.affine
+parcel_data = parcel_img.get_fdata()
+group_map = np.zeros_like(parcel_data)
 
-# Initialize new labeled array
-labeled_img = np.zeros(parcel_data.shape, dtype=int)
+group_values = I_tmax_group[0,:]
 
-# Right hemisphere: labels 1-180
-for label in range(1, 181):
-    labeled_img[parcel_data == label] = label
+for i in range(360):
+    group_map[parcel_data == i + 1] = group_values[i]
 
-# Left hemisphere: labels 1001-1180 -> map to 181-360
-for idx, label in enumerate(range(1001, 1181), start=181):
-    labeled_img[parcel_data == label] = idx
-
-labeled_img = labeled_img.astype(np.int32)
-# Save new NIfTI
-out_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0_labeled_360.nii.gz')
-new_img = nib.Nifti1Image(labeled_img, affine)
-nib.save(new_img, out_path)
-
-print("Saved labeled 360-parcel image to:", out_path)
-print("Unique labels:", np.unique(labeled_img))
-# Alternative: read directly from dataobj
-# parcel_data = np.array(parcel_img.dataobj, dtype=np.int32)
-
-# Check unique labels
-# labels = np.unique(parcel_data)
-# print(f"Unique labels in the parcellation: {labels}")
-# print(f"Shape: {parcel_data.shape}, Non-zero voxels: {np.count_nonzero(parcel_data)}")
-# #parcel_data = np.asanyarray(parcel_img.dataobj)
-# #parcel_data = parcel_img.get_fdata()
-
-
-# print("Shape:", parcel_data.shape)
-# print("Data type:", parcel_data.dtype)
-# print("Min/Max values:", parcel_data.min(), parcel_data.max())
-# print("Affine:\n", parcel_img.affine)
-
-
-#print(parcel_data)
-# Your group-level values (one per parcel)
-# e.g., 360 parcels for Glasser360
-parcel_img = nib.load(out_path)
-parcel_data = parcel_img.get_fdata().astype(int)
-
-group_values = I_tmax_group
-group_maps = []
-
-# Create a volume where each voxel gets the parcel's value
-for g in range(3):
-    group_map = np.zeros_like(parcel_data)
-    
-    # Only fill the first 18 parcels, leave the rest as 0
-    for i, val in enumerate(group_values[g]):
-        group_map[parcel_data == (i + 1)] = val
-    
-    group_maps.append(group_map)
-
-group_img = nib.Nifti1Image(group_map.astype(np.float32), affine=parcel_img.affine)
-#group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
-
-# -----------------------
-# Fetch fsaverage surface
-# -----------------------
+group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
 fsaverage = datasets.fetch_surf_fsaverage()
 
-# Project volume to surface
 texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
 texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
 
-# Global color limits
 vmin = np.min(group_values)
 vmax = np.max(group_values)
 
-# -----------------------
-# Create surface plots
-# -----------------------
 fig = plt.figure(figsize=(10, 5))
 
-# Left hemisphere
 ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-plotting.plot_surf_stat_map(
-    fsaverage.pial_left, texture_left,
-    hemi='left', view='lateral',
-    colorbar=False, cmap='viridis',
-    bg_map=fsaverage.sulc_left,
-    vmin=vmin, vmax=vmax,
-    axes=ax1, title='Left', darkness=None
-)
+plotting.plot_surf_stat_map(fsaverage.pial_left, texture_left,
+                            hemi='left', view='lateral',
+                            colorbar=False, cmap='viridis',
+                            bg_map=fsaverage.sulc_left,
+                            vmin=vmin, vmax=vmax,
+                            axes=ax1, title='Left')
 
-# Right hemisphere
 ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-plotting.plot_surf_stat_map(
-    fsaverage.pial_right, texture_right,
-    hemi='right', view='lateral',
-    colorbar=False, cmap='viridis',
-    bg_map=fsaverage.sulc_right,
-    vmin=vmin, vmax=vmax,
-    axes=ax2, title='Right', darkness=None
-)
+plotting.plot_surf_stat_map(fsaverage.pial_right, texture_right,
+                            hemi='right', view='lateral',
+                            colorbar=False, cmap='viridis',
+                            bg_map=fsaverage.sulc_right,
+                            vmin=vmin, vmax=vmax,
+                            axes=ax2, title='Right')
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
 
-# -----------------------
-# Add colorbar
-# -----------------------
 norm = Normalize(vmin=vmin, vmax=vmax)
 sm = ScalarMappable(cmap='viridis', norm=norm)
 sm.set_array([])
 
-cbar_ax = fig.add_axes([0.47, 0.25, 0.02, 0.5])  # adjust position
+# Define position: [left, bottom, width, height] in figure coordinates (0 to 1)
+cbar_ax = fig.add_axes([0.47, 0.25, 0.02, 0.5])  # adjust as needed
+# Create the colorbar manually in that position
 cbar = plt.colorbar(sm, cax=cbar_ax)
-cbar.set_label("Group Difference")
+# cbar.set_label("Group Difference")
 
 plt.tight_layout()
 plt.show()
 
-print("Unique labels in final image:", np.unique(labeled_img))
-print("Non-zero voxel count:", np.count_nonzero(labeled_img))
