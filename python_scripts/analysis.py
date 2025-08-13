@@ -541,7 +541,8 @@ for g in range(3):
     
     group_maps.append(group_map)
 
-group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
+group_img = nib.Nifti1Image(group_map.astype(np.float32), affine=parcel_img.affine)
+#group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
 
 # -----------------------
 # Fetch fsaverage surface
