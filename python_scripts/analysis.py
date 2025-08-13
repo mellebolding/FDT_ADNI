@@ -494,17 +494,18 @@ ax.set_title(f'Mean I_tmax for SomMot RSN — All Groups')
 
 # Group separators
 for g, (start, end) in enumerate(group_avg_positions):
-    ax.hlines(
-        group_avg_values[g],
-        xmin=start - 0.3,  # slightly before first bar of group
-        xmax=end + 0.3,    # slightly after last bar of group
-        colors=colors[g],
-        linestyles='--',
-        linewidth=2,
-        label=f'{group_names[g]} mean'
+    width = end - start + 1
+    ax.bar(
+        start + width / 2,                  # center position
+        group_avg_values[g],                # height
+        width=width,                         # span across group
+        color=colors[g],
+        alpha=0.3,                           # transparency
+        edgecolor='black',
+        linewidth=1,
+        align='center'
     )
-    #if g < len(subjects_per_group) - 1:
-        #ax.axvline(end + 0.5, color='k', linestyle='--', alpha=0.5)
+
 ax.legend()
 plt.tight_layout()
 plt.show()
