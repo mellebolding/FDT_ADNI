@@ -32,6 +32,10 @@ import matplotlib.pyplot as plt
 from functions_violinplots_WN3_v0 import plot_violins_HC_MCI_AD
 import p_values as p_values  # Make sure this is working!
 import statannotations_permutation
+from nilearn import surface, datasets, plotting
+import nibabel as nib
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
 
 ### Loads data from npz file ######################################
 def load_appended_records(filepath, filters=None, verbose=False):
@@ -440,60 +444,61 @@ RSNs = {
 
 
 ###### VISUALIZATION ######
-from nilearn import surface, datasets, plotting
-import nibabel as nib
-from matplotlib.cm import ScalarMappable
-from matplotlib.colors import Normalize
 
-nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
-parcel_img = nib.load(nii_path)
-parcel_data = parcel_img.get_fdata()
-group_map = np.zeros_like(parcel_data)
+def left_right_brain_map(name,I_tmax_group,NPARCELLS):
+    """
+    Visualizes the group differences in I(tmax, 0) on a brain map.
+    """
+    nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
+    parcel_img = nib.load(nii_path)
+    parcel_data = parcel_img.get_fdata()
+    group_map = np.zeros_like(parcel_data)
 
-group_values = I_tmax_group[0,:]
+    group_values = I_tmax_group[0,:]
 
-for i in range(17):
-    group_map[parcel_data == i + 1] = group_values[i]
+    for i in range(NPARCELLS):
+        group_map[parcel_data == i + 1] = group_values[i]
 
-group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
-fsaverage = datasets.fetch_surf_fsaverage()
+    group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
+    fsaverage = datasets.fetch_surf_fsaverage()
 
-texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
-texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
+    texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
+    texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
 
-vmin = np.min(group_values)
-vmax = np.max(group_values)
+    vmin = np.min(group_values)
+    vmax = np.max(group_values)
 
-fig = plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(10, 5))
+    fig_name = f"left_right_brain{name}_N{NPARCELLS}_{NOISE_TYPE}"
+    save_path = os.path.join(FDT_subject_subfolder, fig_name)
 
-ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-plotting.plot_surf_stat_map(fsaverage.pial_left, texture_left,
-                            hemi='left', view='lateral',
-                            colorbar=False, cmap='viridis',
-                            bg_map=fsaverage.sulc_left,
-                            vmin=vmin, vmax=vmax,
-                            axes=ax1, title='Left')
+    ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+    plotting.plot_surf_stat_map(fsaverage.pial_left, texture_left,
+                                hemi='left', view='lateral',
+                                colorbar=False, cmap='viridis',
+                                bg_map=fsaverage.sulc_left,
+                                vmin=vmin, vmax=vmax,
+                                axes=ax1, title='Left', darkness=None)
 
-ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-plotting.plot_surf_stat_map(fsaverage.pial_right, texture_right,
-                            hemi='right', view='lateral',
-                            colorbar=False, cmap='viridis',
-                            bg_map=fsaverage.sulc_right,
-                            vmin=vmin, vmax=vmax,
-                            axes=ax2, title='Right')
-from matplotlib.cm import ScalarMappable
-from matplotlib.colors import Normalize
+    ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+    plotting.plot_surf_stat_map(fsaverage.pial_right, texture_right,
+                                hemi='right', view='lateral',
+                                colorbar=False, cmap='viridis',
+                                bg_map=fsaverage.sulc_right,
+                                vmin=vmin, vmax=vmax,
+                                axes=ax2, title='Right', darkness=None)
 
-norm = Normalize(vmin=vmin, vmax=vmax)
-sm = ScalarMappable(cmap='viridis', norm=norm)
-sm.set_array([])
+    norm = Normalize(vmin=vmin, vmax=vmax)
+    sm = ScalarMappable(cmap='viridis', norm=norm)
+    sm.set_array([])
 
-# Define position: [left, bottom, width, height] in figure coordinates (0 to 1)
-cbar_ax = fig.add_axes([0.47, 0.25, 0.02, 0.5])  # adjust as needed
-# Create the colorbar manually in that position
-cbar = plt.colorbar(sm, cax=cbar_ax)
-# cbar.set_label("Group Difference")
+    # Define position: [left, bottom, width, height] in figure coordinates (0 to 1)
+    cbar_ax = fig.add_axes([0.47, 0.25, 0.02, 0.5])  # adjust as needed
+    # Create the colorbar manually in that position
+    cbar = plt.colorbar(sm, cax=cbar_ax)
+    # cbar.set_label("Group Difference")
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
 
-plt.tight_layout()
-plt.show()
+left_right_brain_map('I_tmax', I_tmax_group, NPARCELLS)
 
