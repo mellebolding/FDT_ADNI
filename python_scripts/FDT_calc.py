@@ -233,7 +233,7 @@ I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_gro
 # subject analysis
 I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
 
-def X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega_group, a_param=-0.02, gconst=1.0):
+def X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega_group, NPARCELLS, a_param=-0.02, gconst=1.0):
     avec = a_param * np.ones(NPARCELLS)
     tmax = 5000
     ts = 0
@@ -251,17 +251,43 @@ def X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega_group, a_param=-0.0
 
     return intR_tmax_s0_group, intRnorm1_tmax_s0_group, intRnorm2_tmax_s0_group
 
-X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0)
+def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_param=-0.02, gconst=1.0):
+    max_len_subs = max(a.shape[0] for a in omega_subs)
+    avec = a_param * np.ones(NPARCELLS)
+    intR_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
+    intRnorm1_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
+    intRnorm2_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
+
+    for COND in range(3):
+        for sub in range(sigma_subs[COND].shape[0]):
+            sigma_vec = np.append(sigma_subs[COND][sub, :], sigma_subs[COND][sub, :])
+            Gamma = -construct_matrix_A(avec, omega_subs[COND][sub, :], Ceff_subs[COND][sub, :], gconst)
+            D = np.diag(sigma_vec**2 * np.ones(2*NPARCELLS))
+            V_0 = solve_continuous_lyapunov(Gamma, D)
+            intR_tmax_s0_subject[COND, sub, :] = intRts_Langevin_ND(Gamma, tmax=5000, ts=0)[0:NPARCELLS]
+            intRnorm1_tmax_s0_subject[COND, sub, :] = intRts_norm1_Langevin_ND(Gamma, 10000, ts=0)[0:NPARCELLS]
+            intRnorm2_tmax_s0_subject[COND, sub, :] = intRts_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax=5000, ts=0)[0:NPARCELLS]
+
+    return intR_tmax_s0_subject, intRnorm1_tmax_s0_subject, intRnorm2_tmax_s0_subject
+
+X_I_tmax_sub, X_I_norm1_sub, X_I_norm2_sub = X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_param=-0.02, gconst=1.0)
+
+X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, NPARCELLS, a_param=-0.02, gconst=1.0)
 
 print("X_I_tmax_group: ", X_I_tmax_group
       , "X_Inorm1_group: ", X_Inorm1_group, "X_Inorm2_group: ", X_Inorm2_group)
+print("X_I_tmax_sub: ", X_I_tmax_sub
+      , "X_I_norm1_sub: ", X_I_norm1_sub, "X_I_norm2_sub: ", X_I_norm2_sub)
 append_record_to_npz(
     FDT_values_subfolder,
     f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz",
     level="subject",
     I_tmax = I_tmax_sub,
     I_norm1 = I_norm1_sub,
-    I_norm2 = I_norm2_sub
+    I_norm2 = I_norm2_sub,
+    X_I_tmax = X_I_tmax_sub,
+    X_Inorm1 = X_I_norm1_sub,
+    X_Inorm2 = X_I_norm2_sub,
 )
 append_record_to_npz(
     FDT_values_subfolder,
@@ -269,7 +295,10 @@ append_record_to_npz(
     level="group",
     I_tmax = I_tmax_group,
     I_norm1 = I_norm1_group,
-    I_norm2 = I_norm2_group
+    I_norm2 = I_norm2_group,
+    X_I_tmax = X_I_tmax_group,
+    X_Inorm1 = X_Inorm1_group,
+    X_Inorm2 = X_Inorm2_group,
 )
 
 
