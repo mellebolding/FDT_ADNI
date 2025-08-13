@@ -266,9 +266,9 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
             Gamma = -construct_matrix_A(avec, omega_subs[COND][sub, :], Ceff_subs[COND][sub, :], gconst)
             D = np.diag(sigma_vec**2 * np.ones(2*NPARCELLS))
             V_0 = solve_continuous_lyapunov(Gamma, D)
-            intR_tmax_s0_subject[COND, sub, :] = intRts_Langevin_ND(Gamma, tmax=5000, ts=0)[0:NPARCELLS]
-            intRnorm1_tmax_s0_subject[COND, sub, :] = intRts_norm1_Langevin_ND(Gamma, 10000, ts=0)[0:NPARCELLS]
-            intRnorm2_tmax_s0_subject[COND, sub, :] = intRts_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax=5000, ts=0)[0:NPARCELLS]
+            intR_tmax_s0_subject[COND, sub, :] = intRts_Langevin_ND(Gamma, tmax, ts)[0:NPARCELLS]
+            intRnorm1_tmax_s0_subject[COND, sub, :] = intRts_norm1_Langevin_ND(Gamma, 10000, ts)[0:NPARCELLS]
+            intRnorm2_tmax_s0_subject[COND, sub, :] = intRts_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts)[0:NPARCELLS]
 
     return intR_tmax_s0_subject, intRnorm1_tmax_s0_subject, intRnorm2_tmax_s0_subject
 
