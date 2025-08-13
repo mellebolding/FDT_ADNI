@@ -341,6 +341,40 @@ def figures_barplot_parcels(option,I_tmax_group):
     plt.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+
+def plot_means_per_RSN(name, I_tmax_group, NPARCELLS=18):
+
+    group_names = ['HC', 'MCI', 'AD']
+
+    # Compute mean per RSN for each group
+    means_per_group = []
+    for g in range(I_tmax_group.shape[0]):
+        group_means = []
+        for rsn_name, nodes in RSNs.items():
+            nodes_in_range = [n for n in nodes if n < NPARCELLS]
+            if nodes_in_range:  # avoid empty
+                group_means.append(np.nanmean(I_tmax_group[g, nodes_in_range]))
+            else:
+                group_means.append(np.nan)
+        means_per_group.append(group_means)
+
+    means_per_group = np.array(means_per_group)
+    fig_name = f"barplot_RSN_{name}_N{NPARCELLS}_{NOISE_TYPE}"
+    save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    x = np.arange(len(RSNs))
+    width = 0.25
+
+    for i, group in enumerate(group_names):
+        ax.bar(x + i*width - width, means_per_group[i], width, label=group)
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(RSNs.keys(), rotation=45)
+    ax.set_ylabel(f'Mean {name}')
+    ax.set_title(f'Mean {name} per RSN (first {NPARCELLS} parcels)')
+    ax.legend()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
 ####################################################################
 
 NPARCELLS = 18
@@ -424,37 +458,8 @@ RSNs = {
     'Limbic': Limbic,
     'SalVentAttn': SalVentAttn
 }
-N_parcels_test = 18  # change to 360 for full data
 
-group_names = ['HC', 'MCI', 'AD']
+plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS=NPARCELLS)
+plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS=NPARCELLS)
+plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS=NPARCELLS)
 
-# Compute mean per RSN for each group
-means_per_group = []
-for g in range(I_tmax_group.shape[0]):
-    group_means = []
-    for rsn_name, nodes in RSNs.items():
-        nodes_in_range = [n for n in nodes if n < N_parcels_test]
-        if nodes_in_range:  # avoid empty
-            group_means.append(np.nanmean(I_tmax_group[g, nodes_in_range]))
-        else:
-            group_means.append(np.nan)
-    means_per_group.append(group_means)
-
-means_per_group = np.array(means_per_group)
-
-# Plot
-fig, ax = plt.subplots(figsize=(10, 6))
-x = np.arange(len(RSNs))
-width = 0.25
-
-for i, group in enumerate(group_names):
-    ax.bar(x + i*width - width, means_per_group[i], width, label=group)
-
-ax.set_xticks(x)
-ax.set_xticklabels(RSNs.keys(), rotation=45)
-ax.set_ylabel('Mean I_tmax')
-ax.set_title(f'Mean I_tmax per RSN (first {N_parcels_test} parcels)')
-ax.legend()
-
-plt.tight_layout()
-plt.show()
