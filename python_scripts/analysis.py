@@ -489,7 +489,7 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, NPARCELLS):
     ax.set_xticks(range(len(means)))
     ax.set_xticklabels(labels, rotation=90)
     ax.set_ylabel('Mean I_tmax')
-    ax.set_title(f'Mean I_tmax for SomMot RSN — All Groups')
+    ax.set_title(f'Mean I_tmax for {RSN} RSN — All Groups')
 
     # Group separators
     for g, (start, end) in enumerate(group_avg_positions):
@@ -507,4 +507,4 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, NPARCELLS):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-plot_means_per_subjects_per_RSN('SomMot', 'I_tmax_sub', NPARCELLS)
+plot_means_per_subjects_per_RSN(SomMot, 'I_tmax_sub', NPARCELLS)
