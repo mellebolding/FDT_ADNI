@@ -522,31 +522,29 @@ from matplotlib.colors import Normalize
 # Load your parcellation
 # -----------------------
 # For example, your parcellation NIfTI (replace with your file)
-nii_path = os.path.join(repo_root, 'ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
-parcel_img = nib.load(nii_path)  
-#parcel_data = np.array(parcel_img.dataobj, dtype=np.int32) # force int32
-
+nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
+parcel_img = nib.load(nii_path)
 parcel_data = parcel_img.get_fdata().astype(int)
 affine = parcel_img.affine
 
-# Pick a label to check, e.g., 1 (first left hemisphere label)
-label_to_check = 1
-coords = np.argwhere(parcel_data == label_to_check)
+# Initialize new labeled array
+labeled_img = np.zeros(parcel_data.shape, dtype=int)
 
-# Take the first voxel with that label
-voxel_index = coords[0]  # i, j, k
+# Right hemisphere: labels 1-180
+for label in range(1, 181):
+    labeled_img[parcel_data == label] = label
 
-# Compute MNI coordinates
-voxel_homogeneous = np.append(voxel_index, 1)
-mni_coord = affine @ voxel_homogeneous
+# Left hemisphere: labels 1001-1180 -> map to 181-360
+for idx, label in enumerate(range(1001, 1181), start=181):
+    labeled_img[parcel_data == label] = idx
 
-print(f"Voxel index of label {label_to_check}: {voxel_index}")
-print(f"MNI coordinates: {mni_coord[:3]}")
+# Save new NIfTI
+out_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0_labeled_360.nii.gz')
+new_img = nib.Nifti1Image(labeled_img, affine)
+nib.save(new_img, out_path)
 
-if mni_coord[0] < 0:
-    print(f"Label {label_to_check} is in LEFT hemisphere")
-else:
-    print(f"Label {label_to_check} is in RIGHT hemisphere")
+print("Saved labeled 360-parcel image to:", out_path)
+print("Unique labels:", np.unique(labeled_img))
 # Alternative: read directly from dataobj
 # parcel_data = np.array(parcel_img.dataobj, dtype=np.int32)
 
@@ -567,6 +565,9 @@ else:
 #print(parcel_data)
 # Your group-level values (one per parcel)
 # e.g., 360 parcels for Glasser360
+parcel_img = nib.load(out_path)
+parcel_data = parcel_img.get_fdata().astype(int)
+
 group_values = I_tmax_group
 group_maps = []
 
