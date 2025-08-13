@@ -375,83 +375,6 @@ def plot_means_per_RSN(name, I_tmax_group, NPARCELLS=18):
     ax.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
-####################################################################
-
-NPARCELLS = 18
-NOISE_TYPE = "HOMO"
-
-# Load all records
-all_records = load_appended_records(
-    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
-)
-
-# Extract group-level data
-HC_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "1"}))
-HC_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "1"}))
-HC_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "1"}))
-MCI_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "2"}))
-MCI_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "2"}))
-MCI_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "2"}))
-AD_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "3"}))
-AD_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "3"}))
-AD_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "3"}))
-
-sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
-Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
-omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
-
-# Extract subject-level data
-HC_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "1"}))
-HC_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "1"}))
-HC_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "1"}))
-MCI_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "2"}))
-MCI_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "2"}))
-MCI_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "2"}))
-AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "3"}))
-AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "3"}))
-AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "3"}))
-
-# lists, as the arrays are not the same length
-sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
-Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
-omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
-
-# group analysis
-I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-
-# subject analysis
-I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-
-#figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
-#figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
-
-#figures_barplot_parcels('I_tmax',I_tmax_group)
-#figures_barplot_parcels('I_norm1', I_norm1_group)
-#figures_barplot_parcels('I_norm2', I_norm2_group)
-
-##### RESTING STATE NETWORKS #####
-
-SomMot = [7, 8, 23, 35, 38, 39, 40, 42, 50, 52, 54, 55, 56, 98, 99, 100, 101, 102, 103, 104, 105, 106, 114, 123, 124, 167, 172, 173, 174, 187, 188, 191, 203, 207, 215, 218, 219, 220, 221, 230, 232, 233, 234, 235, 279, 280, 281, 282, 283, 284, 303, 347, 352, 353, 354]
-Vis = [0, 1, 2, 3, 4, 5, 6, 12, 15, 17, 18, 19, 20, 21, 22, 118, 119, 120, 125, 126, 141, 142, 145, 151, 152, 153, 154, 155, 156, 157, 158, 159, 162, 180, 181, 182, 183, 184, 185, 186, 192, 195, 198, 199, 200, 201, 202, 300, 322, 331, 332, 333, 335, 337, 338, 339, 342]
-Def = [25, 27, 29, 30, 32, 33, 34, 60, 63, 64, 65, 67, 68, 70, 71, 73, 74, 75, 86, 87, 93, 122, 127, 128, 129, 130, 131, 148, 149, 150, 160, 175, 176, 177, 205, 209, 210, 212, 213, 214, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 254, 255, 256, 266, 268, 273, 277, 286, 291, 298, 299, 302, 304, 305, 306, 307, 308, 309, 311, 313, 318, 321, 328, 329, 330, 334, 340, 341, 344, 349, 355, 356, 359]
-DorsAttn = [9, 16, 26, 28, 41, 44, 45, 46, 47, 48, 49, 51, 53, 79, 95, 115, 116, 135, 136, 137, 139, 140, 144, 189, 190, 196, 197, 224, 225, 226, 227, 228, 229, 231, 259, 275, 276, 295, 296, 315, 316, 317, 319, 320, 324, 325, 336]
-Cont = [13, 14, 57, 61, 62, 66, 69, 72, 76, 78, 80, 81, 82, 83, 84, 90, 94, 96, 97, 110, 132, 143, 161, 169, 170, 178, 179, 193, 194, 208, 237, 252, 253, 258, 260, 261, 262, 263, 264, 265, 270, 274, 290, 312, 323, 350]
-Limbic = [88, 89, 91, 92, 117, 121, 133, 134, 163, 164, 165, 171, 267, 269, 271, 272, 297, 301, 310, 314, 343, 345, 351]
-SalVentAttn = [10, 11, 24, 31, 36, 37, 43, 58, 59, 77, 85, 107, 108, 109, 111, 112, 113, 138, 146, 147, 166, 168, 204, 206, 211, 216, 217, 222, 223, 236, 238, 239, 257, 278, 285, 287, 288, 289, 292, 293, 294, 326, 327, 346, 348, 357, 358]
-
-RSNs = {
-    'SomMot': SomMot,
-    'Vis': Vis,
-    'Def': Def,
-    'DorsAttn': DorsAttn,
-    'Cont': Cont,
-    'Limbic': Limbic,
-    'SalVentAttn': SalVentAttn
-}
-
-#plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS=NPARCELLS)
-#plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS=NPARCELLS)
-#plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS=NPARCELLS)
 
 def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS):
     subjects_per_group = [17, 9, 10]   # number of valid subjects per group
@@ -506,5 +429,164 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS):
         )
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+####################################################################
 
-plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
+NPARCELLS = 18
+NOISE_TYPE = "HOMO"
+
+# Load all records
+all_records = load_appended_records(
+    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
+)
+
+# Extract group-level data
+HC_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "1"}))
+HC_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "1"}))
+HC_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "1"}))
+MCI_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "2"}))
+MCI_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "2"}))
+MCI_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "2"}))
+AD_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "3"}))
+AD_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "3"}))
+AD_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "3"}))
+
+sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
+Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
+omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
+
+# Extract subject-level data
+HC_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "1"}))
+HC_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "1"}))
+HC_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "1"}))
+MCI_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "2"}))
+MCI_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "2"}))
+MCI_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "2"}))
+AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "3"}))
+AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "3"}))
+AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "3"}))
+
+# lists, as the arrays are not the same length
+sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
+Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
+omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
+
+# group analysis
+I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+
+# subject analysis
+I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+
+#figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+#figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+
+#figures_barplot_parcels('I_tmax',I_tmax_group)
+#figures_barplot_parcels('I_norm1', I_norm1_group)
+#figures_barplot_parcels('I_norm2', I_norm2_group)
+
+
+##### RESTING STATE NETWORKS #####
+SomMot = [7, 8, 23, 35, 38, 39, 40, 42, 50, 52, 54, 55, 56, 98, 99, 100, 101, 102, 103, 104, 105, 106, 114, 123, 124, 167, 172, 173, 174, 187, 188, 191, 203, 207, 215, 218, 219, 220, 221, 230, 232, 233, 234, 235, 279, 280, 281, 282, 283, 284, 303, 347, 352, 353, 354]
+Vis = [0, 1, 2, 3, 4, 5, 6, 12, 15, 17, 18, 19, 20, 21, 22, 118, 119, 120, 125, 126, 141, 142, 145, 151, 152, 153, 154, 155, 156, 157, 158, 159, 162, 180, 181, 182, 183, 184, 185, 186, 192, 195, 198, 199, 200, 201, 202, 300, 322, 331, 332, 333, 335, 337, 338, 339, 342]
+Def = [25, 27, 29, 30, 32, 33, 34, 60, 63, 64, 65, 67, 68, 70, 71, 73, 74, 75, 86, 87, 93, 122, 127, 128, 129, 130, 131, 148, 149, 150, 160, 175, 176, 177, 205, 209, 210, 212, 213, 214, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 254, 255, 256, 266, 268, 273, 277, 286, 291, 298, 299, 302, 304, 305, 306, 307, 308, 309, 311, 313, 318, 321, 328, 329, 330, 334, 340, 341, 344, 349, 355, 356, 359]
+DorsAttn = [9, 16, 26, 28, 41, 44, 45, 46, 47, 48, 49, 51, 53, 79, 95, 115, 116, 135, 136, 137, 139, 140, 144, 189, 190, 196, 197, 224, 225, 226, 227, 228, 229, 231, 259, 275, 276, 295, 296, 315, 316, 317, 319, 320, 324, 325, 336]
+Cont = [13, 14, 57, 61, 62, 66, 69, 72, 76, 78, 80, 81, 82, 83, 84, 90, 94, 96, 97, 110, 132, 143, 161, 169, 170, 178, 179, 193, 194, 208, 237, 252, 253, 258, 260, 261, 262, 263, 264, 265, 270, 274, 290, 312, 323, 350]
+Limbic = [88, 89, 91, 92, 117, 121, 133, 134, 163, 164, 165, 171, 267, 269, 271, 272, 297, 301, 310, 314, 343, 345, 351]
+SalVentAttn = [10, 11, 24, 31, 36, 37, 43, 58, 59, 77, 85, 107, 108, 109, 111, 112, 113, 138, 146, 147, 166, 168, 204, 206, 211, 216, 217, 222, 223, 236, 238, 239, 257, 278, 285, 287, 288, 289, 292, 293, 294, 326, 327, 346, 348, 357, 358]
+
+RSNs = {
+    'SomMot': SomMot,
+    'Vis': Vis,
+    'Def': Def,
+    'DorsAttn': DorsAttn,
+    'Cont': Cont,
+    'Limbic': Limbic,
+    'SalVentAttn': SalVentAttn
+}
+
+#plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS=NPARCELLS)
+#plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS=NPARCELLS)
+#plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS=NPARCELLS)
+
+#plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
+#plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
+# ...
+
+
+###### VISUALIZATION ######
+from nilearn import surface, datasets, plotting
+import nibabel as nib
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
+
+# -----------------------
+# Load your parcellation
+# -----------------------
+# For example, your parcellation NIfTI (replace with your file)
+nii_path = os.path.join(repo_root, 'ADNI-A_DATA', 'glasser360MNI.nii.gz')
+parcel_img = nib.load(nii_path)  
+parcel_data = parcel_img.get_fdata().astype(int)
+
+# Your group-level values (one per parcel)
+# e.g., 360 parcels for Glasser360
+group_values = I_tmax_group
+
+# Create a volume where each voxel gets the parcel's value
+group_map = np.zeros_like(parcel_data)
+for i, val in enumerate(group_values):
+    group_map[parcel_data == (i + 1)] = val
+
+group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
+
+# -----------------------
+# Fetch fsaverage surface
+# -----------------------
+fsaverage = datasets.fetch_surf_fsaverage()
+
+# Project volume to surface
+texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
+texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
+
+# Global color limits
+vmin = np.min(group_values)
+vmax = np.max(group_values)
+
+# -----------------------
+# Create surface plots
+# -----------------------
+fig = plt.figure(figsize=(10, 5))
+
+# Left hemisphere
+ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+plotting.plot_surf_stat_map(
+    fsaverage.pial_left, texture_left,
+    hemi='left', view='lateral',
+    colorbar=False, cmap='viridis',
+    bg_map=fsaverage.sulc_left,
+    vmin=vmin, vmax=vmax,
+    axes=ax1, title='Left'
+)
+
+# Right hemisphere
+ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+plotting.plot_surf_stat_map(
+    fsaverage.pial_right, texture_right,
+    hemi='right', view='lateral',
+    colorbar=False, cmap='viridis',
+    bg_map=fsaverage.sulc_right,
+    vmin=vmin, vmax=vmax,
+    axes=ax2, title='Right'
+)
+
+# -----------------------
+# Add colorbar
+# -----------------------
+norm = Normalize(vmin=vmin, vmax=vmax)
+sm = ScalarMappable(cmap='viridis', norm=norm)
+sm.set_array([])
+
+cbar_ax = fig.add_axes([0.47, 0.25, 0.02, 0.5])  # adjust position
+cbar = plt.colorbar(sm, cax=cbar_ax)
+cbar.set_label("Group Difference")
+
+plt.tight_layout()
+plt.show()
