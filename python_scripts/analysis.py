@@ -525,8 +525,16 @@ from matplotlib.colors import Normalize
 nii_path = os.path.join(repo_root, 'ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
 parcel_img = nib.load(nii_path)  
 parcel_data = parcel_img.get_fdata()
+import nibabel as nib
 
-print(parcel_data)
+
+print("Shape:", parcel_data.shape)
+print("Data type:", parcel_data.dtype)
+print("Min/Max values:", parcel_data.min(), parcel_data.max())
+print("Affine:\n", parcel_img.affine)
+
+
+#print(parcel_data)
 # Your group-level values (one per parcel)
 # e.g., 360 parcels for Glasser360
 group_values = I_tmax_group
