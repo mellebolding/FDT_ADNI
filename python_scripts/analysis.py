@@ -503,8 +503,8 @@ for g, (start, end) in enumerate(group_avg_positions):
         linewidth=2,
         label=f'{group_names[g]} mean'
     )
-    if g < len(subjects_per_group) - 1:
-        ax.axvline(end + 0.5, color='k', linestyle='--', alpha=0.5)
+    #if g < len(subjects_per_group) - 1:
+        #ax.axvline(end + 0.5, color='k', linestyle='--', alpha=0.5)
 ax.legend()
 plt.tight_layout()
 plt.show()
