@@ -506,3 +506,5 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, NPARCELLS):
         )
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+
+plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, NPARCELLS)
