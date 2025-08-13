@@ -538,6 +538,7 @@ for label in range(1, 181):
 for idx, label in enumerate(range(1001, 1181), start=181):
     labeled_img[parcel_data == label] = idx
 
+labeled_img = labeled_img.astype(np.int32)
 # Save new NIfTI
 out_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0_labeled_360.nii.gz')
 new_img = nib.Nifti1Image(labeled_img, affine)
