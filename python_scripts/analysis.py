@@ -544,6 +544,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
                             darkness=None,
                             title=f'{name}')
     view.open_in_browser()  # or just `view` if using Jupyter
+    view
     #view.save_as_html(f'surface_plot_{condition_set1}_{label_set1}__{condition_set2}_{label_set2}.html')
 
 brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
