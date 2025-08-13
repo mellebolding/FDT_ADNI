@@ -539,7 +539,8 @@ view = plotting.view_surf(surf_mesh=mesh_both,
                           vmin=np.min(surf_map),     # Minimum value of colorbar
                           vmax=np.max(surf_map),     # Maximum value of colorbar
                           symmetric_cmap=False,
-                          colorbar=True)
+                          colorbar=True,
+                          darkness=None,
+                          title=f'{name}',
 view.open_in_browser()  # or just `view` if using Jupyter
 #view.save_as_html(f'surface_plot_{condition_set1}_{label_set1}__{condition_set2}_{label_set2}.html')
-view
