@@ -467,14 +467,22 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # distinct for each group
 means = []
 labels = []
 bar_colors = []
+group_avg_positions = []
+group_avg_values = []
 
+pos = 0
 for g, group in enumerate(group_names):
     n_subs = subjects_per_group[g]
+    group_vals = []
     for s in range(n_subs):
         mean_val = np.nanmean(I_tmax_sub[g, s, nodes_in_range])
         means.append(mean_val)
+        group_vals.append(mean_val)
         labels.append(f'{group}_S{s+1}')
         bar_colors.append(colors[g])
+    group_avg_values.append(np.nanmean(group_vals))
+    group_avg_positions.append((pos, pos + n_subs - 1))
+    pos += n_subs
 
 # Plot
 fig, ax = plt.subplots(figsize=(12, 6))
@@ -486,9 +494,14 @@ ax.set_title(f'Mean I_tmax for SomMot RSN — All Groups')
 
 # Group separators
 sep = 0
-for n in subjects_per_group[:-1]:
-    sep += n
-    ax.axvline(sep - 0.5, color='k', linestyle='--', alpha=0.5)
+for g, n in enumerate(subjects_per_group):
+    start, end = group_avg_positions[g]
+    ax.axhline(group_avg_values[g], color=colors[g], linestyle='--', linewidth=2,
+               label=f'{group_names[g]} mean')
+    if g < len(subjects_per_group) - 1:
+        sep += n
+        ax.axvline(sep - 0.5, color='k', linestyle='--', alpha=0.5)
 
+ax.legend()
 plt.tight_layout()
 plt.show()
