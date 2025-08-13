@@ -188,7 +188,7 @@ def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, 
 
 ####################################################################
 
-NPARCELLS = 379
+NPARCELLS = 18
 NOISE_TYPE = "HOMO"
 
 # Load all records
