@@ -186,9 +186,47 @@ def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, 
             Inorm2_tmax_s0_subs[COND-1, sub, :] = Its_norm2_Langevin_ND(Gamma, sigma_subs_2, V_0, tmax, ts0)[0:Ndim]
     return I_FDT_all, Inorm1_tmax_s0_subs, Inorm2_tmax_s0_subs
 
+def X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega_group, NPARCELLS, a_param=-0.02, gconst=1.0):
+    avec = a_param * np.ones(NPARCELLS)
+    tmax = 5000
+    ts = 0
+    intR_tmax_s0_group = np.zeros((3, NPARCELLS))
+    intRnorm1_tmax_s0_group = np.zeros((3, NPARCELLS))
+    intRnorm2_tmax_s0_group = np.zeros((3, NPARCELLS))
+    for COND in range(3):
+        sigma_vec = np.append(sigma_group[COND], sigma_group[COND])
+        Gamma = -construct_matrix_A(avec, omega_group[COND], Ceff_group[COND], gconst)
+        D = np.diag(sigma_vec**2 * np.ones(2*NPARCELLS))
+        V_0 = solve_continuous_lyapunov(Gamma, D)
+        intR_tmax_s0_group[COND] = intRts_Langevin_ND(Gamma, tmax, ts)[0:NPARCELLS]
+        intRnorm1_tmax_s0_group[COND] = intRts_norm1_Langevin_ND(Gamma, 10000, ts)[0:NPARCELLS]
+        intRnorm2_tmax_s0_group[COND] = intRts_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts)[0:NPARCELLS]
+
+    return intR_tmax_s0_group, intRnorm1_tmax_s0_group, intRnorm2_tmax_s0_group
+
+def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_param=-0.02, gconst=1.0):
+    tmax = 5000
+    ts = 0
+    max_len_subs = max(a.shape[0] for a in omega_subs)
+    avec = a_param * np.ones(NPARCELLS)
+    intR_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
+    intRnorm1_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
+    intRnorm2_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
+
+    for COND in range(3):
+        for sub in range(sigma_subs[COND].shape[0]):
+            sigma_vec = np.append(sigma_subs[COND][sub, :], sigma_subs[COND][sub, :])
+            Gamma = -construct_matrix_A(avec, omega_subs[COND][sub, :], Ceff_subs[COND][sub, :], gconst)
+            D = np.diag(sigma_vec**2 * np.ones(2*NPARCELLS))
+            V_0 = solve_continuous_lyapunov(Gamma, D)
+            intR_tmax_s0_subject[COND, sub, :] = intRts_Langevin_ND(Gamma, tmax, ts)[0:NPARCELLS]
+            intRnorm1_tmax_s0_subject[COND, sub, :] = intRts_norm1_Langevin_ND(Gamma, 10000, ts)[0:NPARCELLS]
+            intRnorm2_tmax_s0_subject[COND, sub, :] = intRts_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts)[0:NPARCELLS]
+
+    return intR_tmax_s0_subject, intRnorm1_tmax_s0_subject, intRnorm2_tmax_s0_subject
 ####################################################################
 
-NPARCELLS = 18
+NPARCELLS = 379
 NOISE_TYPE = "HOMO"
 
 # Load all records
@@ -229,57 +267,12 @@ omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 
 # group analysis
 I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, NPARCELLS, a_param=-0.02, gconst=1.0)
 
 # subject analysis
 I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-
-def X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega_group, NPARCELLS, a_param=-0.02, gconst=1.0):
-    avec = a_param * np.ones(NPARCELLS)
-    tmax = 5000
-    ts = 0
-    intR_tmax_s0_group = np.zeros((3, NPARCELLS))
-    intRnorm1_tmax_s0_group = np.zeros((3, NPARCELLS))
-    intRnorm2_tmax_s0_group = np.zeros((3, NPARCELLS))
-    for COND in range(3):
-        sigma_vec = np.append(sigma_group[COND], sigma_group[COND])
-        Gamma = -construct_matrix_A(avec, omega_group[COND], Ceff_group[COND], gconst)
-        D = np.diag(sigma_vec**2 * np.ones(2*NPARCELLS))
-        V_0 = solve_continuous_lyapunov(Gamma, D)
-        intR_tmax_s0_group[COND] = intRts_Langevin_ND(Gamma, tmax, ts)[0:NPARCELLS]
-        intRnorm1_tmax_s0_group[COND] = intRts_norm1_Langevin_ND(Gamma, 10000, ts)[0:NPARCELLS]
-        intRnorm2_tmax_s0_group[COND] = intRts_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts)[0:NPARCELLS]
-
-    return intR_tmax_s0_group, intRnorm1_tmax_s0_group, intRnorm2_tmax_s0_group
-
-def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_param=-0.02, gconst=1.0):
-    tmax = 5000
-    ts = 0
-    max_len_subs = max(a.shape[0] for a in omega_subs)
-    avec = a_param * np.ones(NPARCELLS)
-    intR_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
-    intRnorm1_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
-    intRnorm2_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
-
-    for COND in range(3):
-        for sub in range(sigma_subs[COND].shape[0]):
-            sigma_vec = np.append(sigma_subs[COND][sub, :], sigma_subs[COND][sub, :])
-            Gamma = -construct_matrix_A(avec, omega_subs[COND][sub, :], Ceff_subs[COND][sub, :], gconst)
-            D = np.diag(sigma_vec**2 * np.ones(2*NPARCELLS))
-            V_0 = solve_continuous_lyapunov(Gamma, D)
-            intR_tmax_s0_subject[COND, sub, :] = intRts_Langevin_ND(Gamma, tmax, ts)[0:NPARCELLS]
-            intRnorm1_tmax_s0_subject[COND, sub, :] = intRts_norm1_Langevin_ND(Gamma, 10000, ts)[0:NPARCELLS]
-            intRnorm2_tmax_s0_subject[COND, sub, :] = intRts_norm2_Langevin_ND(Gamma, sigma_vec, V_0, tmax, ts)[0:NPARCELLS]
-
-    return intR_tmax_s0_subject, intRnorm1_tmax_s0_subject, intRnorm2_tmax_s0_subject
-
 X_I_tmax_sub, X_I_norm1_sub, X_I_norm2_sub = X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_param=-0.02, gconst=1.0)
 
-X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, NPARCELLS, a_param=-0.02, gconst=1.0)
-
-print("X_I_tmax_group: ", X_I_tmax_group
-      , "X_Inorm1_group: ", X_Inorm1_group, "X_Inorm2_group: ", X_Inorm2_group)
-print("X_I_tmax_sub: ", X_I_tmax_sub
-      , "X_I_norm1_sub: ", X_I_norm1_sub, "X_I_norm2_sub: ", X_I_norm2_sub)
 append_record_to_npz(
     FDT_values_subfolder,
     f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz",
