@@ -522,7 +522,7 @@ from matplotlib.colors import Normalize
 # Load your parcellation
 # -----------------------
 # For example, your parcellation NIfTI (replace with your file)
-nii_path = os.path.join(repo_root, 'ADNI-A_DATA', 'glasser360MNI.nii.gz')
+nii_path = os.path.join(repo_root, 'ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
 parcel_img = nib.load(nii_path)  
 parcel_data = parcel_img.get_fdata().astype(int)
 
