@@ -502,45 +502,48 @@ RSNs = {
 
 ###### VISUALIZATION ######
 
-left_right_brain_map('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
-left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
-left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
+# left_right_brain_map('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
+# left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
+# left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
 
-COND = 0
-fsaverage = datasets.fetch_surf_fsaverage()
-nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
-parcel_img = nib.load(nii_path)
-parcel_data = parcel_img.get_fdata()
-group_map = np.zeros_like(parcel_data)
+def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
 
-group_values = I_tmax_group[COND,:]
+    fsaverage = datasets.fetch_surf_fsaverage()
+    nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
+    parcel_img = nib.load(nii_path)
+    parcel_data = parcel_img.get_fdata()
+    group_map = np.zeros_like(parcel_data)
 
-for i in range(NPARCELLS):
-    group_map[parcel_data == i + 1] = group_values[i]
+    group_values = I_tmax_group[COND,:]
 
-group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
-    
+    for i in range(NPARCELLS):
+        group_map[parcel_data == i + 1] = group_values[i]
 
-texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
-texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
+    group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
+        
 
-surf_map = np.concatenate([texture_left, texture_right])
-coords_left, faces_left = surface.load_surf_mesh(fsaverage.pial_left)
-coords_right, faces_right = surface.load_surf_mesh(fsaverage.pial_right)
+    texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
+    texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
 
-coords = np.vstack([coords_left, coords_right])
-faces = np.vstack([faces_left, faces_right + coords_left.shape[0]])
-mesh_both = (coords, faces)
+    surf_map = np.concatenate([texture_left, texture_right])
+    coords_left, faces_left = surface.load_surf_mesh(fsaverage.pial_left)
+    coords_right, faces_right = surface.load_surf_mesh(fsaverage.pial_right)
 
-# Plot interactively
-view = plotting.view_surf(surf_mesh=mesh_both,
-                          surf_map=surf_map,
-                          cmap='viridis',
-                          vmin=np.min(surf_map),     # Minimum value of colorbar
-                          vmax=np.max(surf_map),     # Maximum value of colorbar
-                          symmetric_cmap=False,
-                          colorbar=True,
-                          darkness=None,
-                          title=f'{name}',
-view.open_in_browser()  # or just `view` if using Jupyter
-#view.save_as_html(f'surface_plot_{condition_set1}_{label_set1}__{condition_set2}_{label_set2}.html')
+    coords = np.vstack([coords_left, coords_right])
+    faces = np.vstack([faces_left, faces_right + coords_left.shape[0]])
+    mesh_both = (coords, faces)
+
+    # Plot interactively
+    view = plotting.view_surf(surf_mesh=mesh_both,
+                            surf_map=surf_map,
+                            cmap='viridis',
+                            vmin=np.min(surf_map),     # Minimum value of colorbar
+                            vmax=np.max(surf_map),     # Maximum value of colorbar
+                            symmetric_cmap=False,
+                            colorbar=True,
+                            darkness=None,
+                            title=f'{name}')
+    view.open_in_browser()  # or just `view` if using Jupyter
+    #view.save_as_html(f'surface_plot_{condition_set1}_{label_set1}__{condition_set2}_{label_set2}.html')
+
+brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
