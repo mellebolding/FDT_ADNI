@@ -421,7 +421,8 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS):
 
     ax1 = fig.add_subplot(1, 2, 1, projection='3d')
     plotting.plot_surf_stat_map(fsaverage.pial_left, texture_left,
-                                hemi='left', view='lateral',
+                                hemi='left', title = f'{name} Left',
+                                view='lateral',
                                 colorbar=False, cmap='viridis',
                                 bg_map=fsaverage.sulc_left,
                                 vmin=vmin, vmax=vmax,
@@ -429,7 +430,8 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS):
 
     ax2 = fig.add_subplot(1, 2, 2, projection='3d')
     plotting.plot_surf_stat_map(fsaverage.pial_right, texture_right,
-                                hemi='right', view='lateral',
+                                hemi='right', title = f'{name} Left',
+                                view='lateral',
                                 colorbar=False, cmap='viridis',
                                 bg_map=fsaverage.sulc_right,
                                 vmin=vmin, vmax=vmax,
