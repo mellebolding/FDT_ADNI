@@ -496,11 +496,11 @@ ax.set_title(f'Mean I_tmax for SomMot RSN — All Groups')
 for g, (start, end) in enumerate(group_avg_positions):
     width = end - start + 1
     ax.bar(
-        start + width / 2,                  # center position
+        start ,                  # center position
         group_avg_values[g],                # height
         width=width,                         # span across group
         color=colors[g],
-        alpha=0.3,                           # transparency
+        alpha=0.5,                           # transparency
         edgecolor='black',
         linewidth=1,
         align='center'
