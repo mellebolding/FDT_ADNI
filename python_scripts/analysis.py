@@ -424,20 +424,23 @@ RSNs = {
     'Limbic': Limbic,
     'SalVentAttn': SalVentAttn
 }
+N_parcels_test = 18  # change to 360 for full data
+
 group_names = ['HC', 'MCI', 'AD']
 
 # Compute mean per RSN for each group
-means_per_RSN = []
+means_per_group = []
 for g in range(I_tmax_group.shape[0]):
-    RSN_means = []
+    group_means = []
     for rsn_name, nodes in RSNs.items():
-        if nodes:  # avoid empty lists
-            RSN_means.append(np.nanmean(I_tmax_group[g, nodes]))
+        nodes_in_range = [n for n in nodes if n < N_parcels_test]
+        if nodes_in_range:  # avoid empty
+            group_means.append(np.nanmean(I_tmax_group[g, nodes_in_range]))
         else:
-            RSN_means.append(np.nan)
-    means_per_RSN.append(RSN_means)
+            group_means.append(np.nan)
+    means_per_group.append(group_means)
 
-means_per_group = np.array(means_per_RSN)
+means_per_group = np.array(means_per_group)
 
 # Plot
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -450,7 +453,7 @@ for i, group in enumerate(group_names):
 ax.set_xticks(x)
 ax.set_xticklabels(RSNs.keys(), rotation=45)
 ax.set_ylabel('Mean I_tmax')
-ax.set_title('Mean I_tmax per RSN (first 18 parcels)')
+ax.set_title(f'Mean I_tmax per RSN (first {N_parcels_test} parcels)')
 ax.legend()
 
 plt.tight_layout()
