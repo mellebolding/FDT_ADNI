@@ -524,23 +524,44 @@ from matplotlib.colors import Normalize
 # For example, your parcellation NIfTI (replace with your file)
 nii_path = os.path.join(repo_root, 'ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
 parcel_img = nib.load(nii_path)  
-parcel_data = np.array(parcel_img.dataobj, dtype=np.int32) # force int32
+#parcel_data = np.array(parcel_img.dataobj, dtype=np.int32) # force int32
 
+parcel_data = parcel_img.get_fdata().astype(int)
+affine = parcel_img.affine
+
+# Pick a label to check, e.g., 1 (first left hemisphere label)
+label_to_check = 1
+coords = np.argwhere(parcel_data == label_to_check)
+
+# Take the first voxel with that label
+voxel_index = coords[0]  # i, j, k
+
+# Compute MNI coordinates
+voxel_homogeneous = np.append(voxel_index, 1)
+mni_coord = affine @ voxel_homogeneous
+
+print(f"Voxel index of label {label_to_check}: {voxel_index}")
+print(f"MNI coordinates: {mni_coord[:3]}")
+
+if mni_coord[0] < 0:
+    print(f"Label {label_to_check} is in LEFT hemisphere")
+else:
+    print(f"Label {label_to_check} is in RIGHT hemisphere")
 # Alternative: read directly from dataobj
 # parcel_data = np.array(parcel_img.dataobj, dtype=np.int32)
 
 # Check unique labels
-labels = np.unique(parcel_data)
-print(f"Unique labels in the parcellation: {labels}")
-print(f"Shape: {parcel_data.shape}, Non-zero voxels: {np.count_nonzero(parcel_data)}")
-#parcel_data = np.asanyarray(parcel_img.dataobj)
-#parcel_data = parcel_img.get_fdata()
+# labels = np.unique(parcel_data)
+# print(f"Unique labels in the parcellation: {labels}")
+# print(f"Shape: {parcel_data.shape}, Non-zero voxels: {np.count_nonzero(parcel_data)}")
+# #parcel_data = np.asanyarray(parcel_img.dataobj)
+# #parcel_data = parcel_img.get_fdata()
 
 
-print("Shape:", parcel_data.shape)
-print("Data type:", parcel_data.dtype)
-print("Min/Max values:", parcel_data.min(), parcel_data.max())
-print("Affine:\n", parcel_img.affine)
+# print("Shape:", parcel_data.shape)
+# print("Data type:", parcel_data.dtype)
+# print("Min/Max values:", parcel_data.min(), parcel_data.max())
+# print("Affine:\n", parcel_img.affine)
 
 
 #print(parcel_data)
