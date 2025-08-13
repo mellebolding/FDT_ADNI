@@ -493,15 +493,18 @@ ax.set_ylabel('Mean I_tmax')
 ax.set_title(f'Mean I_tmax for SomMot RSN — All Groups')
 
 # Group separators
-sep = 0
-for g, n in enumerate(subjects_per_group):
-    start, end = group_avg_positions[g]
-    ax.axhline(group_avg_values[g], color=colors[g], linestyle='--', linewidth=2,
-               label=f'{group_names[g]} mean')
+for g, (start, end) in enumerate(group_avg_positions):
+    ax.hlines(
+        group_avg_values[g],
+        xmin=start - 0.3,  # slightly before first bar of group
+        xmax=end + 0.3,    # slightly after last bar of group
+        colors=colors[g],
+        linestyles='--',
+        linewidth=2,
+        label=f'{group_names[g]} mean'
+    )
     if g < len(subjects_per_group) - 1:
-        sep += n
-        ax.axvline(sep - 0.5, color='k', linestyle='--', alpha=0.5)
-
+        ax.axvline(end + 0.5, color='k', linestyle='--', alpha=0.5)
 ax.legend()
 plt.tight_layout()
 plt.show()
