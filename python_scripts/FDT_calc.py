@@ -252,6 +252,8 @@ def X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega_group, NPARCELLS, a
     return intR_tmax_s0_group, intRnorm1_tmax_s0_group, intRnorm2_tmax_s0_group
 
 def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_param=-0.02, gconst=1.0):
+    tmax = 5000
+    ts = 0
     max_len_subs = max(a.shape[0] for a in omega_subs)
     avec = a_param * np.ones(NPARCELLS)
     intR_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
