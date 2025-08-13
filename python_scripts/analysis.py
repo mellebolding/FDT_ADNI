@@ -529,11 +529,17 @@ parcel_data = parcel_img.get_fdata().astype(int)
 # Your group-level values (one per parcel)
 # e.g., 360 parcels for Glasser360
 group_values = I_tmax_group
+group_maps = []
 
 # Create a volume where each voxel gets the parcel's value
-group_map = np.zeros_like(parcel_data)
-for i, val in enumerate(group_values):
-    group_map[parcel_data == (i + 1)] = val
+for g in range(3):
+    group_map = np.zeros_like(parcel_data)
+    
+    # Only fill the first 18 parcels, leave the rest as 0
+    for i, val in enumerate(group_values_test[g]):
+        group_map[parcel_data == (i + 1)] = val
+    
+    group_maps.append(group_map)
 
 group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
 
