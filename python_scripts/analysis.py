@@ -692,11 +692,16 @@ X_top18 = I_tmax_sub[:, :, top_parcels]  # shape: (3, n_subs, 18)
 
 # Reshape to (n_subjects, n_parcels)
 n_groups, n_subs, n_parcels = X_top18.shape
+
 X = X_top18.reshape(-1, n_parcels)  # (total_subjects, 18)
+# Remove any subject (row) that has NaN in any of the top 18 parcels
+mask = ~np.isnan(X).any(axis=1)
+X = X[mask]
+
 
 # Create group labels
 groupss = np.array([[g]*n_subs for g in groups]).flatten()  # length = total_subjects
-
+groupss = groupss[mask]
 # -----------------
 # PCA for visualization
 # -----------------
