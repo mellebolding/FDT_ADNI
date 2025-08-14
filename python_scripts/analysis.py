@@ -458,16 +458,17 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
     group_map = np.zeros_like(parcel_data)
 
     group_values = I_tmax_group[COND,:]
-    print(parcel_data)
+    #print(parcel_data)
 
     for i in range(NPARCELLS):
         group_map[parcel_data == i + 1] = group_values[i]
-    print(group_map[:360], "shape: ", group_map.shape)
+        print(group_map[parcel_data == i + 1], "parcel: ", i + 1)
+    #print(group_map[:360], "shape: ", group_map.shape)
     
 
     group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
         
-    print("img:", group_img)
+    #print("img:", group_img)
     texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
     texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
 
