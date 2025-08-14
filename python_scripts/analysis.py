@@ -623,7 +623,12 @@ RSNs = {
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}', I_tmax_group, 0, NPARCELLS)
 # brain_map_3D(f'I_tmax_MCI_{NOISE_TYPE}', I_tmax_group, 1, NPARCELLS)
 # brain_map_3D(f'I_tmax_AD_{NOISE_TYPE}', I_tmax_group, 2, NPARCELLS)
-brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}', I_tmax_sub[0], 0, NPARCELLS)
+brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_0', I_tmax_sub[0], 0, NPARCELLS)
+brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_1', I_tmax_sub[0], 1, NPARCELLS)
+brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_2', I_tmax_sub[0], 2, NPARCELLS)
+brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_3', I_tmax_sub[0], 3, NPARCELLS)
+brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
+brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
 
 # I_group is shape (3, 379)
 # example: I_group[0] = HC values, I_group[1] = MCI values, I_group[2] = AD values
