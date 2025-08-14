@@ -496,7 +496,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
 ####################################################################
 
 NPARCELLS = 379
-NOISE_TYPE = "HETERO"
+NOISE_TYPE = "HOMO"
 
 all_values = load_appended_records(
     filepath=os.path.join(FDT_values_subfolder, f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz")
