@@ -647,7 +647,7 @@ colors = ["tab:blue", "tab:orange", "tab:green"]
 diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)
 
 # 2. Find top N
-top_n = 20
+top_n = 18
 top_parcels = np.sort(np.argsort(diffs)[::-1][:top_n])
 
 # 3. Prepare bar plot
@@ -667,6 +667,7 @@ for i, group in enumerate(groups):
 
 # 4. Set labels
 print([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels])
+print(I_tmax_group[0,0,0])
 ax.set_xticks(x + bar_width)
 ax.set_xticklabels([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels], rotation=45, ha="right")
 ax.set_ylabel("Value")
