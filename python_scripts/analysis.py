@@ -458,33 +458,14 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
     group_map = np.zeros_like(parcel_data)
 
     group_values = I_tmax_group[COND,:]
-    #print(parcel_data)
-
-    # for i in range(NPARCELLS):
-    #     group_map[parcel_data == i + 1] = group_values[i]
-    #     print(group_map[parcel_data == i + 1], "parcel: ", i + 1)
-    #print(group_map[:360], "shape: ", group_map.shape)
-    for i in range(180):
+    
+    for i in range(np.min(NPARCELLS,180)):
         group_map[parcel_data == i + 1] = group_values[i]
-    for i in range(180):
-        group_map[parcel_data == i + 1001] = group_values[i + 180]
-
-    # present_labels = np.unique(parcel_data)
-    # present_labels = present_labels[present_labels != 0]  # remove background
-    # print("Present labels:", present_labels)
-    # print(group_values.shape, "group_values shape")
-    # for label in np.unique(parcel_data):
-    #     if label == 0:  # skip background
-    #         continue
-    #     idx = int(label - 1)
-    #     if 0 <= idx < len(group_values):
-    #         group_map[parcel_data == label] = group_values[idx]
-    #     else:
-    #         group_map[parcel_data == label] = 0  # or np.nan
+        if NPARCELLS > 180:
+            group_map[parcel_data == i + 1001] = group_values[i + 180]
 
     group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
         
-    #print("img:", group_img)
     texture_left = surface.vol_to_surf(group_img, fsaverage.pial_left)
     texture_right = surface.vol_to_surf(group_img, fsaverage.pial_right)
 
@@ -525,8 +506,8 @@ I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"lev
 I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 
 
-#figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
-#figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 
 #figures_barplot_parcels('I_tmax',I_tmax_group)
 #figures_barplot_parcels('I_norm1', I_norm1_group)
@@ -565,7 +546,6 @@ RSNs = {
 # left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
 # left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
 
-brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
-#print(I_tmax_group[0, :],I_tmax_group.shape)
+#brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
 #brain_map_3D('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
 #brain_map_3D('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
