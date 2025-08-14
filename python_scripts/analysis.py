@@ -648,8 +648,8 @@ diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)
 
 # 2. Find top N
 top_n = 18
-top_parcels = np.sort(np.argsort(diffs)[::-1][:top_n])
-
+top_parcels_nonsort = np.argsort(diffs)[::-1][:top_n]
+top_parcels = np.sort(top_parcels_nonsort)  # sort indices for plotting
 # 3. Prepare bar plot
 x = np.arange(len(top_parcels))  # parcel positions
 
@@ -676,78 +676,113 @@ ax.legend()
 plt.tight_layout()
 plt.show()
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
-from sklearn.model_selection import cross_val_score, StratifiedKFold
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-from scipy.stats import f_oneway
+top6_parcels = top_parcels_nonsort[:6]  # first 6 parcels for detailed analysis
+x = np.arange(len(top6_parcels)*27)  # parcel positions
 
-# Assume you have already computed the top 18 parcels:
-# e.g., top_parcel_indices = [list of 18 indices]
+n_parcels = len(top6_parcels)
+n_groups = len(groups)
+n_subjects = 9
 
-# Select only those parcels
-X_top18 = I_tmax_sub[:, :, top_parcels]  # shape: (3, n_subs, 18)
+bar_width = 0.2
+x = np.arange(n_parcels)  # positions for parcels
 
-# Reshape to (n_subjects, n_parcels)
-n_groups, n_subs, n_parcels = X_top18.shape
+fig, ax = plt.subplots(figsize=(12, 6))
 
-X = X_top18.reshape(-1, n_parcels)  # (total_subjects, 18)
-# Remove any subject (row) that has NaN in any of the top 18 parcels
-mask = ~np.isnan(X).any(axis=1)
-X = X[mask]
+for i, group in enumerate(groups):
+    # We plot **all subjects in that group** with a small offset for clarity
+    for subj in range(n_subjects):
+        ax.bar(
+            x + i * bar_width + subj*0.02,  # small shift per subject
+            I_tmax_sub[i, subj, top6_parcels],
+            width=0.02,
+            color=colors[i],
+            alpha=0.7
+        )
 
+# Set labels
+parcel_labels = [Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top6_parcels]
+ax.set_xticks(x + bar_width)  # center ticks
+ax.set_xticklabels(parcel_labels, rotation=45, ha="right")
 
-# Create group labels
-groupss = np.array([[g]*n_subs for g in groups]).flatten()  # length = total_subjects
-groupss = groupss[mask]
-# -----------------
-# PCA for visualization
-# -----------------
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+ax.set_ylabel("I(tmax)")
+ax.set_title("Top 6 parcels — values per subject per group")
+ax.legend(groups)
 
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X)
-
-plt.figure(figsize=(8,6))
-colors = {'HC':'tab:blue', 'MCI':'tab:orange', 'AD':'tab:green'}
-for g in np.unique(groupss):
-    idx = groupss == g
-    plt.scatter(X_pca[idx,0], X_pca[idx,1], label=g, color=colors[g], alpha=0.7)
-plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]*100:.1f}%)")
-plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]*100:.1f}%)")
-plt.title("PCA on top 18 parcels by group difference")
-plt.legend()
 plt.tight_layout()
 plt.show()
 
-# -----------------
-# ANOVA per parcel
-# -----------------
-from scipy.stats import f_oneway
-parcel_names_top18 = [Parcel_names[i] for i in top_parcels]  # actual names
+# import numpy as np
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# from sklearn.decomposition import PCA
+# from sklearn.model_selection import cross_val_score, StratifiedKFold
+# from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+# from scipy.stats import f_oneway
 
-anova_results = []
-for i in range(n_parcels):
-    vals_per_group = [X_top18[g, :, i] for g in range(n_groups)]
-    f_val, p_val = f_oneway(*vals_per_group)
-    anova_results.append((parcel_names_top18[i], f_val, p_val))
+# # Assume you have already computed the top 18 parcels:
+# # e.g., top_parcel_indices = [list of 18 indices]
 
-anova_df = pd.DataFrame(anova_results, columns=["Parcel", "F-value", "p-value"])
-anova_df.sort_values("p-value", inplace=True)
-print("\nTop parcels by ANOVA p-value:")
-print(anova_df)
+# # Select only those parcels
+# X_top18 = I_tmax_sub[:, :, top_parcels]  # shape: (3, n_subs, 18)
 
-# -----------------
-# LDA classification
-# -----------------
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-from sklearn.model_selection import cross_val_score, StratifiedKFold
+# # Reshape to (n_subjects, n_parcels)
+# n_groups, n_subs, n_parcels = X_top18.shape
 
-clf = LDA()
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-scores = cross_val_score(clf, X, groupss, cv=cv)
+# X = X_top18.reshape(-1, n_parcels)  # (total_subjects, 18)
+# # Remove any subject (row) that has NaN in any of the top 18 parcels
+# mask = ~np.isnan(X).any(axis=1)
+# X = X[mask]
 
-print(f"\nLDA classification accuracy (5-fold CV): {np.mean(scores)*100:.2f}% ± {np.std(scores)*100:.2f}%")
+
+# # Create group labels
+# groupss = np.array([[g]*n_subs for g in groups]).flatten()  # length = total_subjects
+# groupss = groupss[mask]
+# # -----------------
+# # PCA for visualization
+# # -----------------
+# from sklearn.decomposition import PCA
+# import matplotlib.pyplot as plt
+
+# pca = PCA(n_components=2)
+# X_pca = pca.fit_transform(X)
+
+# plt.figure(figsize=(8,6))
+# colors = {'HC':'tab:blue', 'MCI':'tab:orange', 'AD':'tab:green'}
+# for g in np.unique(groupss):
+#     idx = groupss == g
+#     plt.scatter(X_pca[idx,0], X_pca[idx,1], label=g, color=colors[g], alpha=0.7)
+# plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]*100:.1f}%)")
+# plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]*100:.1f}%)")
+# plt.title("PCA on top 18 parcels by group difference")
+# plt.legend()
+# plt.tight_layout()
+# plt.show()
+
+# # -----------------
+# # ANOVA per parcel
+# # -----------------
+# from scipy.stats import f_oneway
+# parcel_names_top18 = [Parcel_names[i] for i in top_parcels]  # actual names
+
+# anova_results = []
+# for i in range(n_parcels):
+#     vals_per_group = [X_top18[g, :, i] for g in range(n_groups)]
+#     f_val, p_val = f_oneway(*vals_per_group)
+#     anova_results.append((parcel_names_top18[i], f_val, p_val))
+
+# anova_df = pd.DataFrame(anova_results, columns=["Parcel", "F-value", "p-value"])
+# anova_df.sort_values("p-value", inplace=True)
+# print("\nTop parcels by ANOVA p-value:")
+# print(anova_df)
+
+# # -----------------
+# # LDA classification
+# # -----------------
+# from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+# from sklearn.model_selection import cross_val_score, StratifiedKFold
+
+# clf = LDA()
+# cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+# scores = cross_val_score(clf, X, groupss, cv=cv)
+
+# print(f"\nLDA classification accuracy (5-fold CV): {np.mean(scores)*100:.2f}% ± {np.std(scores)*100:.2f}%")
