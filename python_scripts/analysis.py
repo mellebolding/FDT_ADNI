@@ -277,7 +277,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             dpi=300
         )
 
-def figures_barplot_parcels(option,I_tmax_group):
+def figures_barplot_parcels(option,I_tmax_group,NPARCELLS):
     if option == 'I_tmax':
         I_group = I_tmax_group
     elif option == 'I_norm1':
@@ -292,9 +292,9 @@ def figures_barplot_parcels(option,I_tmax_group):
     plt.figure(figsize=(12, 6))
     fig_name = f"barplot_parcel_{option}_N{NPARCELLS}_{NOISE_TYPE}"
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
-    bottom = np.zeros(18)  # start at zero for stacking
+    bottom = np.zeros(NPARCELLS)  # start at zero for stacking
     for i in range(3):
-        plt.bar(range(18), I_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.7)
+        plt.bar(range(NPARCELLS), I_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.7)
         bottom += I_group[i]
 
     plt.xlabel('Parcel')
@@ -304,7 +304,7 @@ def figures_barplot_parcels(option,I_tmax_group):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-def plot_means_per_RSN(name, I_tmax_group, NPARCELLS=18):
+def plot_means_per_RSN(name, I_tmax_group, NPARCELLS):
 
     group_names = ['HC', 'MCI', 'AD']
 
@@ -509,9 +509,9 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 #figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 #figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 
-figures_barplot_parcels('I_tmax',I_tmax_group)
-figures_barplot_parcels('I_norm1', I_norm1_group)
-figures_barplot_parcels('I_norm2', I_norm2_group)
+figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
+figures_barplot_parcels('I_norm1', I_norm1_group, NPARCELLS)
+figures_barplot_parcels('I_norm2', I_norm2_group, NPARCELLS)
 
 
 ##### RESTING STATE NETWORKS #####
