@@ -135,7 +135,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
         I_norm2_group = I_norm2
 
         for group_idx, group_name in enumerate(group_names):
-            for parcel in range(I_tmax_group.shape[0]):
+            for parcel in range(I_tmax_group.shape[1]):
                 records_parcel_Itmax.append({
                 "value": I_tmax_group[group_idx, parcel],
                 "cond": group_name,
@@ -546,6 +546,6 @@ RSNs = {
 # left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
 # left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
 
-brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
-brain_map_3D('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
-brain_map_3D('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
+# brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
+# brain_map_3D('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
+# brain_map_3D('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
