@@ -208,6 +208,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
         I_tmax_sub_mean = np.nanmean(I_tmax_sub, axis=2)
         I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
         I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
+        print(f"Shape of I_tmax_sub_mean: {I_tmax_sub_mean.shape}")
 
         valid_I_tmax_sub_mean = [row[~np.isnan(row)] for row in I_tmax_sub_mean]
         valid_I_norm1_sub_mean = [row[~np.isnan(row)] for row in I_norm1_sub_mean]
