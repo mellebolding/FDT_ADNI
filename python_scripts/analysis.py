@@ -536,12 +536,13 @@ RSNs = {
     'SalVentAttn': SalVentAttn
 }
 
-plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
-plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
-plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
+# plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
+# plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
+# plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
 
-plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
-plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
+# plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
+# plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
+plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub, 'Limbic', 'I_tmax', NPARCELLS)
 # #...
 
 ###### VISUALIZATION ######
