@@ -460,11 +460,19 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
     group_values = I_tmax_group[COND,:]
     #print(parcel_data)
 
-    for i in range(NPARCELLS):
-        group_map[parcel_data == i + 1] = group_values[i]
-        print(group_map[parcel_data == i + 1], "parcel: ", i + 1)
+    # for i in range(NPARCELLS):
+    #     group_map[parcel_data == i + 1] = group_values[i]
+    #     print(group_map[parcel_data == i + 1], "parcel: ", i + 1)
     #print(group_map[:360], "shape: ", group_map.shape)
-    
+    present_labels = np.unique(parcel_data)
+    present_labels = present_labels[present_labels != 0]  # remove background
+
+    for label in present_labels:
+        idx = label - 1  # adjust for zero-based indexing in group_values
+        if idx < len(group_values):
+            group_map[parcel_data == label] = group_values[idx]
+        else:
+            print(f"Skipping label {label}: no corresponding group_value")
 
     group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
         
