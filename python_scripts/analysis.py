@@ -297,8 +297,8 @@ def figures_barplot_parcels(option,I_tmax_group,NPARCELLS):
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     bottom = np.zeros(NPARCELLS)  # start at zero for stacking
     for i in range(3):
-        plt.bar(range(NPARCELLS), I_group[i], bottom=bottom, color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.7)
-        bottom += I_group[i]
+        plt.bar(range(NPARCELLS), I_group[i], color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.5)
+        #bottom += I_group[i]
 
     plt.xlabel('Parcel')
     plt.ylabel(f'{option}')
@@ -509,8 +509,8 @@ I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"lev
 I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 
 
-figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
-figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+# figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+# figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 
 figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
 figures_barplot_parcels('I_norm1', I_norm1_group, NPARCELLS)
