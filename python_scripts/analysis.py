@@ -666,6 +666,7 @@ for i, group in enumerate(groups):
     )
 
 # 4. Set labels
+print([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels])
 ax.set_xticks(x + bar_width)
 ax.set_xticklabels([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels], rotation=45, ha="right")
 ax.set_ylabel("Value")
