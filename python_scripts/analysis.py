@@ -681,7 +681,7 @@ x = np.arange(len(top6_parcels)*27)  # parcel positions
 
 n_parcels = len(top6_parcels)
 n_groups = len(groups)
-n_subjects = 9
+n_subjects = 4
 
 bar_width = 0.2
 x = np.arange(n_parcels)  # positions for parcels
