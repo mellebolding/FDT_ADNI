@@ -209,22 +209,26 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
         I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
         I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
 
+        valid_I_tmax_sub_mean = I_tmax_sub_mean[~np.isnan(I_tmax_sub_mean)]
+        valid_I_norm1_sub_mean = I_norm1_sub_mean[~np.isnan(I_norm1_sub_mean)]
+        valid_I_norm2_sub_mean = I_norm2_sub_mean[~np.isnan(I_norm2_sub_mean)]
+
         print(f"I_tmax_sub_mean: {I_tmax_sub_mean}")
 
         for groupidx, group_name in enumerate(group_names):
-            for subject in range(I_tmax_sub_mean.shape[1]):
+            for subject in range(valid_I_tmax_sub_mean.shape[1]):
                 records_subject_Itmax.append({
-                    "value": I_tmax_sub_mean[groupidx, subject],
+                    "value": valid_I_tmax_sub_mean[groupidx, subject],
                     "cond": group_name,
                     "subject": subject
                 })
                 records_subject_norm1.append({
-                    "value": I_norm1_sub_mean[groupidx, subject],
+                    "value": valid_I_norm1_sub_mean[groupidx, subject],
                     "cond": group_name,
                     "subject": subject
                 })
                 records_subject_norm2.append({
-                    "value": I_norm2_sub_mean[groupidx, subject],
+                    "value": valid_I_norm2_sub_mean[groupidx, subject],
                     "cond": group_name,
                     "subject": subject
                 })
@@ -508,7 +512,7 @@ I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"lev
 I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 
 
-figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+#figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 
 #figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
