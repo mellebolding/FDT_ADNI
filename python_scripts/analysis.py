@@ -533,18 +533,18 @@ RSNs = {
     'SalVentAttn': SalVentAttn
 }
 
-plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
-plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
-plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
+# plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
+# plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
+# plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
 
-plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
-plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
+# plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
+# plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
 # ...
 
 ###### VISUALIZATION ######
-# left_right_brain_map('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
-# left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
-# left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
+left_right_brain_map('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
+left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
+left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
 
 #brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
 #brain_map_3D('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
