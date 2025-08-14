@@ -458,6 +458,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
     group_map = np.zeros_like(parcel_data)
 
     group_values = I_tmax_group[COND,:]
+    print(parcel_data)
 
     for i in range(NPARCELLS):
         group_map[parcel_data == i + 1] = group_values[i]
