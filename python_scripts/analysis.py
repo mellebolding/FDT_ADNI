@@ -546,3 +546,4 @@ RSNs = {
 # left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
 
 brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
+print(I_tmax_group[0, :])
