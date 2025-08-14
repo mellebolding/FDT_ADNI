@@ -216,19 +216,19 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
         print(f"I_tmax_sub_mean: {I_tmax_sub_mean}")
 
         for groupidx, group_name in enumerate(group_names):
-            for subject in range(valid_I_tmax_sub_mean.shape[1]):
+            for subject in range(len(valid_I_tmax_sub_mean[1])):
                 records_subject_Itmax.append({
-                    "value": valid_I_tmax_sub_mean[groupidx, subject],
+                    "value": valid_I_tmax_sub_mean[groupidx][subject],
                     "cond": group_name,
                     "subject": subject
                 })
                 records_subject_norm1.append({
-                    "value": valid_I_norm1_sub_mean[groupidx, subject],
+                    "value": valid_I_norm1_sub_mean[groupidx][subject],
                     "cond": group_name,
                     "subject": subject
                 })
                 records_subject_norm2.append({
-                    "value": valid_I_norm2_sub_mean[groupidx, subject],
+                    "value": valid_I_norm2_sub_mean[groupidx][subject],
                     "cond": group_name,
                     "subject": subject
                 })
