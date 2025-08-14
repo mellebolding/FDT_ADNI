@@ -644,7 +644,7 @@ groups = ["HC", "MCI", "AD"]
 colors = ["tab:blue", "tab:orange", "tab:green"]
 
 # 1. Compute range per parcel
-diffs = np.max(I_norm1_group, axis=0) - np.min(I_norm1_group, axis=0)
+diffs = np.max(I_norm2_group, axis=0) - np.min(I_norm2_group, axis=0)
 
 # 2. Find top N
 top_n = 18
@@ -659,7 +659,7 @@ bar_width = 0.25
 for i, group in enumerate(groups):
     ax.bar(
         x + i * bar_width,
-        I_tmax_group[i, top_parcels],
+        I_norm2_group[i, top_parcels],
         width=bar_width,
         label=group,
         color=colors[i]
@@ -693,7 +693,7 @@ for i, group in enumerate(groups):
     for subj in range(n_subjects):
         ax.bar(
             x + i * bar_width + subj*0.02,  # small shift per subject
-            I_norm1_sub[i, subj, top6_parcels],
+            I_norm2_sub[i, subj, top6_parcels],
             width=0.02,
             color=colors[i],
             alpha=0.7
