@@ -209,6 +209,8 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
         I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
         I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
 
+        print(f"I_tmax_sub_mean: {I_tmax_sub_mean}")
+
         for groupidx, group_name in enumerate(group_names):
             for subject in range(I_tmax_sub_mean.shape[1]):
                 records_subject_Itmax.append({
