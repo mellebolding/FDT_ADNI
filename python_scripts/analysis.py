@@ -636,7 +636,7 @@ groups = ["HC", "MCI", "AD"]
 colors = ["tab:blue", "tab:orange", "tab:green"]
 
 # 1. Compute range per parcel
-diffs = np.max(I_norm2_group, axis=0) - np.min(I_norm2_group, axis=0)
+diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)
 
 # 2. Find top N
 top_n = 18
@@ -651,7 +651,7 @@ bar_width = 0.25
 for i, group in enumerate(groups):
     ax.bar(
         x + i * bar_width,
-        I_norm2_group[i, top_parcels],
+        I_tmax_group[i, top_parcels],
         width=bar_width,
         label=group,
         color=colors[i]
@@ -661,8 +661,8 @@ for i, group in enumerate(groups):
 print([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels])
 ax.set_xticks(x + bar_width)
 ax.set_xticklabels([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels], rotation=45, ha="right")
-ax.set_ylabel("Value")
-ax.set_title("Top parcels with largest between-group differences")
+ax.set_ylabel("I_tmax")
+ax.set_title("I_tmax HOMO top parcels with largest between-group differences")
 ax.legend()
 
 plt.tight_layout()
@@ -685,7 +685,7 @@ for i, group in enumerate(groups):
     for subj in range(n_subjects):
         ax.bar(
             x + i * bar_width + subj*0.02,  # small shift per subject
-            I_norm2_sub[i, subj, top6_parcels],
+            I_tmax_sub[i, subj, top6_parcels],
             width=0.02,
             color=colors[i],
             alpha=0.7
