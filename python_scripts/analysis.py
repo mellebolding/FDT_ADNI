@@ -464,18 +464,23 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
     #     group_map[parcel_data == i + 1] = group_values[i]
     #     print(group_map[parcel_data == i + 1], "parcel: ", i + 1)
     #print(group_map[:360], "shape: ", group_map.shape)
-    present_labels = np.unique(parcel_data)
-    present_labels = present_labels[present_labels != 0]  # remove background
-    print("Present labels:", present_labels)
-    print(group_values.shape, "group_values shape")
-    for label in np.unique(parcel_data):
-        if label == 0:  # skip background
-            continue
-        idx = int(label - 1)
-        if 0 <= idx < len(group_values):
-            group_map[parcel_data == label] = group_values[idx]
-        else:
-            group_map[parcel_data == label] = 0  # or np.nan
+    for i in range(NPARCELLS[:180]):
+        group_map[parcel_data == i + 1] = group_values[i]
+    for i in range(NPARCELLS[180:]):
+        group_map[parcel_data == i + 1001] = group_values[i + 180]
+
+    # present_labels = np.unique(parcel_data)
+    # present_labels = present_labels[present_labels != 0]  # remove background
+    # print("Present labels:", present_labels)
+    # print(group_values.shape, "group_values shape")
+    # for label in np.unique(parcel_data):
+    #     if label == 0:  # skip background
+    #         continue
+    #     idx = int(label - 1)
+    #     if 0 <= idx < len(group_values):
+    #         group_map[parcel_data == label] = group_values[idx]
+    #     else:
+    #         group_map[parcel_data == label] = 0  # or np.nan
 
     group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
         
