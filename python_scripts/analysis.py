@@ -177,7 +177,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             resI_Itmax,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel='FDT I(tmax, 0) Parcels',
+            graphLabel=f'FDT I(tmax, 0) Parcels {NOISE_TYPE}',
             save_path=save_path
         )
         plt.rcParams.update({'font.size': 15})
@@ -187,7 +187,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             resI_norm1,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel='FDT I Norm1 Parcels',
+            graphLabel=f'FDT I Norm1 Parcels {NOISE_TYPE}',
             save_path=save_path
         )
         plt.rcParams.update({'font.size': 15})
@@ -197,7 +197,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             resI_norm2,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel='FDT I Norm2 Parcels',
+            graphLabel=f'FDT I Norm2 Parcels {NOISE_TYPE}',
             save_path=save_path
         )
 
@@ -244,7 +244,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             metric='I(t=tmax,s=0) [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title='FDT I(tmax, 0) — Mean per subject per group',
+            plot_title=f'FDT I(tmax, 0) — Mean per subject per group {NOISE_TYPE}',
             saveplot=1,
             filename=save_path,
             dpi=300
@@ -259,7 +259,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             metric='I Norm1 [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title='FDT I Norm1 — Mean per subject per group',
+            plot_title=f'FDT I Norm1 — Mean per subject per group {NOISE_TYPE}',
             saveplot=1,
             filename=save_path,
             dpi=300
@@ -274,7 +274,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             metric='I Norm2 [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title='FDT I Norm2 — Mean per subject per group',
+            plot_title=f'FDT I Norm2 — Mean per subject per group {NOISE_TYPE}',
             saveplot=1,
             filename=save_path,
             dpi=300
@@ -302,7 +302,7 @@ def figures_barplot_parcels(option,I_tmax_group,NPARCELLS):
 
     plt.xlabel('Parcel')
     plt.ylabel(f'{option}')
-    plt.title(f'{option} for Parcels')
+    plt.title(f'{option} for Parcels {NOISE_TYPE}')
     plt.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
@@ -336,7 +336,7 @@ def plot_means_per_RSN(name, I_tmax_group, NPARCELLS):
     ax.set_xticks(x)
     ax.set_xticklabels(RSNs.keys(), rotation=45)
     ax.set_ylabel(f'Mean {name}')
-    ax.set_title(f'Mean {name} per RSN (first {NPARCELLS} parcels)')
+    ax.set_title(f'Mean {name} per RSN (first {NPARCELLS} parcels) {NOISE_TYPE}')
     ax.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
@@ -377,7 +377,7 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS):
     ax.set_xticks(range(len(means)))
     ax.set_xticklabels(labels, rotation=90)
     ax.set_ylabel(f'Mean {nameI}')
-    ax.set_title(f'Mean {nameI} for {nameRSN} RSN')
+    ax.set_title(f'Mean {nameI} for {nameRSN} RSN {NOISE_TYPE}')
 
     # Group separators
     for g, (start, end) in enumerate(group_avg_positions):
@@ -549,6 +549,6 @@ RSNs = {
 # left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
 # left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
 
-brain_map_3D('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
-brain_map_3D('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
-brain_map_3D('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
+brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}', I_tmax_group, 0, NPARCELLS)
+brain_map_3D(f'I_tmax_MCI_{NOISE_TYPE}', I_tmax_group, 1, NPARCELLS)
+brain_map_3D(f'I_tmax_AD_{NOISE_TYPE}', I_tmax_group, 2, NPARCELLS)
