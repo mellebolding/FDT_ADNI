@@ -208,51 +208,28 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
         I_tmax_sub_mean = np.nanmean(I_tmax_sub, axis=2)
         I_norm1_sub_mean = np.nanmean(I_norm1_sub, axis=2)
         I_norm2_sub_mean = np.nanmean(I_norm2_sub, axis=2)
-        print(f"Shape of I_tmax_sub_mean: {I_tmax_sub_mean.shape}")
-
-        # valid_I_tmax_sub_mean = [row[~np.isnan(row)] for row in I_tmax_sub_mean]
-        # valid_I_norm1_sub_mean = [row[~np.isnan(row)] for row in I_norm1_sub_mean]
-        # valid_I_norm2_sub_mean = [row[~np.isnan(row)] for row in I_norm2_sub_mean]
 
         for groupidx, group_name in enumerate(group_names):
             for subject in range(I_tmax_sub_mean.shape[1]):
-                
                 if not np.isnan(I_tmax_sub_mean[groupidx, subject]):
                     records_subject_Itmax.append({
                         "value": I_tmax_sub_mean[groupidx, subject],
                         "cond": group_name,
                         "subject": subject
                     })
-
                 if not np.isnan(I_norm1_sub_mean[groupidx, subject]):
                     records_subject_norm1.append({
                         "value": I_norm1_sub_mean[groupidx, subject],
                         "cond": group_name,
                         "subject": subject
                     })
-
                 if not np.isnan(I_norm2_sub_mean[groupidx, subject]):
                     records_subject_norm2.append({
                         "value": I_norm2_sub_mean[groupidx, subject],
                         "cond": group_name,
                         "subject": subject
                     })
-                # records_subject_Itmax.append({
-                #     "value": valid_I_tmax_sub_mean[groupidx][subject],
-                #     "cond": group_name,
-                #     "subject": subject
-                # })
-                # records_subject_norm1.append({
-                #     "value": valid_I_norm1_sub_mean[groupidx][subject],
-                #     "cond": group_name,
-                #     "subject": subject
-                # })
-                # records_subject_norm2.append({
-                #     "value": valid_I_norm2_sub_mean[groupidx][subject],
-                #     "cond": group_name,
-                #     "subject": subject
-                # })
-        print(f"records_subject_Itmax: {records_subject_Itmax}")
+
         data_subjects_Itmax = pd.DataFrame.from_records(records_subject_Itmax)
         data_subjects_norm1 = pd.DataFrame.from_records(records_subject_norm1)
         data_subjects_norm2 = pd.DataFrame.from_records(records_subject_norm2)
@@ -519,7 +496,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
 ####################################################################
 
 NPARCELLS = 379
-NOISE_TYPE = "HOMO"
+NOISE_TYPE = "Hetero"
 
 all_values = load_appended_records(
     filepath=os.path.join(FDT_values_subfolder, f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz")
