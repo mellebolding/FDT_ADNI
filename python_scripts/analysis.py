@@ -466,7 +466,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
     #print(group_map[:360], "shape: ", group_map.shape)
     for i in range(NPARCELLS[:180]):
         group_map[parcel_data == i + 1] = group_values[i]
-    for i in range(NPARCELLS[180:]):
+    for i in range(NPARCELLS[180:360]):
         group_map[parcel_data == i + 1001] = group_values[i + 180]
 
     # present_labels = np.unique(parcel_data)
