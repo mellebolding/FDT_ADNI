@@ -290,14 +290,14 @@ def figures_barplot_parcels(option,I_tmax_group,NPARCELLS):
     else:
         raise ValueError("Invalid option. Choose from 'I_tmax', 'I_norm1', or 'I_norm2'.")
 
-    colors = ['tab:blue', 'tab:orange', 'tab:green']
+    colors = ['tab:blue', 'tab:red', 'tab:green']
 
     plt.figure(figsize=(12, 6))
     fig_name = f"barplot_parcel_{option}_N{NPARCELLS}_{NOISE_TYPE}"
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     bottom = np.zeros(NPARCELLS)  # start at zero for stacking
     for i in range(3):
-        plt.bar(range(NPARCELLS), I_group[i], color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.5)
+        plt.bar(range(NPARCELLS), I_group[i], color=colors[i], label=f'{["HC", "MCI", "AD"][i]}', alpha=0.4)
         #bottom += I_group[i]
 
     plt.xlabel('Parcel')
