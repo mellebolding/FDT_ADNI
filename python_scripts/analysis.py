@@ -459,7 +459,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
 
     group_values = I_tmax_group[COND,:]
     
-    for i in range(np.min(NPARCELLS,180)):
+    for i in range(min(NPARCELLS,180)):
         group_map[parcel_data == i + 1] = group_values[i]
         if NPARCELLS > 180:
             group_map[parcel_data == i + 1001] = group_values[i + 180]
