@@ -630,19 +630,6 @@ RSNs = {
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
 
-# I_group is shape (3, 379)
-# example: I_group[0] = HC values, I_group[1] = MCI values, I_group[2] = AD values
-
-# diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)  # range per parcel
-# top_n = 10  # how many top parcels you want
-# top_parcels = np.argsort(diffs)[::-1][:top_n]  # indices of largest differences
-
-# print("Top parcels with largest group differences:")
-# for idx in top_parcels:
-#     print(f"Parcel {idx}: range = {diffs[idx]:.4f}, values = {I_tmax_group[:, idx]}")
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 groups = ["HC", "MCI", "AD"]
