@@ -628,10 +628,49 @@ RSNs = {
 # I_group is shape (3, 379)
 # example: I_group[0] = HC values, I_group[1] = MCI values, I_group[2] = AD values
 
-diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)  # range per parcel
-top_n = 10  # how many top parcels you want
-top_parcels = np.argsort(diffs)[::-1][:top_n]  # indices of largest differences
+# diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)  # range per parcel
+# top_n = 10  # how many top parcels you want
+# top_parcels = np.argsort(diffs)[::-1][:top_n]  # indices of largest differences
 
-print("Top parcels with largest group differences:")
-for idx in top_parcels:
-    print(f"Parcel {idx}: range = {diffs[idx]:.4f}, values = {I_tmax_group[:, idx]}")
+# print("Top parcels with largest group differences:")
+# for idx in top_parcels:
+#     print(f"Parcel {idx}: range = {diffs[idx]:.4f}, values = {I_tmax_group[:, idx]}")
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+groups = ["HC", "MCI", "AD"]
+colors = ["tab:blue", "tab:orange", "tab:green"]
+
+# 1. Compute range per parcel
+diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)
+
+# 2. Find top N
+top_n = 10
+top_parcels = np.argsort(diffs)[::-1][:top_n]
+
+# 3. Prepare bar plot
+x = np.arange(len(top_parcels))  # parcel positions
+
+fig, ax = plt.subplots(figsize=(12, 6))
+bar_width = 0.25
+
+for i, group in enumerate(groups):
+    ax.bar(
+        x + i * bar_width,
+        I_tmax_group[i, top_parcels],
+        width=bar_width,
+        label=group,
+        color=colors[i]
+    )
+
+# 4. Set labels
+ax.set_xticks(x + bar_width)
+ax.set_xticklabels([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels], rotation=45, ha="right")
+ax.set_ylabel("Value")
+ax.set_title("Top parcels with largest between-group differences")
+ax.legend()
+
+plt.tight_layout()
+plt.show()
