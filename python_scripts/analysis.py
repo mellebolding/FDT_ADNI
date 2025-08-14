@@ -648,7 +648,7 @@ diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)
 
 # 2. Find top N
 top_n = 10
-top_parcels = np.argsort(diffs)[::-1][:top_n]
+top_parcels = np.sort(np.argsort(diffs)[::-1][:top_n])
 
 # 3. Prepare bar plot
 x = np.arange(len(top_parcels))  # parcel positions
