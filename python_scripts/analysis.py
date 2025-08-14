@@ -461,7 +461,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
 
     for i in range(NPARCELLS):
         group_map[parcel_data == i + 1] = group_values[i]
-    print(group_map[:360])
+    print(group_map[:360], "shape: ", group_map.shape)
     
 
     group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
