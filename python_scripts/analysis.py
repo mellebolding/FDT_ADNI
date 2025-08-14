@@ -647,7 +647,7 @@ colors = ["tab:blue", "tab:orange", "tab:green"]
 diffs = np.max(I_tmax_group, axis=0) - np.min(I_tmax_group, axis=0)
 
 # 2. Find top N
-top_n = 10
+top_n = 20
 top_parcels = np.sort(np.argsort(diffs)[::-1][:top_n])
 
 # 3. Prepare bar plot
