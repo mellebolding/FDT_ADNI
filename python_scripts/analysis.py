@@ -491,7 +491,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
     view
 ####################################################################
 
-NPARCELLS = 18
+NPARCELLS = 379
 NOISE_TYPE = "HOMO"
 
 all_values = load_appended_records(
