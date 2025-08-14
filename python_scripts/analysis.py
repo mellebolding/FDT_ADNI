@@ -466,7 +466,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
     #print(group_map[:360], "shape: ", group_map.shape)
     present_labels = np.unique(parcel_data)
     present_labels = present_labels[present_labels != 0]  # remove background
-
+    print(group_values.shape, "group_values shape")
     for label in present_labels:
         idx = label - 1  # adjust for zero-based indexing in group_values
         if idx < len(group_values):
