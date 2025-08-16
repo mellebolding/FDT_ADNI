@@ -482,7 +482,7 @@ for i in range(1,4):
     for sub in range(len(ID)):
         subj_id = ID[sub]
         omega = 2 * np.pi * f_diff[sub,:] # omega per subject
-        SC_N = SCs[sub,:NPARCELLS, :NPARCELLS]
+        SC_N = SCs[sub][:NPARCELLS, :NPARCELLS]
         SC_N /= np.max(SC_N)
         SC_N *= 0.2
 
