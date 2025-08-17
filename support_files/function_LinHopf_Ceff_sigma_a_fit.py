@@ -316,10 +316,14 @@ def update_a(a_previous, a_ini, FCemp, FCsim, COVtauemp, COVtausim,
         grad_COVtau = np.sum(COVtauemp[i, :] - COVtausim[i, :])
         
         a_new[i] = a_previous[i] - epsFC_a * grad_FC - epsCOVtau_a * grad_COVtau
-        
+        if np.isnan(grad_FC) or np.isnan(grad_COVtau):
+            print(f"NaN gradient at parcel {i}")
+        if np.isinf(grad_FC) or np.isinf(grad_COVtau):
+            print(f"Inf gradient at parcel {i}")
         if a_new[i] < -0.2 or a_new[i] > 0.2:
             a_new[i] = 0.02
     print(f"update_a: a_new = {a_new}")
+    
 
     return a_new
 
