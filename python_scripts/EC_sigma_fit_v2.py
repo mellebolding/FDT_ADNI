@@ -266,7 +266,7 @@ for subject in HC_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     HC_MRI[subject] = data[subject]['timeseries'].T
     HC_SC[subject] = data[subject]['SC']
-    HC_Abeta[subject] = data[subject]['ABeta']
+    HC_ABeta[subject] = data[subject]['ABeta']
     HC_Tau[subject] = data[subject]['Tau']
 
 
