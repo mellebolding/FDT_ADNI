@@ -352,7 +352,7 @@ MCI_SC_matrices = np.array(list(MCI_SC.values()))  # Shape: (Nsubjects, NPARCELL
 MCI_SC_avg = np.mean(MCI_SC_matrices, axis=0)
 AD_SC_matrices = np.array(list(AD_SC.values()))  # Shape: (Nsubjects, NPARCELLS, NPARCELLS)
 AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
-ABeta_burden = [HC_ABeta[:,:NPARCELLS,0], MCI_ABeta[:,:NPARCELLS,0], AD_ABeta[:,:NPARCELLS,0]]
+ABeta_burden = [np.array(HC_ABeta)[:,:NPARCELLS,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
 Tau_burden = [HC_Tau, MCI_Tau, AD_Tau]
 print(f"HC ABeta shape: {np.array(HC_ABeta).shape}")
 
