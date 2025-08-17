@@ -317,8 +317,8 @@ def update_a(a_previous, a_ini, FCemp, FCsim, COVtauemp, COVtausim,
         
         a_new[i] = a_previous[i] - epsFC_a * grad_FC - epsCOVtau_a * grad_COVtau
         
-        if a_new[i] < 0:
-            a_new[i] = 0.0
+        if a_new[i] < -0.2 or a_new[i] > 0.2:
+            a_new[i] = 0.02
 
     return a_new
 
