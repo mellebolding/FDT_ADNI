@@ -353,8 +353,8 @@ MCI_SC_avg = np.mean(MCI_SC_matrices, axis=0)
 AD_SC_matrices = np.array(list(AD_SC.values()))  # Shape: (Nsubjects, NPARCELLS, NPARCELLS)
 AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
 ABeta_burden = [np.array(HC_ABeta)[:,:NPARCELLS,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
-Tau_burden = [HC_Tau, MCI_Tau, AD_Tau]
-print(f"HC ABeta shape: {np.array(HC_ABeta).shape}")
+Tau_burden = [np.array(HC_Tau)[:,:NPARCELLS,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
+#print(f"HC ABeta shape: {np.array(HC_ABeta).shape}")
 
 ### Group level
 for COND in range(1,4):
