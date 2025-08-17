@@ -9,7 +9,7 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
                                      fit_sigma=True, sigma_reset=False,
                                      fit_a=True,
                                      epsFC_Ceff=8e-5, epsCOVtau_Ceff=3e-5, epsFC_sigma=8e-5, epsCOVtau_sigma=3e-5, 
-                                     epsFC_a=8e-7, epsCOVtau_a=3e-7,
+                                     epsFC_a=8e-6, epsCOVtau_a=3e-6,
                                      MAXiter=10000, error_tol=5e-4, patience=2, learning_rate_factor=0.8,
                                      Ceff_norm=True, maxC=0.2,
                                      iter_check=50, plot_evol=False, plot_evol_last=False):
@@ -198,7 +198,7 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
                                      FCemp, FCsim, COVtauemp, COVtausim,
                                      epsFC_sigma, epsCOVtau_sigma, sigma_reset)
             ### sigma re-normalization
-            _, COVsim, _, _ = hopf_int(Ceff_new, f_diff, sigma_new, a)
+            _, COVsim, _, _ = hopf_int(Ceff_new, f_diff, sigma_new, a_new)
             COVsim_diag = np.diag(COVsim)
             normalization_factor = np.sum(COVemp_diag) / np.sum(COVsim_diag)
             sigma_new *= np.sqrt(normalization_factor)
@@ -322,7 +322,7 @@ def update_a(a_previous, a_ini, FCemp, FCsim, COVtauemp, COVtausim,
             print(f"Inf gradient at parcel {i}")
         if a_new[i] < -0.2 or a_new[i] > 0.2:
             a_new[i] = 0.02
-    print(f"update_a: a_new = {a_new}")
+    #print(f"update_a: a_new = {a_new}")
     
 
     return a_new
