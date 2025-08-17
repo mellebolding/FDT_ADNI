@@ -56,7 +56,7 @@ from scipy.signal import butter, filtfilt
 from scipy.signal import detrend as scipy_detrend
 from functions_FC_v3 import *
 from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
-from functions_Linhopf_Ceff_sigma_a_fit import LinHopf_Ceff_sigma_a_fitting_numba
+from functions_LinHopf_Ceff_sigma_a_fit import LinHopf_Ceff_sigma_a_fitting_numba
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
 from scipy.linalg import expm
