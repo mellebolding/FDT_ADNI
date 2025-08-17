@@ -545,3 +545,6 @@ for i in range(1,4):
         Ceff=Ceff_sub[sub],
         omega=omega,
         a=a_sub[sub])
+
+print("a_group: ", a_group)
+print("a_sub: ", a_sub)
