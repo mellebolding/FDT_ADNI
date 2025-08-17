@@ -598,6 +598,8 @@ def from_PET_to_a(a_values, abeta_values, tau_values, fit_type='linear'):
     Tau_all   = np.concatenate(tau_values, axis=0).flatten()
     a_all     = np.concatenate(a_values, axis=0).flatten()
 
+    print(f"ABeta_all shape: {ABeta_all.shape}, Tau_all shape: {Tau_all.shape}, a_all shape: {a_all.shape}")
+
     # Interaction term
     interaction = ABeta_all * Tau_all
 
