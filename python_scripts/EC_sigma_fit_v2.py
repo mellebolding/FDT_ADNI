@@ -457,6 +457,7 @@ for COND in range(1,4):
 # Note: The subject level calculations are done in parallel for each condition
 for i in range(1,4):
     COND = i
+    a_list_sub_temp = []
     if COND == 1: ## --> HC
         #f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = HC_MRI
@@ -548,7 +549,7 @@ for i in range(1,4):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
 
-        a_list_sub.append(a_sub[sub])
+        a_list_sub_temp.append(a_sub[sub])
         ## save the results
         append_record_to_npz(
         Ceff_sigma_subfolder,
@@ -560,6 +561,9 @@ for i in range(1,4):
         Ceff=Ceff_sub[sub],
         omega=omega,
         a=a_sub[sub])
+    a_list_sub.append(np.array(a_list_sub_temp))
 
 print("a_group: ", a_list_group)
 print("a_sub: ", a_list_sub)
+print("shape a_sub: ", len(a_list_sub), len(a_list_sub[0]), a_list_sub[0].shape)
+
