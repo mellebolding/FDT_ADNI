@@ -578,3 +578,42 @@ def exp_scaling_squaring(Gamma, m=10):
         result = np.dot(result, result)
     
     return result
+
+import statsmodels.api as sm
+import pandas as pd
+def from_PET_to_a(a_values, abeta_values, tau_values, fit_type='linear'):
+    # pooled_a = []
+    # pooled_abeta = []
+    # pooled_tau = []
+
+    # N_subjects = len(a_values[0])+len(a_values[1])+len(a_values[2])
+    # for i in range(N_subjects):
+    #     pooled_a.append(a_values[0][i])
+    #     pooled_abeta.append(abeta_values[0][i])
+    #     pooled_tau.append(tau_values[0][i])
+
+    # X = np.column_stack((pooled_abeta, pooled_tau))
+    # X = sm.add_constant(X)
+    ABeta_all = np.concatenate(abeta_values, axis=0).flatten()
+    Tau_all   = np.concatenate(tau_values, axis=0).flatten()
+    a_all     = np.concatenate(a_values, axis=0).flatten()
+
+    # Interaction term
+    interaction = ABeta_all * Tau_all
+
+    # Step 2: Create design matrix (with intercept)
+    X = pd.DataFrame({
+        'ABeta': ABeta_all,
+        'Tau': Tau_all,
+        'ABeta_x_Tau': interaction
+    })
+    X = sm.add_constant(X)  # adds intercept term
+    
+    if fit_type == "linear":
+        model = sm.OLS(a_all, X).fit()
+        return {
+            "params": model.params,
+            "pvalues": model.pvalues,
+            "rsquared": model.rsquared,
+            "summary": model.summary().as_text()
+        }

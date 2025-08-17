@@ -260,39 +260,39 @@ NPARCELLS = 18 #tot: 379
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
 HC_SC = {}
-HC_ABeta = {}
-HC_Tau = {}
+HC_ABeta = []
+HC_Tau = []
 for subject in HC_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     HC_MRI[subject] = data[subject]['timeseries'].T
     HC_SC[subject] = data[subject]['SC']
-    HC_ABeta[subject] = data[subject]['ABeta']
-    HC_Tau[subject] = data[subject]['Tau']
+    HC_ABeta.append(np.vstack(data[subject]['ABeta'])) 
+    HC_Tau.append(np.vstack(data[subject]['Tau']))
 
 
 MCI_IDs = DL.get_groupSubjects('MCI')
 MCI_MRI = {}
 MCI_SC = {}
-MCI_ABeta = {}
-MCI_Tau = {}
+MCI_ABeta = []
+MCI_Tau = []
 for subject in MCI_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     MCI_MRI[subject] = data[subject]['timeseries'].T
     MCI_SC[subject] = data[subject]['SC']
-    MCI_ABeta[subject] = data[subject]['ABeta']
-    MCI_Tau[subject] = data[subject]['Tau']
+    MCI_ABeta.append(np.vstack(data[subject]['ABeta']))
+    MCI_Tau.append(np.vstack(data[subject]['Tau']))
 
 AD_IDs = DL.get_groupSubjects('AD')
 AD_MRI = {}
 AD_SC = {}
-AD_ABeta = {}
-AD_Tau = {}
+AD_ABeta = []
+AD_Tau = []
 for subject in AD_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     AD_MRI[subject] = data[subject]['timeseries'].T
     AD_SC[subject] = data[subject]['SC']
-    AD_ABeta[subject] = data[subject]['ABeta']
-    AD_Tau[subject] = data[subject]['Tau']
+    AD_ABeta.append(np.vstack(data[subject]['ABeta']))
+    AD_Tau.append(np.vstack(data[subject]['Tau']))
 
 ### Set conditions
 
@@ -351,6 +351,8 @@ MCI_SC_matrices = np.array(list(MCI_SC.values()))  # Shape: (Nsubjects, NPARCELL
 MCI_SC_avg = np.mean(MCI_SC_matrices, axis=0)
 AD_SC_matrices = np.array(list(AD_SC.values()))  # Shape: (Nsubjects, NPARCELLS, NPARCELLS)
 AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
+ABeta_burden = [HC_ABeta, MCI_ABeta, AD_ABeta]
+Tau_burden = [HC_Tau, MCI_Tau, AD_Tau]
 
 ### Group level
 for COND in range(1,4):
@@ -563,7 +565,12 @@ for i in range(1,4):
         a=a_sub[sub])
     a_list_sub.append(np.array(a_list_sub_temp))
 
+results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
+
+
 print("a_group: ", a_list_group)
 print("a_sub: ", a_list_sub)
 print("shape a_sub: ", len(a_list_sub), len(a_list_sub[0]), a_list_sub[0].shape)
+
+print("Results from PET to a: ", results)
 
