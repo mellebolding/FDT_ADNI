@@ -9,7 +9,7 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
                                      fit_sigma=True, sigma_reset=False,
                                      fit_a=True,
                                      epsFC_Ceff=8e-5, epsCOVtau_Ceff=3e-5, epsFC_sigma=8e-5, epsCOVtau_sigma=3e-5, 
-                                     epsFC_a=8e-5, epsCOVtau_a=3e-5,
+                                     epsFC_a=8e-7, epsCOVtau_a=3e-7,
                                      MAXiter=10000, error_tol=5e-4, patience=2, learning_rate_factor=0.8,
                                      Ceff_norm=True, maxC=0.2,
                                      iter_check=50, plot_evol=False, plot_evol_last=False):
