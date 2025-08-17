@@ -140,6 +140,7 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
                     #print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} ; patience_sum: {patience_sum} | Achieved convergence --> EXIT (return present sigma)")
                     Ceff_fit = Ceff_new
                     sigma_fit = sigma_new
+                    a_fit = a_new
                     break
                 patience_sum += 1
                 ## Modify learning rate
