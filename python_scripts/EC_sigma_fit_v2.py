@@ -354,6 +354,7 @@ AD_SC_matrices = np.array(list(AD_SC.values()))  # Shape: (Nsubjects, NPARCELLS,
 AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
 ABeta_burden = [HC_ABeta, MCI_ABeta, AD_ABeta]
 Tau_burden = [HC_Tau, MCI_Tau, AD_Tau]
+print(f"HC ABeta shape: {np.array(HC_ABeta).shape}")
 
 ### Group level
 for COND in range(1,4):
