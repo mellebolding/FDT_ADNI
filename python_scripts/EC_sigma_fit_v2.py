@@ -251,6 +251,7 @@ def calc_H_freq(
 ###### Loading the data ######
 DL = ADNI_A.ADNI_A()
 
+print("keys in DL: ", DL.keys())
 # example of individual
 subdata = DL.get_subjectData('002_S_0413')
 SC = subdata['002_S_0413']['SC'] # Structural connectivity
