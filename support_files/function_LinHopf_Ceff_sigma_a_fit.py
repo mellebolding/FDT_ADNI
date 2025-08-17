@@ -319,6 +319,7 @@ def update_a(a_previous, a_ini, FCemp, FCsim, COVtauemp, COVtausim,
         
         if a_new[i] < -0.2 or a_new[i] > 0.2:
             a_new[i] = 0.02
+    print(f"update_a: a_new = {a_new}")
 
     return a_new
 
