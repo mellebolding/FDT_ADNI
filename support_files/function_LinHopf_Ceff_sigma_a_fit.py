@@ -7,7 +7,7 @@ from scipy.signal import correlate
 def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-0.02, Tau=1,
                                      fit_Ceff=True, competitive_coupling=False,
                                      fit_sigma=True, sigma_reset=False,
-                                     fit_a=True
+                                     fit_a=True,
                                      epsFC_Ceff=8e-5, epsCOVtau_Ceff=3e-5, epsFC_sigma=8e-5, epsCOVtau_sigma=3e-5, 
                                      epsFC_a=8e-5, epsCOVtau_a=3e-5,
                                      MAXiter=10000, error_tol=5e-4, patience=2, learning_rate_factor=0.8,
