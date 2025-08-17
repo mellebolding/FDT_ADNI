@@ -267,8 +267,8 @@ for subject in HC_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     HC_MRI[subject] = data[subject]['timeseries'].T
     HC_SC[subject] = data[subject]['SC']
-    HC_ABeta.append(np.vstack(data[subject]['ABeta'])) 
-    HC_Tau.append(np.vstack(data[subject]['Tau']))
+    HC_ABeta.append(np.vstack(data[subject]['ABeta'])[:,:NPARCELLS,0]) 
+    HC_Tau.append(np.vstack(data[subject]['Tau'])[:,:NPARCELLS,0])
 
 
 MCI_IDs = DL.get_groupSubjects('MCI')
