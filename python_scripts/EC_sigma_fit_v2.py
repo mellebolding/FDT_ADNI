@@ -56,6 +56,7 @@ from scipy.signal import butter, filtfilt
 from scipy.signal import detrend as scipy_detrend
 from functions_FC_v3 import *
 from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
+from functions_Linhopf_Ceff_sigma_fit_a import LinHopf_Ceff_sigma_a_fitting_numba
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
 from scipy.linalg import expm
@@ -380,10 +381,11 @@ for COND in range(1,4):
     
 
     start_time = time.time()
-    Ceff_group, sigma_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
-                                LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_group, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+    Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
+                                LinHopf_Ceff_sigma_a_fitting_numba(TSemp_fit_group, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
                                 fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                 fit_sigma=False, sigma_reset=sigma_reset,
+                                fit_a=True,
                                 epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
                                 MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
                                 Ceff_norm=Ceff_norm, maxC=maxC,
@@ -433,7 +435,8 @@ for COND in range(1,4):
     condition=f"{COND}",
     sigma=sigma_group,
     Ceff=Ceff_group,
-    omega=omega)
+    omega=omega,
+    a=a_group)
 
 
 ### subject level
@@ -471,6 +474,7 @@ for i in range(1,4):
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
     Ceff_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     sigma_sub = np.zeros((len(ID), NPARCELLS))
+    a_sub = np.zeros((len(ID), NPARCELLS))
     FCemp_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     FCsim_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     error_iter_sub = np.ones((len(ID), 200)) * np.nan
@@ -488,7 +492,7 @@ for i in range(1,4):
 
         TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
-        Ceff_sub[sub], sigma_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
+        Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
                                             LinHopf_Ceff_sigma_fitting_numba(TSemp_fit_sub, SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=False, sigma_reset=sigma_reset,
@@ -539,4 +543,5 @@ for i in range(1,4):
         subject=f"S{sub}",
         sigma=sigma_sub[sub],
         Ceff=Ceff_sub[sub],
-        omega=omega)
+        omega=omega,
+        a=a_sub[sub])
