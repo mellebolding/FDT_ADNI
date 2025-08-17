@@ -260,29 +260,39 @@ NPARCELLS = 18 #tot: 379
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
 HC_SC = {}
-HC_Abeta = {}
+HC_ABeta = {}
+HC_Tau = {}
 for subject in HC_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     HC_MRI[subject] = data[subject]['timeseries'].T
     HC_SC[subject] = data[subject]['SC']
     HC_Abeta[subject] = data[subject]['ABeta']
+    HC_Tau[subject] = data[subject]['Tau']
 
 
 MCI_IDs = DL.get_groupSubjects('MCI')
 MCI_MRI = {}
 MCI_SC = {}
+MCI_ABeta = {}
+MCI_Tau = {}
 for subject in MCI_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     MCI_MRI[subject] = data[subject]['timeseries'].T
     MCI_SC[subject] = data[subject]['SC']
+    MCI_ABeta[subject] = data[subject]['ABeta']
+    MCI_Tau[subject] = data[subject]['Tau']
 
 AD_IDs = DL.get_groupSubjects('AD')
 AD_MRI = {}
 AD_SC = {}
+AD_ABeta = {}
+AD_Tau = {}
 for subject in AD_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     AD_MRI[subject] = data[subject]['timeseries'].T
     AD_SC[subject] = data[subject]['SC']
+    AD_ABeta[subject] = data[subject]['ABeta']
+    AD_Tau[subject] = data[subject]['Tau']
 
 ### Set conditions
 
@@ -327,6 +337,8 @@ iter_check=iter_check_group
 
 group_names = ['HC', 'MCI', 'AD']
 group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
+a_list_group = []
+a_list_sub = []
 cond_index_map = {'HC': 0, 'MCI': 1, 'AD': 2}
 I_FDT_all = np.full((3, NPARCELLS), np.nan)
 Inorm1_tmax_s0_group = np.zeros((3, NPARCELLS))
@@ -429,7 +441,7 @@ for COND in range(1,4):
     plt.close()
 
     ## save the results
-    
+    a_list.append(a_group)
     append_record_to_npz(
     Ceff_sigma_subfolder,
     f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
@@ -536,6 +548,7 @@ for i in range(1,4):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
 
+        a_list_sub.append(a_sub[sub])
         ## save the results
         append_record_to_npz(
         Ceff_sigma_subfolder,
@@ -548,5 +561,5 @@ for i in range(1,4):
         omega=omega,
         a=a_sub[sub])
 
-print("a_group: ", a_group)
-print("a_sub: ", a_sub)
+print("a_group: ", a_list_group)
+print("a_sub: ", a_list_sub)
