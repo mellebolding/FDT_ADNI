@@ -441,7 +441,7 @@ for COND in range(1,4):
     plt.close()
 
     ## save the results
-    a_list.append(a_group)
+    a_list_group.append(a_group)
     append_record_to_npz(
     Ceff_sigma_subfolder,
     f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
