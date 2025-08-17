@@ -261,10 +261,12 @@ NPARCELLS = 18 #tot: 379
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
 HC_SC = {}
+HC_Abeta = {}
 for subject in HC_IDs:
     data = DL.get_subjectData(subject,printInfo=False)
     HC_MRI[subject] = data[subject]['timeseries'].T
     HC_SC[subject] = data[subject]['SC']
+    HC_Abeta[subject] = data[subject]['Abeta']
 
 
 MCI_IDs = DL.get_groupSubjects('MCI')
