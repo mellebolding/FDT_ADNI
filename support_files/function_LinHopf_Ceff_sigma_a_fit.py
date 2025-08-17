@@ -9,7 +9,7 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
                                      fit_sigma=True, sigma_reset=False,
                                      fit_a=True,
                                      epsFC_Ceff=8e-5, epsCOVtau_Ceff=3e-5, epsFC_sigma=8e-5, epsCOVtau_sigma=3e-5, 
-                                     epsFC_a=8e-6, epsCOVtau_a=3e-6,
+                                     epsFC_a=8e-7, epsCOVtau_a=3e-7,
                                      MAXiter=10000, error_tol=5e-4, patience=2, learning_rate_factor=0.8,
                                      Ceff_norm=True, maxC=0.2,
                                      iter_check=50, plot_evol=False, plot_evol_last=False):
@@ -308,7 +308,7 @@ def update_sigma(sigma_previous, sigma_ini,
     return sigma_new
 
 def update_a(a_previous, a_ini, FCemp, FCsim, COVtauemp, COVtausim,
-                epsFC_a, epsCOVtau_a):
+                epsFC_a, epsCOVtau_a,a_min=-0.1, a_max=0.1):
     N = len(a_previous)
     a_new = np.zeros(N)
 
@@ -321,8 +321,7 @@ def update_a(a_previous, a_ini, FCemp, FCsim, COVtauemp, COVtausim,
             print(f"NaN gradient at parcel {i}")
         if np.isinf(grad_FC) or np.isinf(grad_COVtau):
             print(f"Inf gradient at parcel {i}")
-        if a_new[i] < -0.2 or a_new[i] > 0.2:
-            a_new[i] = 0.02
+        a_new[i] = np.clip(a_new[i], a_min, a_max)
     #print(f"update_a: a_new = {a_new}")
     
 
