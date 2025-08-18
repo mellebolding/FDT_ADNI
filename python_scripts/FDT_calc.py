@@ -273,7 +273,7 @@ omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 a_group = get_field(all_records, "a", filters={"level": "group"})
 a_subs = get_field(all_records, "a", filters={"level": "subject"})
 
-#print("a_group shape:", a_group)
+print("a_group shape:", a_group)
 print("a_subs shape:", a_subs)
 
 # group analysis
