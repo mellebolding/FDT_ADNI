@@ -594,9 +594,9 @@ def predict_a(ABeta_all, Tau_all, coef_matrix):
 
 predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
 predicted_a_group = predict_a(ABeta_burden_group[0], Tau_burden_group[0], coef_matrix_group)
-print("predicted_a shape:", predicted_a.shape)
-print("predicted_a:", predicted_a)
-print("predicted_a_group shape:", predicted_a_group.shape)
+# print("predicted_a shape:", predicted_a.shape)
+# print("predicted_a:", predicted_a)
+# print("predicted_a_group shape:", predicted_a_group.shape)
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
@@ -610,7 +610,7 @@ append_record_to_npz(
         level="group",
         a = predicted_a_group)
 
-clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
+#clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
 
 
 # print("a_group: ", a_list_group)

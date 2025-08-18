@@ -565,7 +565,7 @@ Parcel_names = {
 
 NPARCELLS = 18
 NOISE_TYPE = "HOMO"
-
+all_values = None
 all_values = load_appended_records(
     filepath=os.path.join(FDT_values_subfolder, f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz")
 )
