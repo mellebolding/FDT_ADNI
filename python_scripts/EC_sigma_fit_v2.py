@@ -248,6 +248,16 @@ def calc_H_freq(
         f_diff = filterps.filt_pow_spetra_multiple_subjects(all_HC_fMRI, tr, version)
         return f_diff 
 
+def predict_a(ABeta_all, Tau_all, coef_matrix):
+    const      = coef_matrix["const"].values[None, :]     
+    beta_coef  = coef_matrix["ABeta"].values[None, :]       
+    tau_coef   = coef_matrix["Tau"].values[None, :]         
+    inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :] 
+
+    return (const
+            + beta_coef * ABeta_all
+            + tau_coef * Tau_all
+            + inter_coef * (ABeta_all * Tau_all))
 
 ###### Loading the data ######
 DL = ADNI_A.ADNI_A()
@@ -565,38 +575,26 @@ for i in range(1,4):
         omega=omega)
     a_list_sub.append(np.array(a_list_sub_temp))
 
-#print("a_list_group shape:", a_list_group[0].shape)
-#print("a_list_sub shape:", a_list_sub[0].shape)
-ABeta_burden_group = [np.array([np.mean(arr, axis=0) for arr in ABeta_burden])]
-Tau_burden_group = [np.array([np.mean(arr, axis=0) for arr in Tau_burden])]
-#print("ABeta_burden_group shape:", ABeta_burden_group[0].shape)
-#print("ABeta_burden shape:", ABeta_burden[0].shape)
-params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
-params_group, results_group = from_PET_to_a([np.array(a_list_group)], ABeta_burden_group, Tau_burden_group)
 
-coef_matrix = pd.DataFrame([p["params"] for p in params])
-coef_matrix_group = pd.DataFrame([p["params"] for p in params_group])
+def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
 
+    ABeta_burden_group = [np.array([np.mean(arr, axis=0) for arr in ABeta_burden])]
+    Tau_burden_group = [np.array([np.mean(arr, axis=0) for arr in Tau_burden])]
 
-ABeta_burden = np.vstack(ABeta_burden)  # shape: (n_subjects, n_parcels)
-Tau_burden = np.vstack(Tau_burden)      # shape: (n_subjects, n_parcels)
+    params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
+    params_group, results_group = from_PET_to_a([np.array(a_list_group)], ABeta_burden_group, Tau_burden_group)
 
-def predict_a(ABeta_all, Tau_all, coef_matrix):
-    const      = coef_matrix["const"].values[None, :]     
-    beta_coef  = coef_matrix["ABeta"].values[None, :]       
-    tau_coef   = coef_matrix["Tau"].values[None, :]         
-    inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :] 
+    coef_matrix = pd.DataFrame([p["params"] for p in params])
+    coef_matrix_group = pd.DataFrame([p["params"] for p in params_group])
 
-    return (const
-            + beta_coef * ABeta_all
-            + tau_coef * Tau_all
-            + inter_coef * (ABeta_all * Tau_all))
+    ABeta_burden = np.vstack(ABeta_burden) 
+    Tau_burden = np.vstack(Tau_burden) 
 
-predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
-predicted_a_group = predict_a(ABeta_burden_group[0], Tau_burden_group[0], coef_matrix_group)
-# print("predicted_a shape:", predicted_a.shape)
-# print("predicted_a:", predicted_a)
-# print("predicted_a_group shape:", predicted_a_group.shape)
+    predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
+    predicted_a_group = predict_a(ABeta_burden_group[0], Tau_burden_group[0], coef_matrix_group)
+    return predicted_a, predicted_a_group
+
+predicted_a, predicted_a_group = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
@@ -610,12 +608,4 @@ append_record_to_npz(
         level="group",
         a = predicted_a_group)
 
-#clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
-
-
-# print("a_group: ", a_list_group)
-# print("a_sub: ", a_list_sub)
-# print("shape a_sub: ", len(a_list_sub), len(a_list_sub[0]), a_list_sub[0].shape)
-
-# print("Params from PET to a: ", params, "Results from PET to a: ", results)
 
