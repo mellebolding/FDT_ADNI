@@ -569,10 +569,29 @@ for i in range(1,4):
 
 params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
 
+coef_matrix = pd.DataFrame([p["params"] for p in params])
+ABeta_burden = np.vstack(ABeta_burden)  # shape: (n_subjects, n_parcels)
+Tau_burden = np.vstack(Tau_burden)      # shape: (n_subjects, n_parcels)
+# shape: (n_parcels, 4), with columns: const, ABeta, Tau, ABeta_x_Tau
 
-print("a_group: ", a_list_group)
-print("a_sub: ", a_list_sub)
-print("shape a_sub: ", len(a_list_sub), len(a_list_sub[0]), a_list_sub[0].shape)
+# Step 2: Define prediction function
+def predict_a(ABeta_all, Tau_all, coef_matrix):
+    const      = coef_matrix["const"].values[None, :]       # shape (1,18)
+    beta_coef  = coef_matrix["ABeta"].values[None, :]       # (1,18)
+    tau_coef   = coef_matrix["Tau"].values[None, :]         # (1,18)
+    inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :] # (1,18)
 
-print("Params from PET to a: ", params, "Results from PET to a: ", results)
+    return (const
+            + beta_coef * ABeta_all
+            + tau_coef * Tau_all
+            + inter_coef * (ABeta_all * Tau_all))
+predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
+print("predicted_a shape:", predicted_a.shape)
+
+
+# print("a_group: ", a_list_group)
+# print("a_sub: ", a_list_sub)
+# print("shape a_sub: ", len(a_list_sub), len(a_list_sub[0]), a_list_sub[0].shape)
+
+# print("Params from PET to a: ", params, "Results from PET to a: ", results)
 
