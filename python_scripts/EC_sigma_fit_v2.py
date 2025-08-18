@@ -542,7 +542,7 @@ for i in range(1,4):
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
                                             LinHopf_Ceff_sigma_a_fitting_numba(TSemp_fit_sub, SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
-                                            fit_sigma=False, sigma_reset=sigma_reset,
+                                            fit_sigma=False, sigma_reset=sigma_reset,fit_a=A_FITTING,
                                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
                                             MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
                                             Ceff_norm=Ceff_norm, maxC=maxC,
@@ -598,12 +598,14 @@ append_record_to_npz(
         Ceff_sigma_subfolder,
         f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
         level="subject",
-        a = predicted_a)
+        a = predicted_a,
+        original_a = a_list_sub)
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
         f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
         level="group",
-        a = predicted_a_group)
+        a = predicted_a_group,
+        original_a = np.array(a_list_group))
 
 
