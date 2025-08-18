@@ -453,8 +453,7 @@ for COND in range(1,4):
     condition=f"{COND}",
     sigma=sigma_group,
     Ceff=Ceff_group,
-    omega=omega,
-    a=a_group)
+    omega=omega)
 
 
 ### subject level
@@ -563,23 +562,25 @@ for i in range(1,4):
         subject=f"S{sub}",
         sigma=sigma_sub[sub],
         Ceff=Ceff_sub[sub],
-        omega=omega,
-        a=a_sub[sub])
+        omega=omega)
     a_list_sub.append(np.array(a_list_sub_temp))
 
 params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
+params_group, results_group = from_PET_to_a(a_list_group, ABeta_burden, Tau_burden)
 
 coef_matrix = pd.DataFrame([p["params"] for p in params])
+coef_matrix_group = pd.DataFrame([p["params"] for p in params_group])
+
+print("coef_matrix shape:", coef_matrix.shape)
+print("coef_matrix_group shape:", coef_matrix_group.shape)
 ABeta_burden = np.vstack(ABeta_burden)  # shape: (n_subjects, n_parcels)
 Tau_burden = np.vstack(Tau_burden)      # shape: (n_subjects, n_parcels)
-# shape: (n_parcels, 4), with columns: const, ABeta, Tau, ABeta_x_Tau
 
-# Step 2: Define prediction function
 def predict_a(ABeta_all, Tau_all, coef_matrix):
-    const      = coef_matrix["const"].values[None, :]       # shape (1,18)
-    beta_coef  = coef_matrix["ABeta"].values[None, :]       # (1,18)
-    tau_coef   = coef_matrix["Tau"].values[None, :]         # (1,18)
-    inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :] # (1,18)
+    const      = coef_matrix["const"].values[None, :]     
+    beta_coef  = coef_matrix["ABeta"].values[None, :]       
+    tau_coef   = coef_matrix["Tau"].values[None, :]         
+    inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :] 
 
     return (const
             + beta_coef * ABeta_all
@@ -588,6 +589,12 @@ def predict_a(ABeta_all, Tau_all, coef_matrix):
 predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
 print("predicted_a shape:", predicted_a.shape)
 
+append_record_to_npz(
+        Ceff_sigma_subfolder,
+        f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
+        level="subject",
+        condition=f"{COND}",
+        a = predicted_a)
 
 # print("a_group: ", a_list_group)
 # print("a_sub: ", a_list_sub)

@@ -115,7 +115,7 @@ def append_record_to_npz(folder, filename, **record):
 
 ###################################################################
 
-def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
+def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
     
     Ndim = len(omega[1,:])
     avec = a_param * np.ones(Ndim)
@@ -149,20 +149,22 @@ def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, g
 
     return I_FDT_all, Inorm1_tmax_s0_group, Inorm2_tmax_s0_group
 
-def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
+def FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
     
     Ndim = omega_subs[0].shape[1]
     max_len_subs = max(a.shape[0] for a in omega_subs)
     #print("max_len_subs: ", max_len_subs)
     #print("Ndim: ", Ndim)
-    avec = a_param * np.ones(Ndim)
+    #avec = a_param * np.ones(Ndim)
     I_FDT_all = np.full((3, max_len_subs,Ndim), np.nan)
     Inorm1_tmax_s0_subs = np.full((3, max_len_subs,Ndim), np.nan)
     Inorm2_tmax_s0_subs = np.full((3, max_len_subs,Ndim), np.nan)
     
+    index_a = 0
     for COND in range(1, 4):
         for sub in range(sigma_subs[COND-1].shape[0]):
-
+            avec = a_param[index_a]
+            index_a += 1
             sigma_subs_2 = np.append(sigma_subs[COND-1][sub, :], sigma_subs[COND-1][sub, :])
             v0std = sigma_subs_2
             
