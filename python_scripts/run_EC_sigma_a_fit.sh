@@ -11,6 +11,9 @@
 # Activate your virtual environment
 source /home/cluster/melle/FDT_ADNI/venv/bin/activate
 
+export MPLCONFIGDIR=/tmp/mplconfig_$SLURM_JOB_ID
+mkdir -p $MPLCONFIGDIR
+
 # Go to your script directory (optional but clean)
 cd /home/cluster/melle/FDT_ADNI/python_scripts
 
