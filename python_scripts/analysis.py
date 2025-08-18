@@ -571,7 +571,7 @@ all_values = load_appended_records(
 )
 
 I_tmax_group = np.array(get_field(all_values, "I_tmax", filters={"level": "group"}))
-print(f"Shape of I_tmax_group: {I_tmax_group}")
+print(f"Shape of I_tmax_group: {I_tmax_group.shape}")
 I_norm1_group = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "group"})), axis=0)
 I_norm2_group = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "group"})), axis=0)
 I_tmax_sub = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "subject"})), axis=0)
