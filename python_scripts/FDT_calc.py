@@ -270,7 +270,7 @@ sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
 Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
 omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 
-a_group = get_field(all_records, "a", filters={"level": "group"})[3]
+a_group = get_field(all_records, "a", filters={"level": "group"})
 a_subs = get_field(all_records, "a", filters={"level": "subject"})
 
 #print("a_group shape:", a_group)
