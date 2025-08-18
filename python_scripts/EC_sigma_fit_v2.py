@@ -610,6 +610,9 @@ append_record_to_npz(
         level="group",
         a = predicted_a_group)
 
+clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
+
+
 # print("a_group: ", a_list_group)
 # print("a_sub: ", a_list_sub)
 # print("shape a_sub: ", len(a_list_sub), len(a_list_sub[0]), a_list_sub[0].shape)
