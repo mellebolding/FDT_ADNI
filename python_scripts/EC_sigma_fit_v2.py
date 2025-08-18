@@ -567,8 +567,10 @@ for i in range(1,4):
 
 print("a_list_group shape:", a_list_group[0].shape)
 print("a_list_sub shape:", a_list_sub[0].shape)
+ABeta_burden_group = [np.array([np.mean(arr, axis=0) for arr in ABeta_burden])]
+Tau_burden_group = [np.array([np.mean(arr, axis=0) for arr in Tau_burden])]
 params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
-params_group, results_group = from_PET_to_a(a_list_group, ABeta_burden, Tau_burden)
+params_group, results_group = from_PET_to_a([np.array(a_list_group)], ABeta_burden_group, Tau_burden_group)
 
 coef_matrix = pd.DataFrame([p["params"] for p in params])
 coef_matrix_group = pd.DataFrame([p["params"] for p in params_group])
