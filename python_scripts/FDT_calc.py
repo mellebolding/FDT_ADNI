@@ -267,9 +267,12 @@ sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
 Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
 omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 
+a_group = np.array(get_field(all_records, "a", filters={"level": "group"}))
+a_subs = np.array(get_field(all_records, "a", filters={"level": "subject"}))
+
 # group analysis
-I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, NPARCELLS, a_param=-0.02, gconst=1.0)
+I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_group, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, NPARCELLS, a_subs, gconst=1.0)
 
 # subject analysis
 I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
