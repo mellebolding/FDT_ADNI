@@ -83,7 +83,7 @@ def get_field(records, field, filters=None):
         filtered = [r for r in records if all(r.get(k) == v for k, v in filters.items())]
     else:
         filtered = records
-    return [r.get(field) for r in filtered]
+    return [r[field] for r in filtered if field in r]
 
 def append_record_to_npz(folder, filename, **record):
     """
