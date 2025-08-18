@@ -569,6 +569,8 @@ print("a_list_group shape:", a_list_group[0].shape)
 print("a_list_sub shape:", a_list_sub[0].shape)
 ABeta_burden_group = [np.array([np.mean(arr, axis=0) for arr in ABeta_burden])]
 Tau_burden_group = [np.array([np.mean(arr, axis=0) for arr in Tau_burden])]
+print("ABeta_burden_group shape:", ABeta_burden_group[0].shape)
+print("ABeta_burden shape:", ABeta_burden[0].shape)
 params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
 params_group, results_group = from_PET_to_a([np.array(a_list_group)], ABeta_burden_group, Tau_burden_group)
 
