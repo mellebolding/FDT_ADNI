@@ -593,8 +593,8 @@ def predict_a(ABeta_all, Tau_all, coef_matrix):
             + inter_coef * (ABeta_all * Tau_all))
 predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
 predicted_a_group = predict_a(ABeta_burden_group[0], Tau_burden_group[0], coef_matrix_group)
-print("predicted_a shape:", predicted_a)
-print("predicted_a_group shape:", predicted_a_group)
+print("predicted_a shape:", predicted_a.shape)
+print("predicted_a_group shape:", predicted_a_group.shape)
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
