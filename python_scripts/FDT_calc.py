@@ -228,8 +228,8 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
     return intR_tmax_s0_subject, intRnorm1_tmax_s0_subject, intRnorm2_tmax_s0_subject
 ####################################################################
 
-NPARCELLS = 379
-NOISE_TYPE = "HETERO"
+NPARCELLS = 18
+NOISE_TYPE = "HOMO"
 
 # Load all records
 all_records = load_appended_records(
