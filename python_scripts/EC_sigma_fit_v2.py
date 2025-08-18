@@ -565,8 +565,8 @@ for i in range(1,4):
         omega=omega)
     a_list_sub.append(np.array(a_list_sub_temp))
 
-print("a_list_group shape:", a_list_group)
-print("a_list_sub shape:", a_list_sub)
+print("a_list_group shape:", a_list_group[0].shape)
+print("a_list_sub shape:", a_list_sub[0].shape)
 params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
 params_group, results_group = from_PET_to_a(a_list_group, ABeta_burden, Tau_burden)
 
