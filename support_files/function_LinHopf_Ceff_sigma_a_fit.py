@@ -111,6 +111,12 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
 
     for iter in range(1, MAXiter + 1):
         ### Linear Hopf FC
+        if not np.all(np.isfinite(A)):
+            #print(f"Iter {iter:4d}/{MAXiter} ; error: {error_old:.7f} ; error_tol: {error_tol_old:.7f} | A not finite --> EXIT (return previous sigma)")
+            Ceff_fit = Ceff_previous
+            sigma_fit = sigma_previous
+            a_fit = a_previous
+            break
         FCsim, COVsim, COVsimtotal, A = hopf_int(Ceff_new, f_diff, sigma_new, a_new)
 
         # COVtausim = (expm((Tau * TR) * A) @ COVsimtotal)[:N, :N].copy()
