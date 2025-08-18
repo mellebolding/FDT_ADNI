@@ -571,36 +571,36 @@ ABeta_burden_group = [np.array([np.mean(arr, axis=0) for arr in ABeta_burden])]
 Tau_burden_group = [np.array([np.mean(arr, axis=0) for arr in Tau_burden])]
 print("ABeta_burden_group shape:", ABeta_burden_group[0].shape)
 print("ABeta_burden shape:", ABeta_burden[0].shape)
-params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
-params_group, results_group = from_PET_to_a([np.array(a_list_group)], ABeta_burden_group, Tau_burden_group)
+# params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
+# params_group, results_group = from_PET_to_a([np.array(a_list_group)], ABeta_burden_group, Tau_burden_group)
 
-coef_matrix = pd.DataFrame([p["params"] for p in params])
-coef_matrix_group = pd.DataFrame([p["params"] for p in params_group])
+# coef_matrix = pd.DataFrame([p["params"] for p in params])
+# coef_matrix_group = pd.DataFrame([p["params"] for p in params_group])
 
-print("coef_matrix shape:", coef_matrix.shape)
-print("coef_matrix_group shape:", coef_matrix_group.shape)
-ABeta_burden = np.vstack(ABeta_burden)  # shape: (n_subjects, n_parcels)
-Tau_burden = np.vstack(Tau_burden)      # shape: (n_subjects, n_parcels)
+# print("coef_matrix shape:", coef_matrix.shape)
+# print("coef_matrix_group shape:", coef_matrix_group.shape)
+# ABeta_burden = np.vstack(ABeta_burden)  # shape: (n_subjects, n_parcels)
+# Tau_burden = np.vstack(Tau_burden)      # shape: (n_subjects, n_parcels)
 
-def predict_a(ABeta_all, Tau_all, coef_matrix):
-    const      = coef_matrix["const"].values[None, :]     
-    beta_coef  = coef_matrix["ABeta"].values[None, :]       
-    tau_coef   = coef_matrix["Tau"].values[None, :]         
-    inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :] 
+# def predict_a(ABeta_all, Tau_all, coef_matrix):
+#     const      = coef_matrix["const"].values[None, :]     
+#     beta_coef  = coef_matrix["ABeta"].values[None, :]       
+#     tau_coef   = coef_matrix["Tau"].values[None, :]         
+#     inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :] 
 
-    return (const
-            + beta_coef * ABeta_all
-            + tau_coef * Tau_all
-            + inter_coef * (ABeta_all * Tau_all))
-predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
-print("predicted_a shape:", predicted_a.shape)
+#     return (const
+#             + beta_coef * ABeta_all
+#             + tau_coef * Tau_all
+#             + inter_coef * (ABeta_all * Tau_all))
+# predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
+# print("predicted_a shape:", predicted_a.shape)
 
-append_record_to_npz(
-        Ceff_sigma_subfolder,
-        f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
-        level="subject",
-        condition=f"{COND}",
-        a = predicted_a)
+# append_record_to_npz(
+#         Ceff_sigma_subfolder,
+#         f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
+#         level="subject",
+#         condition=f"{COND}",
+#         a = predicted_a)
 
 # print("a_group: ", a_list_group)
 # print("a_sub: ", a_list_sub)
