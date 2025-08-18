@@ -118,13 +118,13 @@ def append_record_to_npz(folder, filename, **record):
 def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0):
     
     Ndim = len(omega[1,:])
-    avec = a_param * np.ones(Ndim)
+    #avec = a_param * np.ones(Ndim)
     I_FDT_all = np.full((3, Ndim), np.nan)
     Inorm1_tmax_s0_group = np.zeros((3, Ndim))
     Inorm2_tmax_s0_group = np.zeros((3, Ndim))
 
     for COND in range(1, 4):
-
+        avec = a_param[COND-1]
         sigma_group_2 = np.append(sigma_group[COND-1], sigma_group[COND-1])
         v0std = sigma_group_2
         
