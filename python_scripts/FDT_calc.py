@@ -211,7 +211,6 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
     ts = 0
     a_index = 0
     max_len_subs = max(a.shape[0] for a in omega_subs)
-    avec = a_param * np.ones(NPARCELLS)
     intR_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
     intRnorm1_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
     intRnorm2_tmax_s0_subject = np.full((3, max_len_subs,NPARCELLS), np.nan)
@@ -270,8 +269,8 @@ sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
 Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
 omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 
-a_group = get_field(all_records, "a", filters={"level": "group"})
-a_subs = get_field(all_records, "a", filters={"level": "subject"})
+a_group = np.vstack(get_field(all_records, "a", filters={"level": "group"}))
+a_subs = np.vstack(get_field(all_records, "a", filters={"level": "subject"}))
 
 print("a_group shape:", a_group)
 print("a_subs shape:", a_subs)
