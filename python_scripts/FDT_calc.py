@@ -111,7 +111,11 @@ def append_record_to_npz(folder, filename, **record):
     records.append(record)
     np.savez(filepath, records=np.array(records, dtype=object))
 
-
+def clear_npz_file(folder, filename):
+    os.makedirs(folder, exist_ok=True)
+    filepath = os.path.join(folder, filename)
+    # Save an empty records array, overwriting any existing file
+    np.savez(filepath, records=np.array([], dtype=object))
 
 ###################################################################
 
@@ -232,6 +236,7 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
 
 NPARCELLS = 18
 NOISE_TYPE = "HOMO"
+clear_npz_file(FDT_values_subfolder, f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz")
 
 # Load all records
 all_records = load_appended_records(
@@ -272,8 +277,6 @@ omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 a_group = np.vstack(get_field(all_records, "a", filters={"level": "group"}))
 a_subs = np.vstack(get_field(all_records, "a", filters={"level": "subject"}))
 
-print("a_group shape:", a_group)
-print("a_subs shape:", a_subs)
 
 # group analysis
 I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_group, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
