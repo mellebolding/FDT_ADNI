@@ -594,28 +594,59 @@ def from_PET_to_a(a_values, abeta_values, tau_values, fit_type='linear'):
 
     # X = np.column_stack((pooled_abeta, pooled_tau))
     # X = sm.add_constant(X)
-    ABeta_all = np.concatenate(abeta_values, axis=0).flatten()
-    Tau_all   = np.concatenate(tau_values, axis=0).flatten()
-    a_all     = np.concatenate(a_values, axis=0).flatten()
 
-    print(f"ABeta_all shape: {ABeta_all.shape}, Tau_all shape: {Tau_all.shape}, a_all shape: {a_all.shape}")
+    param_list = []
+    model_results = []
+    a_all = np.vstack(a_values)
+    abeta_all = np.vstack(abeta_values)
+    tau_all = np.vstack(tau_values)
 
-    # Interaction term
-    interaction = ABeta_all * Tau_all
+    for i in range(a_values[0].shape[1]):
+        a_per_parcel = a_all[:, i]
+        abeta_per_parcel = abeta_all[:, i]
+        tau_per_parcel = tau_all[:, i]
+        interaction = abeta_per_parcel * tau_per_parcel
+        X = pd.DataFrame({
+            'ABeta': abeta_per_parcel,
+            'Tau': tau_per_parcel,
+            'ABeta_x_Tau': interaction
+        })
+        X = sm.add_constant(X)  # adds intercept term
+        if fit_type == "linear":
+            model = sm.OLS(a_per_parcel, X).fit()
+            param_list.append({
+                "params": model.params})
+            model_results.append({
+                "pvalues": model.pvalues,
+                "rsquared": model.rsquared,
+                "summary": model.summary().as_text()
+            })
+    return param_list, model_results
 
-    # Step 2: Create design matrix (with intercept)
-    X = pd.DataFrame({
-        'ABeta': ABeta_all,
-        'Tau': Tau_all,
-        'ABeta_x_Tau': interaction
-    })
-    X = sm.add_constant(X)  # adds intercept term
+
+
+    # ABeta_all = np.concatenate(abeta_values, axis=0).flatten()
+    # Tau_all   = np.concatenate(tau_values, axis=0).flatten()
+    # a_all     = np.concatenate(a_values, axis=0).flatten()
+
+    # #print(f"ABeta_all shape: {ABeta_all.shape}, Tau_all shape: {Tau_all.shape}, a_all shape: {a_all.shape}")
+
+    # # Interaction term
+    # interaction = ABeta_all * Tau_all
+
     
-    if fit_type == "linear":
-        model = sm.OLS(a_all, X).fit()
-        return {
-            "params": model.params,
-            "pvalues": model.pvalues,
-            "rsquared": model.rsquared,
-            "summary": model.summary().as_text()
-        }
+    # X = pd.DataFrame({
+    #     'ABeta': ABeta_all,
+    #     'Tau': Tau_all,
+    #     'ABeta_x_Tau': interaction
+    # })
+    # X = sm.add_constant(X)  # adds intercept term
+    
+    # if fit_type == "linear":
+    #     model = sm.OLS(a_all, X).fit()
+    #     return {
+    #         "params": model.params,
+    #         "pvalues": model.pvalues,
+    #         "rsquared": model.rsquared,
+    #         "summary": model.summary().as_text()
+    #     }

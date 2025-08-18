@@ -567,12 +567,12 @@ for i in range(1,4):
         a=a_sub[sub])
     a_list_sub.append(np.array(a_list_sub_temp))
 
-results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
+params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
 
 
 print("a_group: ", a_list_group)
 print("a_sub: ", a_list_sub)
 print("shape a_sub: ", len(a_list_sub), len(a_list_sub[0]), a_list_sub[0].shape)
 
-print("Results from PET to a: ", results)
+print("Params from PET to a: ", params, "Results from PET to a: ", results)
 
