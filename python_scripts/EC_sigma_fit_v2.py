@@ -259,6 +259,24 @@ def predict_a(ABeta_all, Tau_all, coef_matrix):
             + tau_coef * Tau_all
             + inter_coef * (ABeta_all * Tau_all))
 
+def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
+
+    ABeta_burden_group = [np.array([np.mean(arr, axis=0) for arr in ABeta_burden])]
+    Tau_burden_group = [np.array([np.mean(arr, axis=0) for arr in Tau_burden])]
+
+    params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
+    params_group, results_group = from_PET_to_a([np.array(a_list_group)], ABeta_burden_group, Tau_burden_group)
+
+    coef_matrix = pd.DataFrame([p["params"] for p in params])
+    coef_matrix_group = pd.DataFrame([p["params"] for p in params_group])
+
+    ABeta_burden = np.vstack(ABeta_burden) 
+    Tau_burden = np.vstack(Tau_burden) 
+
+    predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
+    predicted_a_group = predict_a(ABeta_burden_group[0], Tau_burden_group[0], coef_matrix_group)
+    return predicted_a, predicted_a_group
+
 ###### Loading the data ######
 DL = ADNI_A.ADNI_A()
 
@@ -322,6 +340,7 @@ times = np.arange(t0, tfinal+dt, dt)
 sigma_mean = 0.45
 CEFF_FITTING = True
 SIGMA_FITTING = False
+A_FITTING = True
 if SIGMA_FITTING: NOISE_TYPE = 'hetero'
 else: NOISE_TYPE = 'homo'
 COMPETITIVE_COUPLING = False
@@ -355,7 +374,7 @@ I_FDT_all = np.full((3, NPARCELLS), np.nan)
 Inorm1_tmax_s0_group = np.zeros((3, NPARCELLS))
 Inorm2_tmax_s0_group = np.zeros((3, NPARCELLS))
 
-clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
+clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
 HC_SC_matrices = np.array(list(HC_SC.values()))
 HC_SC_avg = np.mean(HC_SC_matrices, axis=0)
 MCI_SC_matrices = np.array(list(MCI_SC.values()))  # Shape: (Nsubjects, NPARCELLS, NPARCELLS)
@@ -413,7 +432,7 @@ for COND in range(1,4):
                                 LinHopf_Ceff_sigma_a_fitting_numba(TSemp_fit_group, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
                                 fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                 fit_sigma=False, sigma_reset=sigma_reset,
-                                fit_a=True,
+                                fit_a=A_FITTING,
                                 epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
                                 MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
                                 Ceff_norm=Ceff_norm, maxC=maxC,
@@ -422,7 +441,7 @@ for COND in range(1,4):
     #print(f"Execution time group: {end_time - start_time:.4f} seconds")
 
     ## ploting the error iter
-    figure_name = f"error_iter_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
+    figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(training_dir, figure_name)
     plt.figure()
     plt.plot(np.arange(1, len(error_iter_group) + 1) * 100, error_iter_group, 'o-', label='error @100 iter')
@@ -432,15 +451,15 @@ for COND in range(1,4):
     plt.close()
 
     ## plotting the FC and Ceff matrices
-    fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
+    fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(FCgroup_subfolder, fig_name)
     plot_FC_matrices(FCemp_group, FCsim_group, title1="group FCemp", title2="group FCsim", save_path=save_path, size=1, dpi=300)
-    fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
+    fig_name = f"ECmatrix_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(ECgroup_subfolder, fig_name)
     plot_FC_matrix(Ceff_group, title="group Ceff fitted", size=1.1, save_path=save_path,dpi=300)
 
     ## plot the sigma
-    fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
+    fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(sigma_group_subfolder, fig_name)
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), sigma_ini, '.--', color='gray', alpha=0.5, label='Initial guess')
@@ -458,7 +477,7 @@ for COND in range(1,4):
     a_list_group.append(a_group)
     append_record_to_npz(
     Ceff_sigma_subfolder,
-    f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
+    f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
     level="group",
     condition=f"{COND}",
     sigma=sigma_group,
@@ -530,25 +549,24 @@ for i in range(1,4):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
-        figure_name = f"error_iter_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
+        figure_name = f"error_iter_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
         save_path = os.path.join(training_dir, figure_name)
         plt.figure()
         plt.plot(np.arange(1, len(error_iter_sub[sub]) + 1) * 100, error_iter_sub[sub], 'o-', label='error @100 iter')
         plt.xlabel('iter')
         plt.legend()
 
-        # Save and close
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.close()
+        plt.close() 
 
-        fig_name = f"FCmatrices_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
+        fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
         save_path = os.path.join(FCsub_subfolder, fig_name)
         plot_FC_matrices(FCemp_sub[sub], FCsim_sub[sub], title1=f"FCemp sub.{sub+1}", title2=f"FCsim sub.{sub+1}", save_path=save_path, size=1, dpi=300)
-        fig_name = f"ECmatrix_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
+        fig_name = f"ECmatrix_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
         save_path = os.path.join(ECsub_subfolder, fig_name)
         plot_FC_matrix(Ceff_sub[sub], title=f"Ceff fitted sub. {sub+1}", save_path=save_path, size=1.1, dpi=300)
 
-        fig_name = f"sigma_fit_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
+        fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
         save_path = os.path.join(sigma_subfolder, fig_name)
         plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
         plt.plot(range(1, NPARCELLS + 1), sigma_group, '.-', color='tab:blue', alpha=1, lw=2, label='sigma fit normalized (group)')
@@ -563,10 +581,9 @@ for i in range(1,4):
         plt.close()
 
         a_list_sub_temp.append(a_sub[sub])
-        ## save the results
         append_record_to_npz(
         Ceff_sigma_subfolder,
-        f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
+        f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
         level="subject",
         condition=f"{COND}",
         subject=f"S{sub}",
@@ -575,36 +592,17 @@ for i in range(1,4):
         omega=omega)
     a_list_sub.append(np.array(a_list_sub_temp))
 
-
-def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
-
-    ABeta_burden_group = [np.array([np.mean(arr, axis=0) for arr in ABeta_burden])]
-    Tau_burden_group = [np.array([np.mean(arr, axis=0) for arr in Tau_burden])]
-
-    params, results = from_PET_to_a(a_list_sub, ABeta_burden, Tau_burden)
-    params_group, results_group = from_PET_to_a([np.array(a_list_group)], ABeta_burden_group, Tau_burden_group)
-
-    coef_matrix = pd.DataFrame([p["params"] for p in params])
-    coef_matrix_group = pd.DataFrame([p["params"] for p in params_group])
-
-    ABeta_burden = np.vstack(ABeta_burden) 
-    Tau_burden = np.vstack(Tau_burden) 
-
-    predicted_a = predict_a(ABeta_burden, Tau_burden, coef_matrix)
-    predicted_a_group = predict_a(ABeta_burden_group[0], Tau_burden_group[0], coef_matrix_group)
-    return predicted_a, predicted_a_group
-
 predicted_a, predicted_a_group = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
-        f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
+        f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
         level="subject",
         a = predicted_a)
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
-        f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz",
+        f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
         level="group",
         a = predicted_a_group)
 
