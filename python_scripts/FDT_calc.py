@@ -274,11 +274,11 @@ print("a_group shape:", a_group)
 
 # group analysis
 I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_group, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, NPARCELLS, a_subs, gconst=1.0)
+X_I_tmax_group, X_Inorm1_group, X_Inorm2_group = X_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, NPARCELLS, a_group, gconst=1.0)
 
 # subject analysis
-I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_param=-0.02, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
-X_I_tmax_sub, X_I_norm1_sub, X_I_norm2_sub = X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_param=-0.02, gconst=1.0)
+I_tmax_sub, I_norm1_sub, I_norm2_sub = FDT_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, a_subs, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
+X_I_tmax_sub, X_I_norm1_sub, X_I_norm2_sub = X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_subs, gconst=1.0)
 
 append_record_to_npz(
     FDT_values_subfolder,
