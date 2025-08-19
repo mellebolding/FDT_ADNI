@@ -239,9 +239,9 @@ NOISE_TYPE = "HOMO"
 A_FITTING = True
 if A_FITTING:
     all_records = load_appended_records(
-    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_{NPARCELLS}_{NOISE_TYPE}.npz")
+    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
     )
-    savefilename = f"FDT_values_a{A_FITTING}_{NPARCELLS}_{NOISE_TYPE}.npz"
+    savefilename = f"FDT_values_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz"
 else:
     all_records = load_appended_records(
     filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_N{NPARCELLS}_{NOISE_TYPE}.npz")
