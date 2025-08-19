@@ -120,7 +120,7 @@ def append_record_to_npz(folder, filename, **record):
 ###################################################################
 
 
-def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
+def figures_I_tmax_norm1_norm2(group, subject,I_tmax, I_norm1, I_norm2,a=False):
     group_names = ['HC', 'MCI', 'AD']
     records_parcel_Itmax = []
     records_parcel_norm1 = []
@@ -171,33 +171,33 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
         }
 
         plt.rcParams.update({'font.size': 15})
-        fig_name = f"box_parcel_Itmax_N{NPARCELLS}_{NOISE_TYPE}"
+        fig_name = f"box_parcel_Itmax_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
         save_path = os.path.join(FDT_parcel_subfolder, fig_name)
         p_values.plotComparisonAcrossLabels2(
             resI_Itmax,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel=f'FDT I(tmax, 0) Parcels {NOISE_TYPE}',
+            graphLabel=f'FDT I(tmax, 0) Parcels {NOISE_TYPE} a{a}',
             save_path=save_path
         )
         plt.rcParams.update({'font.size': 15})
-        fig_name = f"box_parcel_norm1_N{NPARCELLS}_{NOISE_TYPE}"
+        fig_name = f"box_parcel_norm1_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
         save_path = os.path.join(Inorm1_group_subfolder, fig_name)
         p_values.plotComparisonAcrossLabels2(
             resI_norm1,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel=f'FDT I Norm1 Parcels {NOISE_TYPE}',
+            graphLabel=f'FDT I Norm1 Parcels {NOISE_TYPE} a{a}',
             save_path=save_path
         )
         plt.rcParams.update({'font.size': 15})
-        fig_name = f"box_parcel_norm2_N{NPARCELLS}_{NOISE_TYPE}"
+        fig_name = f"box_parcel_norm2_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
         save_path = os.path.join(Inorm2_group_subfolder, fig_name)
         p_values.plotComparisonAcrossLabels2(
             resI_norm2,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel=f'FDT I Norm2 Parcels {NOISE_TYPE}',
+            graphLabel=f'FDT I Norm2 Parcels {NOISE_TYPE} a{a}',
             save_path=save_path
         )
 
@@ -235,7 +235,7 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
         data_subjects_norm2 = pd.DataFrame.from_records(records_subject_norm2)
 
         fig, ax = plt.subplots(figsize=(10, 10))
-        fig_name = f"violin_subject_N{NPARCELLS}_{NOISE_TYPE}"
+        fig_name = f"violin_subject_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
         save_path = os.path.join(FDT_subject_subfolder, fig_name)
         plot_violins_HC_MCI_AD(
             ax=ax,
@@ -244,13 +244,13 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             metric='I(t=tmax,s=0) [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title=f'FDT I(tmax, 0) — Mean per subject per group {NOISE_TYPE}',
+            plot_title=f'FDT I(tmax, 0) — Mean per subject per group {NOISE_TYPE} a{a}',
             saveplot=1,
             filename=save_path,
             dpi=300
         )
         fig, ax = plt.subplots(figsize=(10, 10))
-        fig_name = f"violin_subject_norm1_N{NPARCELLS}_{NOISE_TYPE}"
+        fig_name = f"violin_subject_norm1_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
         save_path = os.path.join(Inorm1_sub_subfolder, fig_name)
         plot_violins_HC_MCI_AD(
             ax=ax,
@@ -259,13 +259,13 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             metric='I Norm1 [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title=f'FDT I Norm1 — Mean per subject per group {NOISE_TYPE}',
+            plot_title=f'FDT I Norm1 — Mean per subject per group {NOISE_TYPE} a{a}',
             saveplot=1,
             filename=save_path,
             dpi=300
         )
         fig, ax = plt.subplots(figsize=(10, 10))
-        fig_name = f"violin_subject_norm2_N{NPARCELLS}_{NOISE_TYPE}"
+        fig_name = f"violin_subject_norm2_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
         save_path = os.path.join(Inorm2_sub_subfolder, fig_name)
         plot_violins_HC_MCI_AD(
             ax=ax,
@@ -274,13 +274,13 @@ def figures_I_tmax_norm1_norm2(group, subject, I_tmax, I_norm1, I_norm2):
             metric='I Norm2 [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title=f'FDT I Norm2 — Mean per subject per group {NOISE_TYPE}',
+            plot_title=f'FDT I Norm2 — Mean per subject per group {NOISE_TYPE} a{a}',
             saveplot=1,
             filename=save_path,
             dpi=300
         )
 
-def figures_barplot_parcels(option,I_tmax_group,NPARCELLS):
+def figures_barplot_parcels(option,I_tmax_group,NPARCELLS,a=False):
     if option == 'I_tmax':
         I_group = I_tmax_group
     elif option == 'I_norm1':
@@ -293,7 +293,7 @@ def figures_barplot_parcels(option,I_tmax_group,NPARCELLS):
     colors = ['tab:blue', 'tab:red', 'tab:green']
 
     plt.figure(figsize=(12, 6))
-    fig_name = f"barplot_parcel_{option}_N{NPARCELLS}_{NOISE_TYPE}"
+    fig_name = f"barplot_parcel_{option}_N{NPARCELLS}_{NOISE_TYPE}_a{a}"
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     bottom = np.zeros(NPARCELLS)  # start at zero for stacking
     for i in range(3):
@@ -302,12 +302,12 @@ def figures_barplot_parcels(option,I_tmax_group,NPARCELLS):
 
     plt.xlabel('Parcel')
     plt.ylabel(f'{option}')
-    plt.title(f'{option} for Parcels {NOISE_TYPE}')
+    plt.title(f'{option} for Parcels {NOISE_TYPE} a{a}')
     plt.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-def plot_means_per_RSN(name, I_tmax_group, NPARCELLS):
+def plot_means_per_RSN(name, I_tmax_group, NPARCELLS,a=False):
 
     group_names = ['HC', 'MCI', 'AD']
 
@@ -324,7 +324,7 @@ def plot_means_per_RSN(name, I_tmax_group, NPARCELLS):
         means_per_group.append(group_means)
 
     means_per_group = np.array(means_per_group)
-    fig_name = f"barplot_RSN_{name}_N{NPARCELLS}_{NOISE_TYPE}"
+    fig_name = f"barplot_RSN_{name}_N{NPARCELLS}_{NOISE_TYPE}_a{a}"
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     fig, ax = plt.subplots(figsize=(10, 6))
     x = np.arange(len(RSNs))
@@ -336,12 +336,12 @@ def plot_means_per_RSN(name, I_tmax_group, NPARCELLS):
     ax.set_xticks(x)
     ax.set_xticklabels(RSNs.keys(), rotation=45)
     ax.set_ylabel(f'Mean {name}')
-    ax.set_title(f'Mean {name} per RSN (first {NPARCELLS} parcels) {NOISE_TYPE}')
+    ax.set_title(f'Mean {name} per RSN (first {NPARCELLS} parcels) {NOISE_TYPE} a{a}')
     ax.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS):
+def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS,a=False):
     subjects_per_group = [17, 9, 10]   # number of valid subjects per group
 
     nodes_in_range = [n for n in RSN if n < NPARCELLS]
@@ -371,13 +371,13 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS):
 
     # Plot
     fig, ax = plt.subplots(figsize=(12, 6))
-    fig_name = f"barplot_{nameRSN}_sub_{nameI}_N{NPARCELLS}_{NOISE_TYPE}"
+    fig_name = f"barplot_{nameRSN}_sub_{nameI}_N{NPARCELLS}_{NOISE_TYPE}_a{a}"
     save_path = os.path.join(FDT_subject_subfolder, fig_name)
     ax.bar(range(len(means)), means, color=bar_colors)
     ax.set_xticks(range(len(means)))
     ax.set_xticklabels(labels, rotation=90)
     ax.set_ylabel(f'Mean {nameI}')
-    ax.set_title(f'Mean {nameI} for {nameRSN} RSN {NOISE_TYPE}')
+    ax.set_title(f'Mean {nameI} for {nameRSN} RSN {NOISE_TYPE} a{a}')
 
     # Group separators
     for g, (start, end) in enumerate(group_avg_positions):
@@ -395,7 +395,7 @@ def plot_means_per_subjects_per_RSN(RSN, I_tmax_sub, nameRSN, nameI, NPARCELLS):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS):
+def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS,a=False):
     """
     Visualizes the group differences in I(tmax, 0) on a brain map.
     """
@@ -419,12 +419,12 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS):
     vmax = np.max(group_values)
 
     fig = plt.figure(figsize=(10, 5))
-    fig_name = f"left_right_brain{name}_N{NPARCELLS}_{NOISE_TYPE}"
+    fig_name = f"left_right_brain{name}_N{NPARCELLS}_{NOISE_TYPE}_a{a}"
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
 
     ax1 = fig.add_subplot(1, 2, 1, projection='3d')
     plotting.plot_surf_stat_map(fsaverage.pial_left, texture_left,
-                                hemi='left', title = f'{name} Left',
+                                hemi='left', title = f'{name} Left a{a}',
                                 view='lateral',
                                 colorbar=False, cmap='viridis',
                                 bg_map=fsaverage.sulc_left,
@@ -433,7 +433,7 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS):
 
     ax2 = fig.add_subplot(1, 2, 2, projection='3d')
     plotting.plot_surf_stat_map(fsaverage.pial_right, texture_right,
-                                hemi='right', title = f'{name} Right',
+                                hemi='right', title = f'{name} Right a{a}',
                                 view='lateral',
                                 colorbar=False, cmap='viridis',
                                 bg_map=fsaverage.sulc_right,
@@ -452,7 +452,7 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
+def brain_map_3D(name, I_tmax_group, COND, NPARCELLS,a=False):
 
     fsaverage = datasets.fetch_surf_fsaverage()
     nii_path = os.path.join('ADNI-A_DATA', 'MNI_Glasser_HCP_v1.0.nii.gz')
@@ -491,7 +491,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS):
                             darkness=None,
                             title=f'{name}')
     view.open_in_browser()  # or just `view` if using Jupyter
-    view.save_as_html(f'surface_plot_{name}_N{NPARCELLS}_{NOISE_TYPE}.html')
+    view.save_as_html(f'surface_plot_{name}_N{NPARCELLS}_{NOISE_TYPE}_a{a}.html')
     view
 
 # Dictionary mapping parcel indices (1-based) to their names
@@ -567,14 +567,26 @@ NPARCELLS = 379
 NOISE_TYPE = "HOMO"
 A_FITTING = True
 all_values = None
+all_values_a = None
 if A_FITTING:
-    all_values = load_appended_records(
+    all_values_a = load_appended_records(
         filepath=os.path.join(FDT_values_subfolder, f"FDT_values_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
     )
-else:
-    all_values = load_appended_records(
-        filepath=os.path.join(FDT_values_subfolder, f"FDT_values_N{NPARCELLS}_{NOISE_TYPE}.npz")
-    )
+    I_tmax_group_a = np.squeeze(np.array(get_field(all_values_a, "I_tmax", filters={"level": "group"})), axis=0)
+    I_norm1_group_a = np.squeeze(np.array(get_field(all_values_a, "I_norm1", filters={"level": "group"})), axis=0)
+    I_norm2_group_a = np.squeeze(np.array(get_field(all_values_a, "I_norm2", filters={"level": "group"})), axis=0)
+    I_tmax_sub_a = np.squeeze(np.array(get_field(all_values_a, "I_tmax", filters={"level": "subject"})), axis=0)
+    I_norm1_sub_a = np.squeeze(np.array(get_field(all_values_a, "I_norm1", filters={"level": "subject"})), axis=0)
+    I_norm2_sub_a = np.squeeze(np.array(get_field(all_values_a, "I_norm2", filters={"level": "subject"})), axis=0)
+    a_values_group = get_field(all_values_a, "a", filters={"level": "group"})
+    a_values_sub = get_field(all_values_a, "a", filters={"level": "subject"})
+    a_original_group = get_field(all_values_a, "original_a", filters={"level": "group"})
+    a_original_sub = get_field(all_values_a, "original_a", filters={"level": "subject"})
+
+
+all_values = load_appended_records(
+    filepath=os.path.join(FDT_values_subfolder, f"FDT_values_N{NPARCELLS}_{NOISE_TYPE}.npz")
+)
 I_tmax_group = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "group"})), axis=0)
 I_norm1_group = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "group"})), axis=0)
 I_norm2_group = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "group"})), axis=0)
@@ -584,11 +596,16 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+# if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
 # figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+# if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
 
 # figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
+# if A_FITTING: figures_barplot_parcels('I_tmax', I_tmax_group_a, NPARCELLS, a=A_FITTING)
 # figures_barplot_parcels('I_norm1', I_norm1_group, NPARCELLS)
+# if A_FITTING: figures_barplot_parcels('I_norm1', I_norm1_group_a, NPARCELLS, a=A_FITTING)
 # figures_barplot_parcels('I_norm2', I_norm2_group, NPARCELLS)
+# if A_FITTING: figures_barplot_parcels('I_norm2', I_norm2_group_a, NPARCELLS, a=A_FITTING)
 
 
 ##### RESTING STATE NETWORKS #####
@@ -613,12 +630,18 @@ RSNs = {
 
 
 # plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
+# if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
 # plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
+# if A_FITTING: plot_means_per_RSN('I_norm1_a', I_norm1_group_a, NPARCELLS,a=A_FITTING)
 # plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
+# if A_FITTING: plot_means_per_RSN('I_norm2_a', I_norm2_group_a, NPARCELLS,a=A_FITTING)
 
 # plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
+# if A_FITTING: plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub_a, 'SomMot', 'I_tmax', NPARCELLS,a=A_FITTING)
 # plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
+# if A_FITTING: plot_means_per_subjects_per_RSN(Vis, I_tmax_sub_a, 'Vis', 'I_tmax', NPARCELLS,a=A_FITTING)
 #plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub, 'Limbic', 'I_tmax', NPARCELLS)
+# if A_FITTING: plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub_a, 'Limbic', 'I_tmax', NPARCELLS,a=A_FITTING)
 # #...
 
 ###### VISUALIZATION ######
@@ -626,9 +649,12 @@ RSNs = {
 # left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
 # left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
 
-brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}', I_tmax_group, 0, NPARCELLS)
+# brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}', I_tmax_group, 0, NPARCELLS)
+# if A_FITTING: brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 0, NPARCELLS, a=A_FITTING)
 # brain_map_3D(f'I_tmax_MCI_{NOISE_TYPE}', I_tmax_group, 1, NPARCELLS)
+# if A_FITTING: brain_map_3D(f'I_tmax_MCI_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 1, NPARCELLS, a=A_FITTING)
 # brain_map_3D(f'I_tmax_AD_{NOISE_TYPE}', I_tmax_group, 2, NPARCELLS)
+# if A_FITTING: brain_map_3D(f'I_tmax_AD_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 2, NPARCELLS, a=A_FITTING)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_0', I_tmax_sub[0], 0, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_1', I_tmax_sub[0], 1, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_2', I_tmax_sub[0], 2, NPARCELLS)
