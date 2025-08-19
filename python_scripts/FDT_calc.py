@@ -234,14 +234,24 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
     return intR_tmax_s0_subject, intRnorm1_tmax_s0_subject, intRnorm2_tmax_s0_subject
 ####################################################################
 
-NPARCELLS = 18
+NPARCELLS = 379
 NOISE_TYPE = "HOMO"
-clear_npz_file(FDT_values_subfolder, f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz")
+A_FITTING = True
+if A_FITTING:
+    all_records = load_appended_records(
+    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_{NPARCELLS}_{NOISE_TYPE}.npz")
+    )
+    savefilename = f"FDT_values_a{A_FITTING}_{NPARCELLS}_{NOISE_TYPE}.npz"
+else:
+    all_records = load_appended_records(
+    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_N{NPARCELLS}_{NOISE_TYPE}.npz")
+    )
+    savefilename = f"FDT_values_N{NPARCELLS}_{NOISE_TYPE}.npz"
+
+clear_npz_file(FDT_values_subfolder, savefilename)
 
 # Load all records
-all_records = load_appended_records(
-    filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_{NPARCELLS}_{NOISE_TYPE}.npz")
-)
+
 print('done loading')
 # Extract group-level data
 HC_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "1"}))
@@ -288,7 +298,7 @@ X_I_tmax_sub, X_I_norm1_sub, X_I_norm2_sub = X_sub_Itmax_norm1_norm2(sigma_subs,
 
 append_record_to_npz(
     FDT_values_subfolder,
-    f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz",
+    savefilename,
     level="subject",
     I_tmax = I_tmax_sub,
     I_norm1 = I_norm1_sub,
@@ -299,7 +309,7 @@ append_record_to_npz(
 )
 append_record_to_npz(
     FDT_values_subfolder,
-    f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz",
+    savefilename,
     level="group",
     I_tmax = I_tmax_group,
     I_norm1 = I_norm1_group,
