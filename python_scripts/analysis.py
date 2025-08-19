@@ -565,10 +565,15 @@ Parcel_names = {
 
 NPARCELLS = 18
 NOISE_TYPE = "HOMO"
+A_FITTING = True
 all_values = None
-all_values = load_appended_records(
-    filepath=os.path.join(FDT_values_subfolder, f"FDT_values_{NPARCELLS}_{NOISE_TYPE}.npz")
-)
+if A_FITTING:
+    all_values = load_appended_records(
+        filepath=os.path.join(FDT_values_subfolder, f"FDT_values_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
+    )
+else:
+    all_values = load_appended_records(
+        filepath=os.path.join(FDT_values_subfolder, f"FDT_values_N{NPARCELLS}_{NOISE_TYPE}.npz")
 
 I_tmax_group = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "group"})), axis=0)
 I_norm1_group = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "group"})), axis=0)
