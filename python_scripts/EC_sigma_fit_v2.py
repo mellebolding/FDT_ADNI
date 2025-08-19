@@ -509,11 +509,11 @@ for i in range(1,4):
         SCs = AD_SC
 
     ### Generates a "group" TS with the same length for all subjects
-    min_ntimes = min(ts_gr[subj_id].shape[1] for subj_id in ID)
+    min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
     ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:NPARCELLS, :min_ntimes].copy() 
+        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
     TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
     TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
     TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()

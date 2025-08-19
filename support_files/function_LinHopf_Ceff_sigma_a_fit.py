@@ -9,7 +9,7 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
                                      fit_sigma=True, sigma_reset=False,
                                      fit_a=True,
                                      epsFC_Ceff=8e-5, epsCOVtau_Ceff=3e-5, epsFC_sigma=8e-5, epsCOVtau_sigma=3e-5, 
-                                     epsFC_a=8e-7, epsCOVtau_a=3e-7,
+                                     epsFC_a=8e-8, epsCOVtau_a=3e-8,
                                      MAXiter=10000, error_tol=5e-4, patience=2, learning_rate_factor=0.8,
                                      Ceff_norm=True, maxC=0.2,
                                      iter_check=50, plot_evol=False, plot_evol_last=False):
@@ -111,12 +111,11 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
 
     for iter in range(1, MAXiter + 1):
         ### Linear Hopf FC
-        if not np.all(np.isfinite(A)):
-            #print(f"Iter {iter:4d}/{MAXiter} ; error: {error_old:.7f} ; error_tol: {error_tol_old:.7f} | A not finite --> EXIT (return previous sigma)")
-            Ceff_fit = Ceff_previous
-            sigma_fit = sigma_previous
-            a_fit = a_previous
-            break
+        if not np.all(np.isfinite(a_new)):
+            print(f"Iter {iter:4d}/{MAXiter} ; error: {error_old:.7f} ; error_tol: {error_tol_old:.7f} | A not finite --> EXIT (return previous sigma)")
+            print("a_new ", a_new)
+            print("a_previous ", a_previous)
+            
         FCsim, COVsim, COVsimtotal, A = hopf_int(Ceff_new, f_diff, sigma_new, a_new)
 
         # COVtausim = (expm((Tau * TR) * A) @ COVsimtotal)[:N, :N].copy()
@@ -314,7 +313,7 @@ def update_sigma(sigma_previous, sigma_ini,
     return sigma_new
 
 def update_a(a_previous, a_ini, FCemp, FCsim, COVtauemp, COVtausim,
-                epsFC_a, epsCOVtau_a,a_min=-0.1, a_max=0.1):
+                epsFC_a, epsCOVtau_a,a_min=-0.1, a_max=-0.001):
     N = len(a_previous)
     a_new = np.zeros(N)
 
