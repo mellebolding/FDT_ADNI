@@ -286,7 +286,8 @@ omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 
 a_group = np.vstack(get_field(all_records, "a", filters={"level": "group"}))
 a_subs = np.vstack(get_field(all_records, "a", filters={"level": "subject"}))
-
+a_group_org = np.array(get_field(all_records, "original_a", filters={"level": "group"}))
+a_subs_org = np.array(get_field(all_records, "original_a", filters={"level": "subject"}))
 
 # group analysis
 I_tmax_group,I_norm1_group,I_norm2_group = FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_group, gconst=1.0, v0bias=0.0, tfinal=200, dt=0.01, tmax=100, ts0=0)
@@ -306,6 +307,8 @@ append_record_to_npz(
     X_I_tmax = X_I_tmax_sub,
     X_Inorm1 = X_I_norm1_sub,
     X_Inorm2 = X_I_norm2_sub,
+    a = a_subs,
+    original_a = a_subs_org,
 )
 append_record_to_npz(
     FDT_values_subfolder,
@@ -317,6 +320,8 @@ append_record_to_npz(
     X_I_tmax = X_I_tmax_group,
     X_Inorm1 = X_Inorm1_group,
     X_Inorm2 = X_Inorm2_group,
+    a = a_group,
+    original_a = a_group_org,
 )
 
 
