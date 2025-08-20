@@ -595,11 +595,12 @@ I_tmax_sub = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level
 I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "subject"})), axis=0)
 I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 
-print("a_sub: ", a_values_sub[0].shape)
-print("a_sub_org: ", a_original_sub[0].shape)
+print("a_sub: ", min(a_values_sub[0][0,:]), max(a_values_sub[0][0,:]))
+#print("a_sub_org: ", a_original_sub[0].shape)
 diff_a_group = np.subtract(a_values_group, a_original_group)
 diff_a_sub = np.subtract(a_values_sub[0], a_original_sub[0])
-print("diff a sub: ", diff_a_sub)
+diff_I_norm1_a_subHC = np.subtract(I_norm1_sub_a[0], I_norm1_sub[0])
+#print("diff a sub: ", diff_a_sub)
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
@@ -678,6 +679,7 @@ brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
 brain_map_3D(f'a_sub_HC_{NOISE_TYPE}', a_values_sub[0], 0, NPARCELLS)
 brain_map_3D(f'I_norm1_a_sub_HC_{NOISE_TYPE}', I_norm1_sub_a[0], 0, NPARCELLS)
 brain_map_3D(f'I_norm1_sub_HC_{NOISE_TYPE}', I_norm1_sub[0], 0, NPARCELLS)
+brain_map_3D(f'diff_I_norm1_sub1_{NOISE_TYPE}', diff_I_norm1_a_subHC, 0, NPARCELLS)
 
 groups = ["HC", "MCI", "AD"]
 colors = ["tab:blue", "tab:orange", "tab:green"]
