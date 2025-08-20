@@ -609,7 +609,7 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 
 print(a_original_group,"sub: ", a_original_sub)
 
-a_original_group = np.squeeze(np.array(a_original_group), axis=0)
+a_original_group = np.squeeze(np.array(a_original_group))
 print("a_original_group shape: ", a_original_group.shape)
 ##### RESTING STATE NETWORKS #####
 SomMot = [7, 8, 23, 35, 38, 39, 40, 42, 50, 52, 54, 55, 56, 98, 99, 100, 101, 102, 103, 104, 105, 106, 114, 123, 124, 167, 172, 173, 174, 187, 188, 191, 203, 207, 215, 218, 219, 220, 221, 230, 232, 233, 234, 235, 279, 280, 281, 282, 283, 284, 303, 347, 352, 353, 354]
