@@ -580,7 +580,7 @@ if A_FITTING:
     I_norm1_sub_a = np.squeeze(np.array(get_field(all_values_a, "I_norm1", filters={"level": "subject"})), axis=0)
     I_norm2_sub_a = np.squeeze(np.array(get_field(all_values_a, "I_norm2", filters={"level": "subject"})), axis=0)
     a_values_group = get_field(all_values_a, "a", filters={"level": "group"})
-    a_values_sub = get_field(all_values_a, "a", filters={"level": "subject"})
+    a_values_sub = np.split(get_field(all_values_a, "a", filters={"level": "subject"})[0], [17, 26], axis=0)
     a_original_group = np.squeeze(np.array(get_field(all_values_a, "original_a", filters={"level": "group"})))
     a_original_sub = get_field(all_values_a, "original_a", filters={"level": "subject"})[0][0]
 
@@ -595,6 +595,7 @@ I_tmax_sub = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level
 I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "subject"})), axis=0)
 I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 
+print("a_values_group shape: ", a_values_group.shape)
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
@@ -608,10 +609,6 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 # figures_barplot_parcels('I_norm2', I_norm2_group, NPARCELLS)
 # if A_FITTING: figures_barplot_parcels('I_norm2', I_norm2_group_a, NPARCELLS, a=A_FITTING)
 
-#print("sub: ", a_values_sub)
-  # extract (36, N) array
-parts = np.split(a_values_sub[0], [17, 26], axis=0)
-print("parts: ", parts[0].shape, parts[1].shape, parts[2].shape)
 
 #print("a_original_group shape: ", a_original_group.shape)
 #print("a_original_sub shape: ", a_values_sub[0].shape)
