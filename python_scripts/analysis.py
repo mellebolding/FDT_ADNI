@@ -610,7 +610,7 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 
 #print("sub: ", a_values_sub)
   # extract (36, N) array
-parts = [np.split(a_values_sub[0], [17, 26], axis=0)]
+parts = np.split(a_values_sub[0], [17, 26], axis=0)
 print("parts: ", parts[0].shape, parts[1].shape, parts[2].shape)
 
 #print("a_original_group shape: ", a_original_group.shape)
