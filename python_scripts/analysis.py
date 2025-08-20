@@ -602,17 +602,17 @@ diff_a_sub = np.subtract(a_values_sub[0], a_original_sub[0])
 diff_I_norm1_a_subHC = np.subtract(I_norm1_sub_a[0], I_norm1_sub[0])
 #print("diff a sub: ", diff_a_sub)
 
-figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
-if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
-figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
-if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
+# figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+# if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
+# figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+# if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
 
-figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
-if A_FITTING: figures_barplot_parcels('I_tmax', I_tmax_group_a, NPARCELLS, a=A_FITTING)
-figures_barplot_parcels('I_norm1', I_norm1_group, NPARCELLS)
-if A_FITTING: figures_barplot_parcels('I_norm1', I_norm1_group_a, NPARCELLS, a=A_FITTING)
-figures_barplot_parcels('I_norm2', I_norm2_group, NPARCELLS)
-if A_FITTING: figures_barplot_parcels('I_norm2', I_norm2_group_a, NPARCELLS, a=A_FITTING)
+# figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
+# if A_FITTING: figures_barplot_parcels('I_tmax', I_tmax_group_a, NPARCELLS, a=A_FITTING)
+# figures_barplot_parcels('I_norm1', I_norm1_group, NPARCELLS)
+# if A_FITTING: figures_barplot_parcels('I_norm1', I_norm1_group_a, NPARCELLS, a=A_FITTING)
+# figures_barplot_parcels('I_norm2', I_norm2_group, NPARCELLS)
+# if A_FITTING: figures_barplot_parcels('I_norm2', I_norm2_group_a, NPARCELLS, a=A_FITTING)
 
 
 ##### RESTING STATE NETWORKS #####
@@ -636,19 +636,19 @@ RSNs = {
 
 
 
-plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
-if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
-plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
-if A_FITTING: plot_means_per_RSN('I_norm1_a', I_norm1_group_a, NPARCELLS,a=A_FITTING)
-plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
-if A_FITTING: plot_means_per_RSN('I_norm2_a', I_norm2_group_a, NPARCELLS,a=A_FITTING)
+# plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
+# if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
+# plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
+# if A_FITTING: plot_means_per_RSN('I_norm1_a', I_norm1_group_a, NPARCELLS,a=A_FITTING)
+# plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
+# if A_FITTING: plot_means_per_RSN('I_norm2_a', I_norm2_group_a, NPARCELLS,a=A_FITTING)
 
-plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
-if A_FITTING: plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub_a, 'SomMot', 'I_tmax', NPARCELLS,a=A_FITTING)
-plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
-if A_FITTING: plot_means_per_subjects_per_RSN(Vis, I_tmax_sub_a, 'Vis', 'I_tmax', NPARCELLS,a=A_FITTING)
-plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub, 'Limbic', 'I_tmax', NPARCELLS)
-if A_FITTING: plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub_a, 'Limbic', 'I_tmax', NPARCELLS,a=A_FITTING)
+# plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
+# if A_FITTING: plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub_a, 'SomMot', 'I_tmax', NPARCELLS,a=A_FITTING)
+# plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
+# if A_FITTING: plot_means_per_subjects_per_RSN(Vis, I_tmax_sub_a, 'Vis', 'I_tmax', NPARCELLS,a=A_FITTING)
+# plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub, 'Limbic', 'I_tmax', NPARCELLS)
+# if A_FITTING: plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub_a, 'Limbic', 'I_tmax', NPARCELLS,a=A_FITTING)
 # #...
 
 ###### VISUALIZATION ######
@@ -675,9 +675,9 @@ if A_FITTING: plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub_a, 'Limbic', 'I
 
 # brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
 # brain_map_3D(f'a_sub_HC_{NOISE_TYPE}', a_values_sub[0], 0, NPARCELLS)
-brain_map_3D(f'I_norm1_a_sub_HC_{NOISE_TYPE}', I_norm1_sub_a[0], 0, NPARCELLS)
-brain_map_3D(f'I_norm1_a_sub_MCI_{NOISE_TYPE}', I_norm1_sub_a[1], 0, NPARCELLS)
-brain_map_3D(f'I_norm1_a_sub_AD_{NOISE_TYPE}', I_norm1_sub_a[2], 0, NPARCELLS)
+# brain_map_3D(f'I_norm1_a_sub_HC_{NOISE_TYPE}', I_norm1_sub_a[0], 0, NPARCELLS)
+# brain_map_3D(f'I_norm1_a_sub_MCI_{NOISE_TYPE}', I_norm1_sub_a[1], 0, NPARCELLS)
+# brain_map_3D(f'I_norm1_a_sub_AD_{NOISE_TYPE}', I_norm1_sub_a[2], 0, NPARCELLS)
 # brain_map_3D(f'I_norm1_sub_HC_{NOISE_TYPE}', I_norm1_sub[0], 0, NPARCELLS)
 # brain_map_3D(f'diff_I_norm1_sub1_{NOISE_TYPE}', diff_I_norm1_a_subHC, 0, NPARCELLS)
 
@@ -685,7 +685,7 @@ groups = ["HC", "MCI", "AD"]
 colors = ["tab:blue", "tab:orange", "tab:green"]
 
 # 1. Compute range per parcel
-diffs = np.max(I_norm1_group_a, axis=0) - np.min(I_norm1_group_a, axis=0)
+diffs = np.max(I_norm2_group_a, axis=0) - np.min(I_norm2_group_a, axis=0)
 
 # 2. Find top N
 top_n = 18
@@ -700,7 +700,7 @@ bar_width = 0.25
 for i, group in enumerate(groups):
     ax.bar(
         x + i * bar_width,
-        I_norm1_group_a[i, top_parcels],
+        I_norm2_group_a[i, top_parcels],
         width=bar_width,
         label=group,
         color=colors[i]
@@ -734,7 +734,7 @@ for i, group in enumerate(groups):
     for subj in range(n_subjects):
         ax.bar(
             x + i * bar_width + subj*0.02,  # small shift per subject
-            I_norm1_sub_a[i, subj, top6_parcels],
+            I_norm2_sub_a[i, subj, top6_parcels],
             width=0.02,
             color=colors[i],
             alpha=0.7
