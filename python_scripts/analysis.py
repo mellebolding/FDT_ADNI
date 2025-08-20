@@ -599,7 +599,7 @@ print("a_sub: ", a_values_sub[0].shape)
 print("a_sub_org: ", a_original_sub[0].shape)
 diff_a_group = np.subtract(a_values_group, a_original_group)
 diff_a_sub = np.subtract(a_values_sub[0], a_original_sub[0])
-print("diff a: ", diff_a_group)
+print("diff a sub: ", diff_a_sub)
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
@@ -670,9 +670,9 @@ RSNs = {
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
 
-brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', diff_a_group, 0, NPARCELLS)
-brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_a_group, 1, NPARCELLS)
-brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_a_group, 2, NPARCELLS)
+# brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', diff_a_group, 0, NPARCELLS)
+# brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_a_group, 1, NPARCELLS)
+# brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_a_group, 2, NPARCELLS)
 
 
 
