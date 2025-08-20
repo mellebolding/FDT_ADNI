@@ -595,7 +595,10 @@ I_tmax_sub = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level
 I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "subject"})), axis=0)
 I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 
+print("a_sub: ", a_values_sub[0])
+print("a_sub_org: ", a_original_sub)
 diff_a_group = np.subtract(a_values_group, a_original_group)
+diff_a_sub = np.subtract(a_values_sub[0], a_original_sub)
 print("diff a: ", diff_a_group)
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
