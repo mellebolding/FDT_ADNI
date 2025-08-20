@@ -596,7 +596,8 @@ predicted_a, predicted_a_group = calc_a_values(a_list_sub, a_list_group, ABeta_b
 
 print(f"a_list_group shape: {a_list_group}"
       f"predicted_a_group shape: {predicted_a_group}")
-diff_a_group = predicted_a_group - a_list_group
+diff_a_group = predicted_a_group - np.squeeze(np.array(a_list_group))
+print(f"diff_a_group shape: {diff_a_group}")
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
