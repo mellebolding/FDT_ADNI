@@ -604,6 +604,7 @@ def from_PET_to_a(a_values, abeta_values, tau_values, fit_type='linear'):
             'Tau': tau_per_parcel,
             'ABeta_x_Tau': interaction
         })
+        print("X: ", X)
         X = sm.add_constant(X)  # adds intercept term
         if fit_type == "linear":
             model = sm.OLS(a_per_parcel, X).fit()
