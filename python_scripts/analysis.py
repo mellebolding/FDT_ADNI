@@ -608,10 +608,10 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 # figures_barplot_parcels('I_norm2', I_norm2_group, NPARCELLS)
 # if A_FITTING: figures_barplot_parcels('I_norm2', I_norm2_group_a, NPARCELLS, a=A_FITTING)
 
-print("sub: ", a_values_sub)
+#print("sub: ", a_values_sub)
   # extract (36, N) array
 parts = [np.split(a_values_sub[0], [17, 26], axis=0)]
-print("parts: ", parts)
+print("parts: ", parts[0].shape, parts[1].shape, parts[2].shape)
 
 #print("a_original_group shape: ", a_original_group.shape)
 #print("a_original_sub shape: ", a_values_sub[0].shape)
