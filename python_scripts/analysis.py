@@ -485,7 +485,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS,a=False):
     view = plotting.view_surf(surf_mesh=mesh_both,
                             surf_map=surf_map_masked,
                             cmap='viridis',
-                            vmin=np.nanmin(surf_map_masked),     # Minimum value of colorbar
+                            vmin=-0.017,#np.nanmin(surf_map_masked),     # Minimum value of colorbar
                             vmax=0,#np.max(surf_map),     # Maximum value of colorbar
                             symmetric_cmap=False,
                             colorbar=True,
