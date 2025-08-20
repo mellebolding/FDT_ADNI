@@ -483,10 +483,10 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS,a=False):
     # Plot interactively
     surf_map_masked = np.where(surf_map < 0, surf_map, np.nan)
     view = plotting.view_surf(surf_mesh=mesh_both,
-                            surf_map=surf_map_masked,
+                            surf_map=surf_map,
                             cmap='viridis',
-                            vmin=np.nanmin(surf_map_masked),     # Minimum value of colorbar
-                            vmax=0,#np.max(surf_map),     # Maximum value of colorbar
+                            vmin=np.nanmin(surf_map),     # Minimum value of colorbar
+                            vmax=np.max(surf_map),     # Maximum value of colorbar
                             symmetric_cmap=False,
                             colorbar=True,
                             darkness=None,
@@ -638,19 +638,19 @@ RSNs = {
 
 
 
-# plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
-# if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
-# plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
-# if A_FITTING: plot_means_per_RSN('I_norm1_a', I_norm1_group_a, NPARCELLS,a=A_FITTING)
-# plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
-# if A_FITTING: plot_means_per_RSN('I_norm2_a', I_norm2_group_a, NPARCELLS,a=A_FITTING)
+plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
+if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
+plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
+if A_FITTING: plot_means_per_RSN('I_norm1_a', I_norm1_group_a, NPARCELLS,a=A_FITTING)
+plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
+if A_FITTING: plot_means_per_RSN('I_norm2_a', I_norm2_group_a, NPARCELLS,a=A_FITTING)
 
-# plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
-# if A_FITTING: plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub_a, 'SomMot', 'I_tmax', NPARCELLS,a=A_FITTING)
-# plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
-# if A_FITTING: plot_means_per_subjects_per_RSN(Vis, I_tmax_sub_a, 'Vis', 'I_tmax', NPARCELLS,a=A_FITTING)
-#plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub, 'Limbic', 'I_tmax', NPARCELLS)
-# if A_FITTING: plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub_a, 'Limbic', 'I_tmax', NPARCELLS,a=A_FITTING)
+plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
+if A_FITTING: plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub_a, 'SomMot', 'I_tmax', NPARCELLS,a=A_FITTING)
+plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
+if A_FITTING: plot_means_per_subjects_per_RSN(Vis, I_tmax_sub_a, 'Vis', 'I_tmax', NPARCELLS,a=A_FITTING)
+plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub, 'Limbic', 'I_tmax', NPARCELLS)
+if A_FITTING: plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub_a, 'Limbic', 'I_tmax', NPARCELLS,a=A_FITTING)
 # #...
 
 ###### VISUALIZATION ######
@@ -676,8 +676,10 @@ RSNs = {
 # brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_a_group, 2, NPARCELLS)
 
 # brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
-brain_map_3D(f'a_sub_HC_{NOISE_TYPE}', a_values_sub[0], 0, NPARCELLS)
-# brain_map_3D(f'I_norm1_a_sub_HC_{NOISE_TYPE}', I_norm1_sub_a[0], 0, NPARCELLS)
+# brain_map_3D(f'a_sub_HC_{NOISE_TYPE}', a_values_sub[0], 0, NPARCELLS)
+brain_map_3D(f'I_norm1_a_sub_HC_{NOISE_TYPE}', I_norm1_sub_a[0], 0, NPARCELLS)
+brain_map_3D(f'I_norm1_a_sub_MCI_{NOISE_TYPE}', I_norm1_sub_a[1], 0, NPARCELLS)
+brain_map_3D(f'I_norm1_a_sub_AD_{NOISE_TYPE}', I_norm1_sub_a[2], 0, NPARCELLS)
 # brain_map_3D(f'I_norm1_sub_HC_{NOISE_TYPE}', I_norm1_sub[0], 0, NPARCELLS)
 # brain_map_3D(f'diff_I_norm1_sub1_{NOISE_TYPE}', diff_I_norm1_a_subHC, 0, NPARCELLS)
 
