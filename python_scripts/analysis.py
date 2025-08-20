@@ -580,8 +580,8 @@ if A_FITTING:
     I_norm2_sub_a = np.squeeze(np.array(get_field(all_values_a, "I_norm2", filters={"level": "subject"})), axis=0)
     a_values_group = get_field(all_values_a, "a", filters={"level": "group"})
     a_values_sub = get_field(all_values_a, "a", filters={"level": "subject"})
-    a_original_group = get_field(all_values_a, "original_a", filters={"level": "group"})
-    a_original_sub = get_field(all_values_a, "original_a", filters={"level": "subject"})
+    a_original_group = np.squeeze(np.array(get_field(all_values_a, "original_a", filters={"level": "group"})))
+    a_original_sub = get_field(all_values_a, "original_a", filters={"level": "subject"})[0][0]
 
 
 all_values = load_appended_records(
@@ -609,11 +609,9 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 
 print("sub: ", a_original_sub)
 
-a_original_group = np.squeeze(np.array(a_original_group))
-#a_original_sub = np.squeeze(np.array(a_original_sub))
 
 #print("a_original_group shape: ", a_original_group.shape)
-print("a_original_sub shape: ", a_original_sub[0][0][1].shape)
+print("a_original_sub shape: ", a_original_sub[1].shape)
 ##### RESTING STATE NETWORKS #####
 SomMot = [7, 8, 23, 35, 38, 39, 40, 42, 50, 52, 54, 55, 56, 98, 99, 100, 101, 102, 103, 104, 105, 106, 114, 123, 124, 167, 172, 173, 174, 187, 188, 191, 203, 207, 215, 218, 219, 220, 221, 230, 232, 233, 234, 235, 279, 280, 281, 282, 283, 284, 303, 347, 352, 353, 354]
 Vis = [0, 1, 2, 3, 4, 5, 6, 12, 15, 17, 18, 19, 20, 21, 22, 118, 119, 120, 125, 126, 141, 142, 145, 151, 152, 153, 154, 155, 156, 157, 158, 159, 162, 180, 181, 182, 183, 184, 185, 186, 192, 195, 198, 199, 200, 201, 202, 300, 322, 331, 332, 333, 335, 337, 338, 339, 342]
@@ -667,7 +665,8 @@ RSNs = {
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_3', I_tmax_sub[0], 3, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
-
+brain_map_3D(f'a_original_HC_{NOISE_TYPE}', a_original_sub[0], 0, NPARCELLS)
+brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', a_original_group, 0, NPARCELLS)
 
 
 groups = ["HC", "MCI", "AD"]
