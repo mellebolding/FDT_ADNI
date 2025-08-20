@@ -284,7 +284,7 @@ DL = ADNI_A.ADNI_A()
 subdata = DL.get_subjectData('002_S_0413')
 SC = subdata['002_S_0413']['SC'] # Structural connectivity
 
-NPARCELLS = 379 #tot: 379
+NPARCELLS = 18 #tot: 379
 # Loading the timeseries data for all subjects and dividing them into groups
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
@@ -593,6 +593,10 @@ for i in range(1,4):
     a_list_sub.append(np.array(a_list_sub_temp))
 
 predicted_a, predicted_a_group = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
+
+print(f"a_list_group shape: {a_list_group}"
+      f"predicted_a_group shape: {predicted_a_group}")
+diff_a_group = predicted_a_group - a_list_group
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
