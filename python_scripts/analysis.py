@@ -675,7 +675,9 @@ RSNs = {
 # brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_a_group, 2, NPARCELLS)
 
 brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
-
+brain_map_3D(f'a_sub_HC_{NOISE_TYPE}', a_values_sub[0], 0, NPARCELLS)
+brain_map_3D(f'I_norm1_a_sub_HC_{NOISE_TYPE}', I_norm1_sub_a[0], 0, NPARCELLS)
+brain_map_3D(f'I_norm1_sub_HC_{NOISE_TYPE}', I_norm1_sub[0], 0, NPARCELLS)
 
 groups = ["HC", "MCI", "AD"]
 colors = ["tab:blue", "tab:orange", "tab:green"]
