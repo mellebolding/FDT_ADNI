@@ -483,10 +483,10 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS,a=False):
     # Plot interactively
     surf_map_masked = np.where(surf_map < 0, surf_map, np.nan)
     view = plotting.view_surf(surf_mesh=mesh_both,
-                            surf_map=surf_map_masked,
+                            surf_map=surf_map,
                             cmap='viridis',
-                            vmin=np.nanmin(surf_map_masked),     # Minimum value of colorbar
-                            vmax=0,#np.max(surf_map),     # Maximum value of colorbar
+                            vmin=np.nanmin(surf_map),     # Minimum value of colorbar
+                            vmax=np.max(surf_map),     # Maximum value of colorbar
                             symmetric_cmap=False,
                             colorbar=True,
                             darkness=None,
@@ -674,6 +674,7 @@ RSNs = {
 # brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_a_group, 1, NPARCELLS)
 # brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_a_group, 2, NPARCELLS)
 
+brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
 
 
 groups = ["HC", "MCI", "AD"]
