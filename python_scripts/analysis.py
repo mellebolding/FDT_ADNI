@@ -667,9 +667,9 @@ RSNs = {
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
 
-# brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', a_original_group, 0, NPARCELLS)
-# brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', a_original_group, 1, NPARCELLS)
-# brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', a_original_group, 2, NPARCELLS)
+brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', a_values_group, 0, NPARCELLS)
+brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', a_values_group, 1, NPARCELLS)
+brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', a_values_group, 2, NPARCELLS)
 
 
 
