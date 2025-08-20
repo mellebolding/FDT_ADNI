@@ -608,11 +608,11 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 # figures_barplot_parcels('I_norm2', I_norm2_group, NPARCELLS)
 # if A_FITTING: figures_barplot_parcels('I_norm2', I_norm2_group_a, NPARCELLS, a=A_FITTING)
 
-print("sub: ", a_original_sub)
+print("sub: ", a_values_sub)
 
 
 #print("a_original_group shape: ", a_original_group.shape)
-print("a_original_sub shape: ", a_original_sub[1].shape)
+print("a_original_sub shape: ", a_values_sub[1].shape)
 ##### RESTING STATE NETWORKS #####
 SomMot = [7, 8, 23, 35, 38, 39, 40, 42, 50, 52, 54, 55, 56, 98, 99, 100, 101, 102, 103, 104, 105, 106, 114, 123, 124, 167, 172, 173, 174, 187, 188, 191, 203, 207, 215, 218, 219, 220, 221, 230, 232, 233, 234, 235, 279, 280, 281, 282, 283, 284, 303, 347, 352, 353, 354]
 Vis = [0, 1, 2, 3, 4, 5, 6, 12, 15, 17, 18, 19, 20, 21, 22, 118, 119, 120, 125, 126, 141, 142, 145, 151, 152, 153, 154, 155, 156, 157, 158, 159, 162, 180, 181, 182, 183, 184, 185, 186, 192, 195, 198, 199, 200, 201, 202, 300, 322, 331, 332, 333, 335, 337, 338, 339, 342]
@@ -666,10 +666,10 @@ RSNs = {
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_3', I_tmax_sub[0], 3, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
-brain_map_3D(f'a_original_HC_{NOISE_TYPE}', a_original_sub[0], 0, NPARCELLS)
-brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', a_original_group, 0, NPARCELLS)
-brain_map_3D(f'a_original_MCI_{NOISE_TYPE}', a_original_group, 1, NPARCELLS)
-brain_map_3D(f'a_original_AD_{NOISE_TYPE}', a_original_group, 2, NPARCELLS)
+
+# brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', a_original_group, 0, NPARCELLS)
+# brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', a_original_group, 1, NPARCELLS)
+# brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', a_original_group, 2, NPARCELLS)
 
 
 
@@ -699,7 +699,7 @@ for i, group in enumerate(groups):
     )
 
 # 4. Set labels
-print([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels])
+# print([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels])
 ax.set_xticks(x + bar_width)
 ax.set_xticklabels([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels], rotation=45, ha="right")
 ax.set_ylabel("I_tmax")
@@ -707,7 +707,7 @@ ax.set_title("I_tmax HOMO top parcels with largest between-group differences")
 ax.legend()
 
 plt.tight_layout()
-plt.show()
+# plt.show()
 
 top6_parcels = top_parcels_nonsort[:6]  # first 6 parcels for detailed analysis
 x = np.arange(len(top6_parcels)*27)  # parcel positions
