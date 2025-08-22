@@ -597,9 +597,10 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 
 #print("a_sub: ", min(a_values_sub[0][0,:]), max(a_values_sub[0][0,:]))
 #print("a_sub_org: ", a_original_sub[0].shape)
-diff_a_group = np.subtract(a_values_group, a_original_group)
-diff_a_sub = np.subtract(a_values_sub[0], a_original_sub[0])
-diff_I_norm1_a_subHC = np.subtract(I_norm1_sub_a[0], I_norm1_sub[0])
+if A_FITTING:
+    diff_a_group = np.subtract(a_values_group, a_original_group)
+    diff_a_sub = np.subtract(a_values_sub[0], a_original_sub[0])
+    diff_I_norm1_a_subHC = np.subtract(I_norm1_sub_a[0], I_norm1_sub[0])
 #print("diff a sub: ", diff_a_sub)
 
 figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
