@@ -605,8 +605,8 @@ if A_FITTING:
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
-# figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
-# if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
+figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
 
 # figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
 # if A_FITTING: figures_barplot_parcels('I_tmax', I_tmax_group_a, NPARCELLS, a=A_FITTING)
