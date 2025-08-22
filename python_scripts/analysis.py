@@ -406,8 +406,10 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS,a=False):
 
     group_values = I_tmax_group[COND,:]
 
-    for i in range(NPARCELLS):
+    for i in range(min(NPARCELLS,180)):
         group_map[parcel_data == i + 1] = group_values[i]
+        if NPARCELLS > 180:
+            group_map[parcel_data == i + 1001] = group_values[i + 180]
 
     group_img = nib.Nifti1Image(group_map, affine=parcel_img.affine)
     fsaverage = datasets.fetch_surf_fsaverage()
