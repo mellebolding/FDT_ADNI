@@ -336,7 +336,7 @@ def plot_means_per_RSN(name, I_tmax_group, NPARCELLS,a=False):
     ax.set_xticks(x)
     ax.set_xticklabels(RSNs.keys(), rotation=45)
     ax.set_ylabel(f'Mean {name}')
-    ax.set_title(f'Mean {name} per RSN (first {NPARCELLS} parcels) {NOISE_TYPE} a{a}')
+    ax.set_title(f'Mean {name} per RSN {NOISE_TYPE} a{a}')
     ax.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
