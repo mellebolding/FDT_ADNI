@@ -118,9 +118,9 @@ def plot_violins_HC_MCI_AD(ax, data,
     sns.set_context('notebook', font_scale=font_scale)
 
     # Light colors for violin
-    box_palette = {'HC': '#B3E2CD', 'MCI': '#FDCDAC', 'AD': '#CBD5E8'}
+    box_palette = {'HC': '#CBD5E8', 'MCI': '#FDCDAC', 'AD': '#B3E2CD'}
     # Dark colors for dots
-    swarmplot_palette = {'HC': '#1B9E77', 'MCI': '#D95F02', 'AD': '#7570B3'}
+    swarmplot_palette = {'HC': '#7570B3', 'MCI': '#D95F02', 'AD': '#1B9E77'}
 
     # Violin plot
     sns.violinplot(y="value",
@@ -183,7 +183,7 @@ def plot_violins_HC_MCI_AD(ax, data,
 
     # Final axis setup
     ax.set_xticks([0, 1, 2])
-    ax.set_xticklabels(["Healthy Controls", "MCI", "Alzheimer's"])
+    ax.set_xticklabels(["HC", "MCI", "AD"])
     ax.set_xlabel('')
     ax.set_ylabel(metric)
     ax.set_title(plot_title)
