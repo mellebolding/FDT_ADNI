@@ -566,7 +566,7 @@ Parcel_names = {
 
 NPARCELLS = 379
 NOISE_TYPE = "HOMO"
-A_FITTING = True
+A_FITTING = False
 all_values = None
 all_values_a = None
 if A_FITTING:
@@ -602,10 +602,10 @@ diff_a_sub = np.subtract(a_values_sub[0], a_original_sub[0])
 diff_I_norm1_a_subHC = np.subtract(I_norm1_sub_a[0], I_norm1_sub[0])
 #print("diff a sub: ", diff_a_sub)
 
-# figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
-# if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
-# figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
-# if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
+figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
+figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
 
 # figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
 # if A_FITTING: figures_barplot_parcels('I_tmax', I_tmax_group_a, NPARCELLS, a=A_FITTING)
