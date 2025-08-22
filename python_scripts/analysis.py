@@ -605,8 +605,8 @@ if A_FITTING:
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
-figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
-if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
+# figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+# if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
 
 # figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
 # if A_FITTING: figures_barplot_parcels('I_tmax', I_tmax_group_a, NPARCELLS, a=A_FITTING)
@@ -639,23 +639,23 @@ RSNs = {
 
 # plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
 # if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
-plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
-if A_FITTING: plot_means_per_RSN('I_norm1_a', I_norm1_group_a, NPARCELLS,a=A_FITTING)
-plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
-if A_FITTING: plot_means_per_RSN('I_norm2_a', I_norm2_group_a, NPARCELLS,a=A_FITTING)
+# plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
+# if A_FITTING: plot_means_per_RSN('I_norm1_a', I_norm1_group_a, NPARCELLS,a=A_FITTING)
+# plot_means_per_RSN('I_norm2', I_norm2_group, NPARCELLS)
+# if A_FITTING: plot_means_per_RSN('I_norm2_a', I_norm2_group_a, NPARCELLS,a=A_FITTING)
 
-# plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
-# if A_FITTING: plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub_a, 'SomMot', 'I_tmax', NPARCELLS,a=A_FITTING)
-# plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
-# if A_FITTING: plot_means_per_subjects_per_RSN(Vis, I_tmax_sub_a, 'Vis', 'I_tmax', NPARCELLS,a=A_FITTING)
-# plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub, 'Limbic', 'I_tmax', NPARCELLS)
-# if A_FITTING: plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub_a, 'Limbic', 'I_tmax', NPARCELLS,a=A_FITTING)
+plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub, 'SomMot', 'I_tmax', NPARCELLS)
+if A_FITTING: plot_means_per_subjects_per_RSN(SomMot, I_tmax_sub_a, 'SomMot', 'I_tmax', NPARCELLS,a=A_FITTING)
+plot_means_per_subjects_per_RSN(Vis, I_tmax_sub, 'Vis', 'I_tmax', NPARCELLS)
+if A_FITTING: plot_means_per_subjects_per_RSN(Vis, I_tmax_sub_a, 'Vis', 'I_tmax', NPARCELLS,a=A_FITTING)
+plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub, 'Limbic', 'I_tmax', NPARCELLS)
+if A_FITTING: plot_means_per_subjects_per_RSN(Limbic, I_tmax_sub_a, 'Limbic', 'I_tmax', NPARCELLS,a=A_FITTING)
 # #...
 
 ###### VISUALIZATION ######
-# left_right_brain_map('I_tmax_HC', I_tmax_group, 0, NPARCELLS)
-# left_right_brain_map('I_tmax_MCI', I_tmax_group, 1, NPARCELLS)
-# left_right_brain_map('I_tmax_AD', I_tmax_group, 2, NPARCELLS)
+left_right_brain_map('I_Norm2_HC', I_norm2_group, 0, NPARCELLS)
+left_right_brain_map('I_Norm2_MCI', I_norm2_group, 1, NPARCELLS)
+left_right_brain_map('I_Norm2_AD', I_norm2_group, 2, NPARCELLS)
 
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}', I_tmax_group, 0, NPARCELLS)
 # if A_FITTING: brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 0, NPARCELLS, a=A_FITTING)
