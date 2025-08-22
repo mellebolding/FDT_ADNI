@@ -442,7 +442,7 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS,a=False):
                                 vmin=0, vmax=0.6,
                                 axes=ax2, darkness=None)
 
-    norm = Normalize(vmin=vmin, vmax=vmax)
+    norm = Normalize(vmin=0, vmax=0.6)
     sm = ScalarMappable(cmap='viridis', norm=norm)
     sm.set_array([])
 
