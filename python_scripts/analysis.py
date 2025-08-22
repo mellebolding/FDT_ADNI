@@ -685,72 +685,73 @@ groups = ["HC", "MCI", "AD"]
 colors = ["tab:blue", "tab:orange", "tab:green"]
 
 # 1. Compute range per parcel
-diffs = np.max(I_norm2_group_a, axis=0) - np.min(I_norm2_group_a, axis=0)
+if A_FITTING: 
+    diffs = np.max(I_norm2_group_a, axis=0) - np.min(I_norm2_group_a, axis=0)
 
-# 2. Find top N
-top_n = 18
-top_parcels_nonsort = np.argsort(diffs)[::-1][:top_n]
-top_parcels = np.sort(top_parcels_nonsort)  # sort indices for plotting
-# 3. Prepare bar plot
-x = np.arange(len(top_parcels))  # parcel positions
+    # 2. Find top N
+    top_n = 18
+    top_parcels_nonsort = np.argsort(diffs)[::-1][:top_n]
+    top_parcels = np.sort(top_parcels_nonsort)  # sort indices for plotting
+    # 3. Prepare bar plot
+    x = np.arange(len(top_parcels))  # parcel positions
 
-fig, ax = plt.subplots(figsize=(12, 6))
-bar_width = 0.25
+    fig, ax = plt.subplots(figsize=(12, 6))
+    bar_width = 0.25
 
-for i, group in enumerate(groups):
-    ax.bar(
-        x + i * bar_width,
-        I_norm2_group_a[i, top_parcels],
-        width=bar_width,
-        label=group,
-        color=colors[i]
-    )
-
-# 4. Set labels
-# print([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels])
-ax.set_xticks(x + bar_width)
-ax.set_xticklabels([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels], rotation=45, ha="right")
-ax.set_ylabel("I_tmax")
-ax.set_title("I_tmax HOMO top parcels with largest between-group differences")
-ax.legend()
-
-plt.tight_layout()
-# plt.show()
-
-top6_parcels = top_parcels_nonsort[:6]  # first 6 parcels for detailed analysis
-x = np.arange(len(top6_parcels)*27)  # parcel positions
-
-n_parcels = len(top6_parcels)
-n_groups = len(groups)
-n_subjects = 4
-
-bar_width = 0.2
-x = np.arange(n_parcels)  # positions for parcels
-
-fig, ax = plt.subplots(figsize=(12, 6))
-
-for i, group in enumerate(groups):
-    # We plot **all subjects in that group** with a small offset for clarity
-    for subj in range(n_subjects):
+    for i, group in enumerate(groups):
         ax.bar(
-            x + i * bar_width + subj*0.02,  # small shift per subject
-            I_norm2_sub_a[i, subj, top6_parcels],
-            width=0.02,
-            color=colors[i],
-            alpha=0.7
+            x + i * bar_width,
+            I_norm2_group_a[i, top_parcels],
+            width=bar_width,
+            label=group,
+            color=colors[i]
         )
 
-# Set labels
-parcel_labels = [Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top6_parcels]
-ax.set_xticks(x + bar_width)  # center ticks
-ax.set_xticklabels(parcel_labels, rotation=45, ha="right")
+    # 4. Set labels
+    # print([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels])
+    ax.set_xticks(x + bar_width)
+    ax.set_xticklabels([Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top_parcels], rotation=45, ha="right")
+    ax.set_ylabel("I_tmax")
+    ax.set_title("I_tmax HOMO top parcels with largest between-group differences")
+    ax.legend()
 
-ax.set_ylabel("I(tmax)")
-ax.set_title("Top 6 parcels — values per subject per group")
-ax.legend(groups)
+    plt.tight_layout()
+    # plt.show()
 
-plt.tight_layout()
-plt.show()
+    top6_parcels = top_parcels_nonsort[:6]  # first 6 parcels for detailed analysis
+    x = np.arange(len(top6_parcels)*27)  # parcel positions
+
+    n_parcels = len(top6_parcels)
+    n_groups = len(groups)
+    n_subjects = 4
+
+    bar_width = 0.2
+    x = np.arange(n_parcels)  # positions for parcels
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    for i, group in enumerate(groups):
+        # We plot **all subjects in that group** with a small offset for clarity
+        for subj in range(n_subjects):
+            ax.bar(
+                x + i * bar_width + subj*0.02,  # small shift per subject
+                I_norm2_sub_a[i, subj, top6_parcels],
+                width=0.02,
+                color=colors[i],
+                alpha=0.7
+            )
+
+    # Set labels
+    parcel_labels = [Parcel_names.get(idx+1, f"Parcel {idx+1}") for idx in top6_parcels]
+    ax.set_xticks(x + bar_width)  # center ticks
+    ax.set_xticklabels(parcel_labels, rotation=45, ha="right")
+
+    ax.set_ylabel("I(tmax)")
+    ax.set_title("Top 6 parcels — values per subject per group")
+    ax.legend(groups)
+
+    plt.tight_layout()
+    plt.show()
 
 # import numpy as np
 # import pandas as pd
