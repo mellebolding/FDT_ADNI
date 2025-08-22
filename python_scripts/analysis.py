@@ -430,7 +430,7 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS,a=False):
                                 view='lateral',
                                 colorbar=False, cmap='viridis',
                                 bg_map=fsaverage.sulc_left,
-                                vmin=vmin, vmax=vmax,
+                                vmin=0, vmax=0.6,
                                 axes=ax1, darkness=None)
 
     ax2 = fig.add_subplot(1, 2, 2, projection='3d')
@@ -439,7 +439,7 @@ def left_right_brain_map(name,I_tmax_group,COND,NPARCELLS,a=False):
                                 view='lateral',
                                 colorbar=False, cmap='viridis',
                                 bg_map=fsaverage.sulc_right,
-                                vmin=vmin, vmax=vmax,
+                                vmin=0, vmax=0.6,
                                 axes=ax2, darkness=None)
 
     norm = Normalize(vmin=vmin, vmax=vmax)
@@ -655,15 +655,15 @@ RSNs = {
 # #...
 
 ###### VISUALIZATION ######
-# left_right_brain_map('I_Norm2_HC', I_norm2_group, 0, NPARCELLS)
-# left_right_brain_map('I_Norm2_MCI', I_norm2_group, 1, NPARCELLS)
-# left_right_brain_map('I_Norm2_AD', I_norm2_group, 2, NPARCELLS)
+left_right_brain_map('I_Norm2_HC', I_norm2_group, 0, NPARCELLS)
+left_right_brain_map('I_Norm2_MCI', I_norm2_group, 1, NPARCELLS)
+left_right_brain_map('I_Norm2_AD', I_norm2_group, 2, NPARCELLS)
 
-brain_map_3D(f'I_Norm2_HC_{NOISE_TYPE}', I_norm2_group, 0, NPARCELLS)
-if A_FITTING: brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 0, NPARCELLS, a=A_FITTING)
-brain_map_3D(f'I_Norm2_MCI_{NOISE_TYPE}', I_norm2_group, 1, NPARCELLS)
-if A_FITTING: brain_map_3D(f'I_tmax_MCI_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 1, NPARCELLS, a=A_FITTING)
-brain_map_3D(f'I_Norm2_AD_{NOISE_TYPE}', I_norm2_group, 2, NPARCELLS)
+# brain_map_3D(f'I_Norm2_HC_{NOISE_TYPE}', I_norm2_group, 0, NPARCELLS)
+# if A_FITTING: brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 0, NPARCELLS, a=A_FITTING)
+# brain_map_3D(f'I_Norm2_MCI_{NOISE_TYPE}', I_norm2_group, 1, NPARCELLS)
+# if A_FITTING: brain_map_3D(f'I_tmax_MCI_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 1, NPARCELLS, a=A_FITTING)
+# brain_map_3D(f'I_Norm2_AD_{NOISE_TYPE}', I_norm2_group, 2, NPARCELLS)
 # if A_FITTING: brain_map_3D(f'I_tmax_AD_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 2, NPARCELLS, a=A_FITTING)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_0', I_tmax_sub[0], 0, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_1', I_tmax_sub[0], 1, NPARCELLS)
