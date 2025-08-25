@@ -272,8 +272,8 @@ def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
     coef_matrix, results = from_PET_to_a_global(a_list_sub, ABeta_burden, Tau_burden)
 
     # ---------- 2) Prepare group averages ----------
-    ABeta_burden_group = np.array([np.mean(np.vstack(ABeta_burden), axis=0)])
-    Tau_burden_group   = np.array([np.mean(np.vstack(Tau_burden), axis=0)])
+    ABeta_burden_group = np.array([np.mean(np.vstack(ABeta_burden), axis=1)])
+    Tau_burden_group   = np.array([np.mean(np.vstack(Tau_burden), axis=1)])
 
     # ---------- 3) Predict ----------
     ABeta_burden_all = np.vstack(ABeta_burden)
