@@ -647,7 +647,6 @@ if A_FITTING:
     diff_org_a_group = np.subtract(a_values_group, a_002)
 #print("diff a sub: ", diff_a_sub)
 
-RSN_significance_group(I_norm2_group, a=A_FITTING)
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
 # figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
@@ -682,6 +681,7 @@ RSNs = {
 
 
 
+RSN_significance_group(I_norm2_group, a=A_FITTING)
 # plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
 # if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
 # plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
