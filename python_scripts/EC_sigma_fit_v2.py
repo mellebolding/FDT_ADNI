@@ -296,7 +296,7 @@ DL = ADNI_A.ADNI_A()
 subdata = DL.get_subjectData('002_S_0413')
 SC = subdata['002_S_0413']['SC'] # Structural connectivity
 
-NPARCELLS = 18 #tot: 379
+NPARCELLS = 379 #tot: 379
 # Loading the timeseries data for all subjects and dividing them into groups
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
