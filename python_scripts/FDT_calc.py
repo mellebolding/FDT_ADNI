@@ -234,9 +234,9 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
     return intR_tmax_s0_subject, intRnorm1_tmax_s0_subject, intRnorm2_tmax_s0_subject
 ####################################################################
 
-NPARCELLS = 379
+NPARCELLS = 18
 NOISE_TYPE = "HOMO"
-A_FITTING = False
+A_FITTING = True
 if A_FITTING:
     all_records = load_appended_records(
     filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
@@ -285,10 +285,10 @@ Ceff_subs = [HC_subs_Ceff, MCI_subs_Ceff, AD_subs_Ceff]
 omega_subs = [HC_subs_omega, MCI_subs_omega, AD_subs_omega]
 
 if A_FITTING:
-    a_group = np.vstack(get_field(all_records, "a", filters={"level": "group", "condition": "1"}))
-    a_subs = np.vstack(get_field(all_records, "a", filters={"level": "subject", "condition": "1"}))
-    a_group_org = np.array(get_field(all_records, "original_a", filters={"level": "group", "condition": "1"}))
-    a_subs_org = get_field(all_records, "original_a", filters={"level": "subject", "condition": "1"})
+    a_group = np.vstack(get_field(all_records, "a", filters={"level": "group"}))
+    a_subs = np.vstack(get_field(all_records, "a", filters={"level": "subject"}))
+    a_group_org = np.array(get_field(all_records, "original_a", filters={"level": "group"}))
+    a_subs_org = get_field(all_records, "original_a", filters={"level": "subject"})
 else:
     a_group = np.array([-0.02, -0.02, -0.02])
     a_subs = np.array([-0.02] * HC_subs_sig.shape[0] + [-0.02] * MCI_subs_sig.shape[0] + [-0.02] * AD_subs_sig.shape[0])
