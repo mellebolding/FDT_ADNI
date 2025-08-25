@@ -634,9 +634,9 @@ def from_PET_to_a_global(a_values, abeta_values, tau_values,
     """
 
     # ---------- 1) Stack all subject data ----------
-    a_all = np.hstack(a_values).ravel().astype(float)
-    abeta_all = np.hstack(abeta_values).ravel().astype(float)
-    tau_all = np.hstack(tau_values).ravel().astype(float)
+    a_all = np.concatenate([arr.ravel() for arr in a_values]).astype(float)
+    abeta_all = np.concatenate([arr.ravel() for arr in abeta_values]).astype(float)
+    tau_all = np.concatenate([arr.ravel() for arr in tau_values]).astype(float)
 
     X = np.column_stack([
         abeta_all,
