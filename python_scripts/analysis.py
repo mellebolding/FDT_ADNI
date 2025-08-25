@@ -600,9 +600,11 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 #print("a_sub: ", min(a_values_sub[0][0,:]), max(a_values_sub[0][0,:]))
 #print("a_sub_org: ", a_original_sub[0].shape)
 if A_FITTING:
+    a_002 = -0.02 * np.ones(a_values_group.shape)
     diff_a_group = np.subtract(a_values_group, a_original_group)
     diff_a_sub = np.subtract(a_values_sub[0], a_original_sub[0])
     diff_I_norm1_a_subHC = np.subtract(I_norm1_sub_a[0], I_norm1_sub[0])
+    diff_org_a_group = np.subtract(a_values_group, a_002)
 #print("diff a sub: ", diff_a_sub)
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
@@ -672,9 +674,9 @@ RSNs = {
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
 
-brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', diff_a_group, 0, NPARCELLS)
-brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_a_group, 1, NPARCELLS)
-brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_a_group, 2, NPARCELLS)
+brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', diff_org_a_group, 0, NPARCELLS)
+brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_org_a_group, 1, NPARCELLS)
+brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_org_a_group, 2, NPARCELLS)
 
 brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
 # brain_map_3D(f'a_sub_HC_{NOISE_TYPE}', a_values_sub[0], 0, NPARCELLS)
