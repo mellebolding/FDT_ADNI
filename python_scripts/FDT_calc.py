@@ -236,7 +236,7 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
 
 NPARCELLS = 18
 NOISE_TYPE = "HOMO"
-A_FITTING = True
+A_FITTING = False
 if A_FITTING:
     all_records = load_appended_records(
     filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
