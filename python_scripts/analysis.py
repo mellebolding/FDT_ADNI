@@ -655,9 +655,9 @@ RSNs = {
 # #...
 
 ###### VISUALIZATION ######
-left_right_brain_map('I_Norm2_HC', I_norm2_group, 0, NPARCELLS)
-left_right_brain_map('I_Norm2_MCI', I_norm2_group, 1, NPARCELLS)
-left_right_brain_map('I_Norm2_AD', I_norm2_group, 2, NPARCELLS)
+# left_right_brain_map('I_Norm2_HC', I_norm2_group, 0, NPARCELLS)
+# left_right_brain_map('I_Norm2_MCI', I_norm2_group, 1, NPARCELLS)
+# left_right_brain_map('I_Norm2_AD', I_norm2_group, 2, NPARCELLS)
 
 # brain_map_3D(f'I_Norm2_HC_{NOISE_TYPE}', I_norm2_group, 0, NPARCELLS)
 # if A_FITTING: brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_a{A_FITTING}', I_tmax_group_a, 0, NPARCELLS, a=A_FITTING)
@@ -672,11 +672,11 @@ left_right_brain_map('I_Norm2_AD', I_norm2_group, 2, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
 
-# brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', diff_a_group, 0, NPARCELLS)
-# brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_a_group, 1, NPARCELLS)
-# brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_a_group, 2, NPARCELLS)
+brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', diff_a_group, 0, NPARCELLS)
+brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_a_group, 1, NPARCELLS)
+brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_a_group, 2, NPARCELLS)
 
-# brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
+brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
 # brain_map_3D(f'a_sub_HC_{NOISE_TYPE}', a_values_sub[0], 0, NPARCELLS)
 # brain_map_3D(f'I_norm1_a_sub_HC_{NOISE_TYPE}', I_norm1_sub_a[0], 0, NPARCELLS)
 # brain_map_3D(f'I_norm1_a_sub_MCI_{NOISE_TYPE}', I_norm1_sub_a[1], 0, NPARCELLS)
