@@ -118,6 +118,45 @@ def append_record_to_npz(folder, filename, **record):
 
 
 ###################################################################
+def RSN_significance_group(I_norm2_group,a=False):
+    records_norm2 = []
+    group_names = ['HC', 'MCI', 'AD']
+
+    for group_idx, group_name in enumerate(group_names):
+        for rsn_name, nodes in RSNs.items():
+            nodes_in_range = [n for n in nodes if n < I_norm2_group.shape[1]]
+            if not nodes_in_range:
+                continue
+            for parcel in nodes_in_range:
+                records_norm2.append({
+                    "value": I_norm2_group[group_idx, parcel],
+                    "cond": group_name,
+                    "parcel": parcel,
+                    "rsn": rsn_name
+                })
+
+    data_parcels_norm2 = pd.DataFrame.from_records(records_norm2)
+    resI_norm2 = {
+        rsn_name: {
+            'HC': data_parcels_norm2[(data_parcels_norm2['cond'] == 'HC') & (data_parcels_norm2['rsn'] == rsn_name)]['value'].values,
+            'MCI': data_parcels_norm2[(data_parcels_norm2['cond'] == 'MCI') & (data_parcels_norm2['rsn'] == rsn_name)]['value'].values,
+            'AD': data_parcels_norm2[(data_parcels_norm2['cond'] == 'AD') & (data_parcels_norm2['rsn'] == rsn_name)]['value'].values,
+        }
+        for rsn_name in RSNs.keys()
+    }
+    plt.rcParams.update({'font.size': 15})
+
+    for rsn_name, res in resI_norm2.items():
+        fig_name = f"box_rsn_{rsn_name}_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
+        save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+
+        p_values.plotComparisonAcrossLabels2(
+            res,
+            custom_test=statannotations_permutation.stat_permutation_test,
+            columnLables=['HC', 'MCI', 'AD'],
+            graphLabel=f'FDT I_norm2 RSN {rsn_name} {NOISE_TYPE} a{a}',
+            save_path=save_path
+        )
 
 
 def figures_I_tmax_norm1_norm2(group, subject,I_tmax, I_norm1, I_norm2,a=False):
@@ -566,7 +605,7 @@ Parcel_names = {
 }
 ####################################################################
 
-NPARCELLS = 18
+NPARCELLS = 379
 NOISE_TYPE = "HOMO"
 A_FITTING = True
 all_values = None
@@ -607,6 +646,7 @@ if A_FITTING:
     diff_org_a_group = np.subtract(a_values_group, a_002)
 #print("diff a sub: ", diff_a_sub)
 
+RSN_significance_group(I_norm2_group, a=A_FITTING)
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=I_tmax_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
 # figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=I_tmax_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
@@ -674,11 +714,11 @@ RSNs = {
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_4', I_tmax_sub[0], 4, NPARCELLS)
 # brain_map_3D(f'I_tmax_HC_{NOISE_TYPE}_5', I_tmax_sub[0], 5, NPARCELLS)
 
-brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', diff_org_a_group, 0, NPARCELLS)
-brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_org_a_group, 1, NPARCELLS)
-brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_org_a_group, 2, NPARCELLS)
+# brain_map_3D(f'a_original_group_HC_{NOISE_TYPE}', diff_org_a_group, 0, NPARCELLS)
+# brain_map_3D(f'a_original_group_MCI_{NOISE_TYPE}', diff_org_a_group, 1, NPARCELLS)
+# brain_map_3D(f'a_original_group_AD_{NOISE_TYPE}', diff_org_a_group, 2, NPARCELLS)
 
-brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
+# brain_map_3D(f'diff_a_sub_HC_{NOISE_TYPE}', diff_a_sub, 0, NPARCELLS)
 # brain_map_3D(f'a_sub_HC_{NOISE_TYPE}', a_values_sub[0], 0, NPARCELLS)
 # brain_map_3D(f'I_norm1_a_sub_HC_{NOISE_TYPE}', I_norm1_sub_a[0], 0, NPARCELLS)
 # brain_map_3D(f'I_norm1_a_sub_MCI_{NOISE_TYPE}', I_norm1_sub_a[1], 0, NPARCELLS)
