@@ -617,30 +617,98 @@ def from_PET_to_a(a_values, abeta_values, tau_values, fit_type='linear'):
             })
     return param_list, model_results
 
+import numpy as np
+import pandas as pd
 
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_squared_error, r2_score
 
-    # ABeta_all = np.concatenate(abeta_values, axis=0).flatten()
-    # Tau_all   = np.concatenate(tau_values, axis=0).flatten()
-    # a_all     = np.concatenate(a_values, axis=0).flatten()
+# scikit-optimize (pip install scikit-optimize)
+from skopt import gp_minimize
+from skopt.space import Real
 
-    # #print(f"ABeta_all shape: {ABeta_all.shape}, Tau_all shape: {Tau_all.shape}, a_all shape: {a_all.shape}")
+def from_PET_to_a_global(a_values, abeta_values, tau_values,
+                         n_calls=80, random_state=0, n_splits=5):
+    """
+    One GLOBAL fit across all subjects/parcels using Bayesian optimization with Gaussian Processes.
+    """
 
-    # # Interaction term
-    # interaction = ABeta_all * Tau_all
+    # ---------- 1) Stack all subject data ----------
+    a_all = np.hstack(a_values).ravel().astype(float)
+    abeta_all = np.hstack(abeta_values).ravel().astype(float)
+    tau_all = np.hstack(tau_values).ravel().astype(float)
 
-    
-    # X = pd.DataFrame({
-    #     'ABeta': ABeta_all,
-    #     'Tau': Tau_all,
-    #     'ABeta_x_Tau': interaction
-    # })
-    # X = sm.add_constant(X)  # adds intercept term
-    
-    # if fit_type == "linear":
-    #     model = sm.OLS(a_all, X).fit()
-    #     return {
-    #         "params": model.params,
-    #         "pvalues": model.pvalues,
-    #         "rsquared": model.rsquared,
-    #         "summary": model.summary().as_text()
-    #     }
+    X = np.column_stack([
+        abeta_all,
+        tau_all,
+        abeta_all * tau_all,  # interaction
+    ])
+    y = a_all
+
+    # ---------- 2) Standardize ----------
+    X_mu = X.mean(axis=0)
+    X_sd = X.std(axis=0, ddof=0)
+    X_sd[X_sd == 0] = 1.0
+
+    y_mu = y.mean()
+    y_sd = y.std(ddof=0) if y.std(ddof=0) > 0 else 1.0
+
+    Xs = (X - X_mu) / X_sd
+    ys = (y - y_mu) / y_sd
+
+    # ---------- 3) Define CV objective ----------
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+
+    def cv_mse(params):
+        b0s, b1s, b2s, b3s = params
+        mse_folds = []
+        for tr, te in kf.split(Xs):
+            yhat_te = b0s + Xs[te] @ np.array([b1s, b2s, b3s])
+            mse_folds.append(mean_squared_error(ys[te], yhat_te))
+        return float(np.mean(mse_folds))
+
+    # ---------- 4) Bayesian optimization ----------
+    space = [
+        Real(-5.0, 5.0, name="b0s"),
+        Real(-5.0, 5.0, name="b1s"),
+        Real(-5.0, 5.0, name="b2s"),
+        Real(-5.0, 5.0, name="b3s"),
+    ]
+
+    result = gp_minimize(
+        cv_mse,
+        dimensions=space,
+        n_calls=n_calls,
+        n_initial_points=min(20, n_calls//2),
+        acq_func="EI",
+        random_state=random_state
+    )
+
+    b0s, b1s, b2s, b3s = result.x
+
+    # ---------- 5) Back-transform ----------
+    slopes_std = np.array([b1s, b2s, b3s])
+    slopes_orig = y_sd * slopes_std / X_sd
+    intercept_orig = y_mu + y_sd * (b0s - np.sum(slopes_std * (X_mu / X_sd)))
+
+    # ---------- 6) Build outputs ----------
+    coef_matrix = pd.DataFrame([{
+        "const": intercept_orig,
+        "ABeta": slopes_orig[0],
+        "Tau": slopes_orig[1],
+        "ABeta_x_Tau": slopes_orig[2]
+    }])
+
+    yhat_orig = intercept_orig + X @ slopes_orig
+
+    model_results = {
+        "cv_mse_stdspace": result.fun,
+        "mse": mean_squared_error(y, yhat_orig),
+        "r2": r2_score(y, yhat_orig),
+        "n_calls": len(result.func_vals),
+        "converged": result.success,
+        "message": result.message
+    }
+
+    return coef_matrix, model_results
+
