@@ -702,12 +702,12 @@ def from_PET_to_a_global(a_values, abeta_values, tau_values,
     yhat_orig = intercept_orig + X @ slopes_orig
 
     model_results = {
-        "cv_mse_stdspace": result.fun,
-        "mse": mean_squared_error(y, yhat_orig),
-        "r2": r2_score(y, yhat_orig),
-        "n_calls": len(result.func_vals),
-        "converged": result.success,
-        "message": result.message
+    "cv_mse_stdspace": result.fun,
+    "mse": mean_squared_error(y, yhat_orig),
+    "r2": r2_score(y, yhat_orig),
+    "n_calls": len(result.func_vals),
+    "converged": getattr(result, "success", None),  # safer access
+    "message": getattr(result, "message", None)
     }
 
     return coef_matrix, model_results
