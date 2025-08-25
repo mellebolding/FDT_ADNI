@@ -607,6 +607,8 @@ for i in range(1,4):
 out = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 predicted_a = out["predicted_a"]
 predicted_a_group = out["predicted_a_group"]
+print("a (subject):", predicted_a.shape)
+print("a_group :", predicted_a_group.shape)
 
 results = out["results"]
 coef_matrix = out["coef_matrix"]
