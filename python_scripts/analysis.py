@@ -566,9 +566,9 @@ Parcel_names = {
 }
 ####################################################################
 
-NPARCELLS = 379
+NPARCELLS = 18
 NOISE_TYPE = "HOMO"
-A_FITTING = False
+A_FITTING = True
 all_values = None
 all_values_a = None
 if A_FITTING:
