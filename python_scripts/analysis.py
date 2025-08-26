@@ -199,8 +199,24 @@ def RSN_radar_plot(I_norm2_group, a=False):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-
-
+def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False):
+    """
+    Scatter plot: I_tmax_group (x-axis) vs X_norm2_group (y-axis) for each group.
+    """
+    group_names = ['HC', 'MCI', 'AD']
+    colors = ['tab:blue', 'tab:orange', 'tab:green']
+    plt.figure(figsize=(8, 6))
+    for i, group in enumerate(group_names):
+        plt.scatter(
+            I_norm2_group[i], X_norm2_group[i],
+            color=colors[i], label=group, alpha=0.7
+        )
+    plt.xlabel('I_tmax')
+    plt.ylabel('X_norm2')
+    plt.title(f'I_tmax vs X_norm2 per group {NOISE_TYPE} a{a}')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
 
 
@@ -695,10 +711,11 @@ if A_FITTING:
     diff_org_a_group = np.subtract(a_values_group, a_002)
 #print("diff a sub: ", diff_a_sub)
 
-figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
-if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
-figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=X_norm2_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
-if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=X_norm2_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
+I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
+# figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+# if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
+# figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=X_norm2_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+# if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=X_norm2_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
 
 # figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
 # if A_FITTING: figures_barplot_parcels('I_tmax', I_tmax_group_a, NPARCELLS, a=A_FITTING)
