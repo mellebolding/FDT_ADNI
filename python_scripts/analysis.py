@@ -187,7 +187,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
         label.set_y(label.get_position()[1] - 0.15)  # push outward
 
     # --- Improve grid lines ---
-    ax.set_ylim(0, np.nanmax(means) * 1.5)  # dynamic max limit
+    ax.set_ylim(0, np.nanmax(means) * 1.3)  # dynamic max limit
     ax.set_yticklabels([])  # hide labels
     ax.grid(True, color="black", alpha=0.3, linewidth=1.2)  # darker & thicker circles
 
