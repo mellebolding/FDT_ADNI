@@ -184,10 +184,21 @@ def RSN_radar_plot(I_norm2_group, a=False):
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(RSNs.keys(), fontsize=12, weight="bold")
     for label in ax.get_xticklabels():
-        label.set_y(label.get_position()[1] - 0.15)  # push outward a bit
+        label.set_y(label.get_position()[1] - 0.15)  # push outward
 
-    # --- Keep all grid lines, but clean labels ---
-    #ax.set_yticks([0.12, 0.18, 0.24])   # choose bet_
+    # --- Improve grid lines ---
+    ax.set_ylim(0, 0.25)  
+    ax.set_yticklabels([])  # hide labels
+    ax.grid(True, color="black", alpha=0.3, linewidth=1.2)  # darker & thicker circles
+
+    ax.set_title(f'FDT I_norm2 per RSN {NOISE_TYPE} a{a}', size=15, y=1.1)
+    ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
+
+    fig_name = f"radar_rsn_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
+    save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
+
 
 
 
