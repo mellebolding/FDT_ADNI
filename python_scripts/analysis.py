@@ -201,7 +201,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
 
 def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False):
     """
-    Scatter plot: I_tmax_group (x-axis) vs X_norm2_group (y-axis) for each group.
+    Scatter plot: I_norm2_group (x-axis) vs X_norm2_group (y-axis) for each group.
     """
     group_names = ['HC', 'MCI', 'AD']
     colors = ['tab:blue', 'tab:orange', 'tab:green']
@@ -211,9 +211,9 @@ def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False):
             I_norm2_group[i], X_norm2_group[i],
             color=colors[i], label=group, alpha=0.7
         )
-    plt.xlabel('I_tmax')
+    plt.xlabel('I_norm2')
     plt.ylabel('X_norm2')
-    plt.title(f'I_tmax vs X_norm2 per group {NOISE_TYPE} a{a}')
+    plt.title(f'I_norm2 vs X_norm2 per group {NOISE_TYPE} a{a}')
     plt.legend()
     plt.tight_layout()
     plt.show()
