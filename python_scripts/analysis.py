@@ -674,7 +674,6 @@ if A_FITTING:
 all_values = load_appended_records(
     filepath=os.path.join(FDT_values_subfolder, f"FDT_values_N{NPARCELLS}_{NOISE_TYPE}.npz")
 )
-print("I_tmax group shape: ", np.array(get_field(all_values, "I_tmax", filters={"level": "group"})).shape)
 I_tmax_group = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "group"})), axis=0)
 I_norm1_group = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "group"})), axis=0)
 I_norm2_group = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "group"})), axis=0)
