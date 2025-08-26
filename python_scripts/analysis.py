@@ -186,28 +186,8 @@ def RSN_radar_plot(I_norm2_group, a=False):
     for label in ax.get_xticklabels():
         label.set_y(label.get_position()[1] - 0.15)  # push outward a bit
 
-    # --- Keep circles but hide auto labels ---
-    ax.set_yticks([0.10, 0.14])  # control circle radii
-    ax.set_yticklabels([])       # remove automatic labels
-    ax.grid(True, color="gray", alpha=0.6)  # keep grid visible
-
-    # --- Add custom values, spread out along vertical radius ---
-    custom_ticks = [0.10, 0.14]
-    for i, t in enumerate(custom_ticks):
-        ax.text(
-            np.pi / 2, t, f"{t:.2f}",
-            ha="center", va="bottom",
-            fontsize=11, color="black",
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.7)
-        )
-
-    ax.set_title(f'FDT I_norm2 per RSN {NOISE_TYPE} a{a}', size=15, y=1.1)
-    ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
-
-    fig_name = f"radar_rsn_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
-    save_path = os.path.join(FDT_parcel_subfolder, fig_name)
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    # --- Keep all grid lines, but clean labels ---
+    ax.set_yticks([0.12, 0.18, 0.24])   # choose bet_
 
 
 
