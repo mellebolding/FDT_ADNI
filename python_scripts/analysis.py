@@ -712,9 +712,9 @@ if A_FITTING:
 #print("diff a sub: ", diff_a_sub)
 
 I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
-# figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
+figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
-# figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=X_norm2_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
+figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=X_norm2_sub, I_norm1=I_norm1_sub, I_norm2=I_norm2_sub)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=False, subject=True, I_tmax=X_norm2_sub_a, I_norm1=I_norm1_sub_a, I_norm2=I_norm2_sub_a, a=A_FITTING)
 
 # figures_barplot_parcels('I_tmax',I_tmax_group, NPARCELLS)
@@ -749,8 +749,8 @@ RSNs = {
 # if A_FITTING: 
 #     RSN_significance_group(I_norm2_group_a, a=A_FITTING)
 #     RSN_radar_plot(I_norm2_group_a, a=A_FITTING)
-# RSN_significance_group(I_norm2_group, a=False)
-# RSN_radar_plot(I_norm2_group, a=False)
+RSN_significance_group(I_norm2_group, a=False)
+RSN_radar_plot(I_norm2_group, a=False)
 # plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
 # if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
 # plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
