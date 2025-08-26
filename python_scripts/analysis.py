@@ -179,21 +179,21 @@ def RSN_radar_plot(I_norm2_group, a=False):
         ax.plot(angles, means, label=group_name, linewidth=2)
         ax.fill(angles, means, alpha=0.25)
 
-    # --- Move RSN names further out ---
+    # --- RSN names outside the circle ---
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(RSNs.keys(), fontsize=12)
     for label in ax.get_xticklabels():
         label.set_horizontalalignment("center")
         label.set_verticalalignment("center")
-        label.set_y(label.get_position()[1] - 0.05)  # push them slightly outward
+        label.set_y(label.get_position()[1] - 0.1)  # push outward
 
-    # --- Show only two radial ticks (absolute values) ---
-    # Compute nice range
-    r_min, r_max = ax.get_ylim()
-    ticks = [0.10, 0.14]  # <-- you can change this list as needed
-    ax.set_yticks(ticks)
-    ax.set_yticklabels([f"{t:.2f}" for t in ticks], fontsize=10)
-    ax.yaxis.grid(True, linestyle="--", alpha=0.6)
+    # --- Keep circles, only annotate 2 values ---
+    ax.set_yticklabels([])  # hide default labels
+    ticks_to_show = [0.10, 0.14]  # absolute values you want to display
+    for t in ticks_to_show:
+        ax.text(
+            0, t, f"{t:.2f}", ha="center", va="bottom", fontsize=10
+        )  # place labels on top (angle=0)
 
     ax.set_title(f'FDT I_norm2 per RSN {NOISE_TYPE} a{a}', size=15, y=1.1)
     ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
@@ -202,6 +202,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+
 
 
 
