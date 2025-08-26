@@ -164,7 +164,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
     angles = np.linspace(0, 2 * np.pi, num_rsn, endpoint=False).tolist()
     angles += angles[:1]  # complete the loop
 
-    fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+    fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
 
     # --- Plot each group ---
     for group_idx, group_name in enumerate(group_names):
@@ -187,7 +187,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
         label.set_y(label.get_position()[1] - 0.15)  # push outward
 
     # --- Improve grid lines ---
-    ax.set_ylim(0, 0.25)  
+    ax.set_ylim(0, 0.45)  
     ax.set_yticklabels([])  # hide labels
     ax.grid(True, color="black", alpha=0.3, linewidth=1.2)  # darker & thicker circles
 
