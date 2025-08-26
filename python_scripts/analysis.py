@@ -255,13 +255,13 @@ def figures_I_tmax_norm1_norm2(group, subject,I_tmax, I_norm1, I_norm2,a=False):
         }
 
         plt.rcParams.update({'font.size': 15})
-        fig_name = f"box_parcel_Itmax_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
+        fig_name = f"box_parcel_X_norm2_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
         save_path = os.path.join(FDT_parcel_subfolder, fig_name)
         p_values.plotComparisonAcrossLabels2(
             resI_Itmax,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel=f'FDT I(tmax, 0) Parcels {NOISE_TYPE} a{a}',
+            graphLabel=f'FDT X_norm2 Parcels {NOISE_TYPE} a{a}',
             save_path=save_path
         )
         plt.rcParams.update({'font.size': 15})
@@ -319,16 +319,16 @@ def figures_I_tmax_norm1_norm2(group, subject,I_tmax, I_norm1, I_norm2,a=False):
         data_subjects_norm2 = pd.DataFrame.from_records(records_subject_norm2)
 
         fig, ax = plt.subplots(figsize=(10, 10))
-        fig_name = f"violin_subject_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
+        fig_name = f"violin_subject_Xnorm2_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
         save_path = os.path.join(FDT_subject_subfolder, fig_name)
         plot_violins_HC_MCI_AD(
             ax=ax,
             data=data_subjects_Itmax,
             font_scale=1.4,
-            metric='I(t=tmax,s=0) [Subject mean]',
+            metric='X_norm2 [Subject mean]',
             point_size=5,
             xgrid=False,
-            plot_title=f'FDT I(tmax, 0) — Mean per subject per group {NOISE_TYPE} a{a}',
+            plot_title=f'FDT X_norm2 — Mean per subject per group {NOISE_TYPE} a{a}',
             saveplot=1,
             filename=save_path,
             dpi=300
