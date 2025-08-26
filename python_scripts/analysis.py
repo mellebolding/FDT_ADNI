@@ -176,12 +176,25 @@ def RSN_radar_plot(I_norm2_group, a=False):
                 means.append(np.nan)
         means += means[:1]  # complete the loop
 
-        ax.plot(angles, means, label=group_name)
+        ax.plot(angles, means, label=group_name, linewidth=2)
         ax.fill(angles, means, alpha=0.25)
 
+    # --- Move RSN names further out ---
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(RSNs.keys(), fontsize=10)
-    ax.set_yticklabels([])  # hide y-tick labels
+    ax.set_xticklabels(RSNs.keys(), fontsize=12)
+    for label in ax.get_xticklabels():
+        label.set_horizontalalignment("center")
+        label.set_verticalalignment("center")
+        label.set_y(label.get_position()[1] - 0.05)  # push them slightly outward
+
+    # --- Show only two radial ticks (absolute values) ---
+    # Compute nice range
+    r_min, r_max = ax.get_ylim()
+    ticks = [0.10, 0.14]  # <-- you can change this list as needed
+    ax.set_yticks(ticks)
+    ax.set_yticklabels([f"{t:.2f}" for t in ticks], fontsize=10)
+    ax.yaxis.grid(True, linestyle="--", alpha=0.6)
+
     ax.set_title(f'FDT I_norm2 per RSN {NOISE_TYPE} a{a}', size=15, y=1.1)
     ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
 
@@ -189,6 +202,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+
 
 
 def figures_I_tmax_norm1_norm2(group, subject,I_tmax, I_norm1, I_norm2,a=False):
