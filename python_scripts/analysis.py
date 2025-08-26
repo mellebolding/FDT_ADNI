@@ -154,9 +154,41 @@ def RSN_significance_group(I_norm2_group,a=False):
             res,
             custom_test=statannotations_permutation.stat_permutation_test,
             columnLables=['HC', 'MCI', 'AD'],
-            graphLabel=f'FDT I_norm2 RSN {rsn_name} {NOISE_TYPE} a{a}',
+            graphLabel=f'FDT I_norm2 {rsn_name} {NOISE_TYPE} a{a}',
             save_path=save_path
         )
+
+def RSN_radar_plot(I_norm2_group, a=False):
+    group_names = ['HC', 'MCI', 'AD']
+    num_rsn = len(RSNs)
+    angles = np.linspace(0, 2 * np.pi, num_rsn, endpoint=False).tolist()
+    angles += angles[:1]  # complete the loop
+
+    fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+
+    for group_idx, group_name in enumerate(group_names):
+        means = []
+        for rsn_name, nodes in RSNs.items():
+            nodes_in_range = [n for n in nodes if n < I_norm2_group.shape[1]]
+            if nodes_in_range:
+                means.append(np.nanmean(I_norm2_group[group_idx, nodes_in_range]))
+            else:
+                means.append(np.nan)
+        means += means[:1]  # complete the loop
+
+        ax.plot(angles, means, label=group_name)
+        ax.fill(angles, means, alpha=0.25)
+
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(RSNs.keys(), fontsize=10)
+    ax.set_yticklabels([])  # hide y-tick labels
+    ax.set_title(f'FDT I_norm2 per RSN {NOISE_TYPE} a{a}', size=15, y=1.1)
+    ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
+
+    fig_name = f"radar_rsn_a{a}_N{NPARCELLS}_{NOISE_TYPE}"
+    save_path = os.path.join(FDT_parcel_subfolder, fig_name)
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
 
 
 def figures_I_tmax_norm1_norm2(group, subject,I_tmax, I_norm1, I_norm2,a=False):
@@ -682,6 +714,7 @@ RSNs = {
 
 
 RSN_significance_group(I_norm2_group_a, a=A_FITTING)
+RSN_radar_plot(I_norm2_group_a, a=A_FITTING)
 # plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
 # if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
 # plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
