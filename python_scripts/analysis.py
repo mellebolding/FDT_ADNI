@@ -187,7 +187,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
         label.set_y(label.get_position()[1] - 0.15)  # push outward a bit
 
     # --- Keep all grid lines, but clean labels ---
-    ax.set_yticks([0.12, 0.18, 0.24])   # choose bet_
+    #ax.set_yticks([0.12, 0.18, 0.24])   # choose bet_
 
 
 
