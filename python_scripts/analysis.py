@@ -166,6 +166,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
 
     fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
 
+    # --- Plot each group ---
     for group_idx, group_name in enumerate(group_names):
         means = []
         for rsn_name, nodes in RSNs.items():
@@ -179,21 +180,26 @@ def RSN_radar_plot(I_norm2_group, a=False):
         ax.plot(angles, means, label=group_name, linewidth=2)
         ax.fill(angles, means, alpha=0.25)
 
-    # --- RSN names outside the circle ---
+    # --- RSN names outside ---
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(RSNs.keys(), fontsize=12)
+    ax.set_xticklabels(RSNs.keys(), fontsize=12, weight="bold")
     for label in ax.get_xticklabels():
-        label.set_horizontalalignment("center")
-        label.set_verticalalignment("center")
-        label.set_y(label.get_position()[1] - 0.1)  # push outward
+        label.set_y(label.get_position()[1] - 0.15)  # push outward a bit
 
-    # --- Keep circles, only annotate 2 values ---
-    ax.set_yticklabels([])  # hide default labels
-    ticks_to_show = [0.10, 0.14]  # absolute values you want to display
-    for t in ticks_to_show:
+    # --- Keep circles but hide auto labels ---
+    ax.set_yticks([0.10, 0.14])  # control circle radii
+    ax.set_yticklabels([])       # remove automatic labels
+    ax.grid(True, color="gray", alpha=0.6)  # keep grid visible
+
+    # --- Add custom values, spread out along vertical radius ---
+    custom_ticks = [0.10, 0.14]
+    for i, t in enumerate(custom_ticks):
         ax.text(
-            0, t, f"{t:.2f}", ha="center", va="bottom", fontsize=10
-        )  # place labels on top (angle=0)
+            np.pi / 2, t, f"{t:.2f}",
+            ha="center", va="bottom",
+            fontsize=11, color="black",
+            bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.7)
+        )
 
     ax.set_title(f'FDT I_norm2 per RSN {NOISE_TYPE} a{a}', size=15, y=1.1)
     ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
@@ -202,6 +208,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
     save_path = os.path.join(FDT_parcel_subfolder, fig_name)
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+
 
 
 
