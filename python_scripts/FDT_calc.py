@@ -235,6 +235,7 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
 ####################################################################
 
 NPARCELLS = 19
+
 NOISE_TYPE = "HOMO"
 A_FITTING = False
 if A_FITTING:
