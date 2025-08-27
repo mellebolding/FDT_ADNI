@@ -741,6 +741,7 @@ if A_FITTING:
 #print("diff a sub: ", diff_a_sub)
 
 I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
+print(I_norm2_sub.shape, X_norm2_sub.shape, I_norm2_sub[1].shape, X_norm2_sub[1].shape)
 I_vs_Xnorm2(I_norm2_sub[1], X_norm2_sub[1], a=False)
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
