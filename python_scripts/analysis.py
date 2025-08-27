@@ -252,50 +252,52 @@ def I_vs_Xnorm22(I_norm2_group, X_norm2_group, a=False):
     """
     Scatter plot: I_norm2_group (x-axis) vs X_norm2_group (y-axis) for each group,
     with subject-level linear fits aggregated into group mean fit + 95% CI.
+    Input arrays expected shape: (n_groups, n_subjects, n_parcels).
     """
     group_names = ['HC', 'MCI', 'AD']
     colors = ['tab:blue', 'tab:orange', 'tab:green']
     plt.figure(figsize=(8, 6))
 
     for i, group in enumerate(group_names):
-        x_group = I_norm2_group[i]   # shape: (n_subjects, n_points)
+        x_group = I_norm2_group[i]   # shape (n_subjects, n_parcels)
         y_group = X_norm2_group[i]
 
-        # Scatter all subject points
+        # scatter all valid subject points
         plt.scatter(x_group.flatten(), y_group.flatten(), color=colors[i], alpha=0.3)
 
-        # Define common x range across group
-        x_line = np.linspace(np.min(x_group), np.max(x_group), 100)
+        # x range for fits
+        x_min, x_max = np.nanmin(x_group), np.nanmax(x_group)
+        x_line = np.linspace(x_min, x_max, 100)
 
-        # Store subject predictions
         subj_preds = []
         slopes = []
-        r2s = []
 
         for subj_x, subj_y in zip(x_group, y_group):
-            if len(subj_x) > 1:  # need >1 point
+            # remove NaNs
+            mask = ~np.isnan(subj_x) & ~np.isnan(subj_y)
+            subj_x, subj_y = subj_x[mask], subj_y[mask]
+
+            # skip empty or constant
+            if len(subj_x) < 2 or np.all(subj_x == subj_x[0]):
+                continue
+
+            try:
                 coef = np.polyfit(subj_x, subj_y, 1)
                 poly_fn = np.poly1d(coef)
                 subj_preds.append(poly_fn(x_line))
                 slopes.append(coef[0])
+            except np.linalg.LinAlgError:
+                continue  # skip bad fits
 
-                # Compute R²
-                y_pred = poly_fn(subj_x)
-                ss_res = np.sum((subj_y - y_pred) ** 2)
-                ss_tot = np.sum((subj_y - np.mean(subj_y)) ** 2)
-                r2s.append(1 - ss_res/ss_tot if ss_tot > 0 else np.nan)
-
-        subj_preds = np.array(subj_preds)
-
-        if subj_preds.size > 0:
-            # Mean prediction across subjects
+        if len(subj_preds) > 0:
+            subj_preds = np.array(subj_preds)
             mean_pred = np.nanmean(subj_preds, axis=0)
 
-            # 95% CI using SEM * t
+            # 95% CI across subjects
             ci = sem(subj_preds, axis=0, nan_policy="omit") * t.ppf(0.975, df=subj_preds.shape[0]-1)
 
-            # Plot mean line + shaded CI
-            plt.plot(x_line, mean_pred, color=colors[i], linewidth=2, label=f"{group} (mean slope={np.mean(slopes):.3f})")
+            plt.plot(x_line, mean_pred, color=colors[i], linewidth=2,
+                     label=f"{group} (mean slope={np.mean(slopes):.3f}, n={len(slopes)})")
             plt.fill_between(x_line, mean_pred-ci, mean_pred+ci, color=colors[i], alpha=0.2)
 
     plt.xlabel('I_norm2')
@@ -304,6 +306,7 @@ def I_vs_Xnorm22(I_norm2_group, X_norm2_group, a=False):
     plt.legend()
     plt.tight_layout()
     plt.show()
+
 
 
 
@@ -804,7 +807,7 @@ I_norm2_select = np.array([I_norm2_sub[0,1,:], I_norm2_sub[0,2,:], I_norm2_sub[0
 X_norm2_select = np.array([X_norm2_sub[0,1,:], X_norm2_sub[0,2,:], X_norm2_sub[0,0,:]])
 
 I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
-print(I_norm2_select.shape, I_norm2_group.shape)
+#print(I_norm2_select.shape, I_norm2_group.shape)
 I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
