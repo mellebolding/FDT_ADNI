@@ -803,10 +803,11 @@ if A_FITTING:
     diff_org_a_group = np.subtract(a_values_group, a_002)
 #print("diff a sub: ", diff_a_sub)
  
-I_norm2_select = np.array([I_norm2_sub[0,1,:], I_norm2_sub[0,2,:], I_norm2_sub[0,0,:]])
-X_norm2_select = np.array([X_norm2_sub[0,1,:], X_norm2_sub[0,2,:], X_norm2_sub[0,0,:]])
+I_norm2_select = np.array([I_norm2_sub[0,0,:], I_norm2_sub[1,0,:], I_norm2_sub[2,0,:]])
+X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
 
 I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
+I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
 #print(I_norm2_select.shape, I_norm2_group.shape)
 I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
