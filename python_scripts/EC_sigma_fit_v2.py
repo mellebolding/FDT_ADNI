@@ -617,14 +617,15 @@ for i in range(1,4):
         Ceff=Ceff_sub[sub],
         omega=omega)
     a_list_sub.append(np.array(a_list_sub_temp))
-Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
+    Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
 for i in range(3):
     Ceff_group_list = np.array(Ceff_group_list)
     Ceff_means = np.array(Ceff_means)
     Ceff_diff = Ceff_group_list[i] - Ceff_means[i]
     plot_FC_matrix(Ceff_diff, title=f"Ceff diff group-{group_names[i]} minus mean subj", size=1.1, dpi=300)
-
+    plot_FC_matrix(Ceff_means, title=f"Ceff means sub", size=1.1, dpi=300)
+    plot_FC_matrix(Ceff_group_list, title=f"Ceff means group", size=1.1, dpi=300)
 out = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 predicted_a = out["predicted_a"]
 predicted_a_group = out["predicted_a_group"]
