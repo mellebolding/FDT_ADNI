@@ -403,7 +403,6 @@ for COND in range(1,4):
         f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
         ts_gr = HC_MRI
         ID = HC_IDs
-        
         SC = HC_SC_avg  # Use the average SC of the HC group
 
     elif COND == 2: ## --> MCI
@@ -428,8 +427,6 @@ for COND in range(1,4):
         subj_id = ID[sub]
         ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
     TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
-    TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
 
     SC_N = SC[:NPARCELLS, :NPARCELLS]
     SC_N /= np.max(SC_N)
@@ -437,11 +434,9 @@ for COND in range(1,4):
     Ceff_ini = SC_N.copy()
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
 
-    
-
     start_time = time.time()
     Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
-                                LinHopf_Ceff_sigma_a_fitting_numba(TSemp_fit_group, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+                                LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
                                 fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                 fit_sigma=False, sigma_reset=sigma_reset,
                                 fit_a=A_FITTING,
@@ -498,7 +493,6 @@ for COND in range(1,4):
 
 
 ### subject level
-# Note: The subject level calculations are done in parallel for each condition
 for i in range(1,4):
     COND = i
     a_list_sub_temp = []
@@ -529,18 +523,18 @@ for i in range(1,4):
     # TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
     # TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
 
-    TSemp_fit_subs = []
-    for sub in range(len(ID)):
-        subj_id = ID[sub]
-        subj_ts = ts_gr[subj_id][:min_ntimes, :NPARCELLS].T.copy()
+    # TSemp_fit_subs = []
+    # for sub in range(len(ID)):
+    #     subj_id = ID[sub]
+    #     subj_ts = ts_gr[subj_id][:min_ntimes, :NPARCELLS].T.copy()
 
-        # z-score **per subject** (individually, not across group)
-        subj_zsc = zscore_time_series(subj_ts[np.newaxis, :, :], 
-                                    mode='global', detrend=True)[0, :, :]
+    #     # z-score **per subject** (individually, not across group)
+    #     subj_zsc = zscore_time_series(subj_ts[np.newaxis, :, :], 
+    #                                 mode='global', detrend=True)[0, :, :]
 
-        TSemp_fit_subs.append(subj_zsc)
+    #     TSemp_fit_subs.append(subj_zsc)
 
-    TSemp_fit_sub = np.array(TSemp_fit_subs)  # shape: (n_subjects, NPARCELLS, min_ntimes)
+    # TSemp_fit_sub = np.array(TSemp_fit_subs)  # shape: (n_subjects, NPARCELLS, min_ntimes)
 
 
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
@@ -565,7 +559,7 @@ for i in range(1,4):
         #TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
-                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_fit_sub[sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
+                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc[sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=False, sigma_reset=sigma_reset,fit_a=A_FITTING,
                                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
