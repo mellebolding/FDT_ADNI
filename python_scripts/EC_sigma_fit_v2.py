@@ -399,6 +399,7 @@ Tau_burden = [np.array(HC_Tau)[:,:NPARCELLS,0], np.array(MCI_Tau)[:,:NPARCELLS,0
 
 ### Group level
 TSemp_zsc_list = []
+Ceff_group_list = []
 for COND in range(1,4):
     if COND == 1: ## --> HC
         f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
@@ -483,6 +484,7 @@ for COND in range(1,4):
 
     ## save the results
     a_list_group.append(a_group)
+    Ceff_group_list.append(Ceff_group)
     append_record_to_npz(
     Ceff_sigma_subfolder,
     f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
@@ -494,9 +496,11 @@ for COND in range(1,4):
 
 
 ### subject level
+Ceff_means = []
 for i in range(1,4):
     COND = i
     a_list_sub_temp = []
+    Ceff_sub_temp = []
     if COND == 1: ## --> HC
         #f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
         ts_gr = HC_MRI
@@ -602,6 +606,7 @@ for i in range(1,4):
         plt.close()
 
         a_list_sub_temp.append(a_sub[sub])
+        Ceff_sub_temp.append(Ceff_sub[sub])
         append_record_to_npz(
         Ceff_sigma_subfolder,
         f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
@@ -612,6 +617,13 @@ for i in range(1,4):
         Ceff=Ceff_sub[sub],
         omega=omega)
     a_list_sub.append(np.array(a_list_sub_temp))
+Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
+
+for i in range(3):
+    Ceff_group_list = np.array(Ceff_group_list)
+    Ceff_means = np.array(Ceff_means)
+    Ceff_diff = Ceff_group_list[i] - Ceff_means[i]
+    plot_FC_matrix(Ceff_diff, title=f"Ceff diff group-{group_names[i]} minus mean subj", size=1.1, dpi=300)
 
 out = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 predicted_a = out["predicted_a"]
