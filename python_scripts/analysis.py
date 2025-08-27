@@ -795,6 +795,7 @@ X_norm2_sub = np.squeeze(np.array(get_field(all_values, "X_Inorm2", filters={"le
 
 #print("a_sub: ", min(a_values_sub[0][0,:]), max(a_values_sub[0][0,:]))
 #print("a_sub_org: ", a_original_sub[0].shape)
+
 if A_FITTING:
     a_002 = -0.02 * np.ones(a_values_group.shape)
     diff_a_group = np.subtract(a_values_group, a_original_group)
