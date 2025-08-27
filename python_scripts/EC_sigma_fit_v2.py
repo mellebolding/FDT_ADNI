@@ -398,6 +398,7 @@ Tau_burden = [np.array(HC_Tau)[:,:NPARCELLS,0], np.array(MCI_Tau)[:,:NPARCELLS,0
 #print(f"HC ABeta shape: {np.array(HC_ABeta).shape}")
 
 ### Group level
+TSemp_zsc_list = []
 for COND in range(1,4):
     if COND == 1: ## --> HC
         f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
@@ -427,7 +428,7 @@ for COND in range(1,4):
         subj_id = ID[sub]
         ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
     TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
-
+    TSemp_zsc_list.append(TSemp_zsc)
     SC_N = SC[:NPARCELLS, :NPARCELLS]
     SC_N /= np.max(SC_N)
     SC_N *= 0.2
@@ -559,7 +560,7 @@ for i in range(1,4):
         #TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
-                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc[sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
+                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND-1][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=False, sigma_reset=sigma_reset,fit_a=A_FITTING,
                                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
