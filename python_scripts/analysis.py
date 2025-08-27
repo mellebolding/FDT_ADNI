@@ -739,9 +739,9 @@ if A_FITTING:
     diff_I_norm1_a_subHC = np.subtract(I_norm1_sub_a[0], I_norm1_sub[0])
     diff_org_a_group = np.subtract(a_values_group, a_002)
 #print("diff a sub: ", diff_a_sub)
-
+ 
 I_norm2_select = np.array([I_norm2_sub[0,1,:], I_norm2_sub[1,1,:], I_norm2_sub[2,0,:]])
-X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
+X_norm2_select = np.array([X_norm2_sub[0,1,:], X_norm2_sub[1,1,:], X_norm2_sub[2,0,:]])
 
 I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
 print(I_norm2_select.shape, I_norm2_group.shape)
