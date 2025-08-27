@@ -563,7 +563,7 @@ for i in range(1,4):
                                             LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND-1][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=False, sigma_reset=sigma_reset,fit_a=A_FITTING,
-                                            epsFC_Ceff=epsFC_Ceff/10, epsCOVtau_Ceff=epsCOVtau_Ceff/10, epsFC_sigma=epsFC_sigma/10, epsCOVtau_sigma=epsCOVtau_sigma/10,
+                                            epsFC_Ceff=epsFC_Ceff*10, epsCOVtau_Ceff=epsCOVtau_Ceff*10, epsFC_sigma=epsFC_sigma*10, epsCOVtau_sigma=epsCOVtau_sigma*10,
                                             MAXiter=MAXiter+10000, error_tol=error_tol, patience=patience-1, learning_rate_factor=learning_rate_factor,
                                             Ceff_norm=Ceff_norm, maxC=maxC,
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
