@@ -201,22 +201,51 @@ def RSN_radar_plot(I_norm2_group, a=False):
 
 def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False):
     """
-    Scatter plot: I_norm2_group (x-axis) vs X_norm2_group (y-axis) for each group.
+    Scatter plot: I_norm2_group (x-axis) vs X_norm2_group (y-axis) for each group,
+    with a linear fit per group + slope and R² in legend.
     """
     group_names = ['HC', 'MCI', 'AD']
     colors = ['tab:blue', 'tab:orange', 'tab:green']
     plt.figure(figsize=(8, 6))
+
     for i, group in enumerate(group_names):
-        plt.scatter(
-            I_norm2_group[i], X_norm2_group[i],
-            color=colors[i], label=group, alpha=0.7
-        )
+        x = I_norm2_group[i]
+        y = X_norm2_group[i]
+
+        # scatter
+        plt.scatter(x, y, color=colors[i], alpha=0.7)
+
+        # linear fit
+        if len(x) > 1:  # need at least 2 points
+            coef = np.polyfit(x, y, 1)   # slope + intercept
+            poly1d_fn = np.poly1d(coef)
+
+            # line over x-range
+            x_line = np.linspace(np.min(x), np.max(x), 100)
+            y_line = poly1d_fn(x_line)
+
+            plt.plot(x_line, y_line, color=colors[i], linewidth=2)
+
+            # compute R²
+            y_pred = poly1d_fn(x)
+            ss_res = np.sum((y - y_pred) ** 2)
+            ss_tot = np.sum((y - np.mean(y)) ** 2)
+            r2 = 1 - (ss_res / ss_tot if ss_tot > 0 else np.nan)
+
+            # add slope and R² to legend label
+            label = f"{group} (slope={coef[0]:.3f}, R²={r2:.2f})"
+        else:
+            label = f"{group} (insufficient data)"
+
+        plt.scatter([], [], color=colors[i], label=label)  # dummy for legend
+
     plt.xlabel('I_norm2')
     plt.ylabel('X_norm2')
     plt.title(f'I_norm2 vs X_norm2 per group {NOISE_TYPE} a{a}')
     plt.legend()
     plt.tight_layout()
     plt.show()
+
 
 
 
@@ -749,8 +778,8 @@ RSNs = {
 # if A_FITTING: 
 #     RSN_significance_group(I_norm2_group_a, a=A_FITTING)
 #     RSN_radar_plot(I_norm2_group_a, a=A_FITTING)
-RSN_significance_group(I_norm2_group, a=False)
-RSN_radar_plot(I_norm2_group, a=False)
+# RSN_significance_group(I_norm2_group, a=False)
+# RSN_radar_plot(I_norm2_group, a=False)
 # plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
 # if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
 # plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
