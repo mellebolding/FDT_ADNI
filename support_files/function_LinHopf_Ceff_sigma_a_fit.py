@@ -133,7 +133,7 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
             error_now = errorFC_now + errorCOVtau_now
             error_iter.append(error_now)
 
-            if  error_old < error_now:
+            if  error_old < error_now + 0.01:
                 #print(f"Iter {iter:4d}/{MAXiter} ; error: {error_now:.7f} ; error_tol: {error_tol_now:.7f} | error_old < error_now --> EXIT (return previous sigma)")
                 Ceff_fit = Ceff_previous
                 sigma_fit = sigma_previous
