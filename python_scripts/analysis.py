@@ -257,10 +257,10 @@ def I_vs_Xnorm22(I_norm2_group, X_norm2_group, a=False):
     group_names = ['HC']#, 'MCI', 'AD']
     colors = ['tab:blue', 'tab:orange', 'tab:green']
     plt.figure(figsize=(8, 6))
-
+    i = 1
     for group in enumerate(group_names):
-        x_group = I_norm2_group[1]   # shape (n_subjects, n_parcels)
-        y_group = X_norm2_group[1]
+        x_group = I_norm2_group[i]   # shape (n_subjects, n_parcels)
+        y_group = X_norm2_group[i]
 
         # scatter all valid subject points
         plt.scatter(x_group.flatten(), y_group.flatten(), color=colors[i], alpha=0.3)
