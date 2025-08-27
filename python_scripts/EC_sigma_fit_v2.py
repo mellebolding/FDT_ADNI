@@ -296,7 +296,7 @@ DL = ADNI_A.ADNI_A()
 subdata = DL.get_subjectData('002_S_0413')
 SC = subdata['002_S_0413']['SC'] # Structural connectivity
 
-NPARCELLS = 379 #tot: 379
+NPARCELLS = 19 #tot: 379
 # Loading the timeseries data for all subjects and dividing them into groups
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
@@ -520,15 +520,28 @@ for i in range(1,4):
         ID = AD_IDs
         SCs = AD_SC
 
-    ### Generates a "group" TS with the same length for all subjects
-    min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
-    ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
+    # min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
+    # ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
+    # for sub in range(len(ID)):
+    #     subj_id = ID[sub]
+    #     ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
+    # TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
+    # TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
+    # TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
+
+    TSemp_fit_subs = []
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
-    TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
-    TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
+        subj_ts = ts_gr[subj_id][:min_ntimes, :NPARCELLS].T.copy()
+
+        # z-score **per subject** (individually, not across group)
+        subj_zsc = zscore_time_series(subj_ts[np.newaxis, :, :], 
+                                    mode='global', detrend=True)[0, :, :]
+
+        TSemp_fit_subs.append(subj_zsc)
+
+    TSemp_fit_sub = np.array(TSemp_fit_subs)  # shape: (n_subjects, NPARCELLS, min_ntimes)
+
 
     sigma_ini = sigma_mean * np.ones(NPARCELLS)
     Ceff_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
@@ -549,7 +562,7 @@ for i in range(1,4):
         SC_N /= np.max(SC_N)
         SC_N *= 0.2
 
-        TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
+        #TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
                                             LinHopf_Ceff_sigma_a_fitting_numba(TSemp_fit_sub, SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
