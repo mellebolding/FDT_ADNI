@@ -65,7 +65,7 @@ def LinHopf_Ceff_sigma_a_fitting_numba(tsdata, C, NPARCELS, TR, f_diff, sigma, a
         
     for sub in range(NSUB):
         ts = tsdata[sub, :, :].copy()    # Extract subject's time series
-        ts2 = ts[indexN, 10:-10].copy()  # Remove edges
+        ts2 = ts[indexN, 5:-5].copy()  # Remove edges
 
         ## Empirical FC(0)
         FCemp = np.corrcoef(ts2)
