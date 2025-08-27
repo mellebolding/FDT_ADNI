@@ -131,7 +131,7 @@ def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param, gconst=
         avec = a_param[COND-1]
         sigma_group_2 = np.append(sigma_group[COND-1], sigma_group[COND-1])
         v0std = sigma_group_2
-        
+
         Gamma = -construct_matrix_A(avec, omega[COND-1], Ceff_group[COND-1], gconst)
 
         v0 = v0std * np.random.standard_normal(2*Ndim) + v0bias
