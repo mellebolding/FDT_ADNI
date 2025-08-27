@@ -254,11 +254,11 @@ def I_vs_Xnorm22(I_norm2_group, X_norm2_group, a=False):
     with subject-level linear fits aggregated into group mean fit + 95% CI.
     Input arrays expected shape: (n_groups, n_subjects, n_parcels).
     """
-    group_names = ['HC']#, 'MCI', 'AD']
+    group_names = ['HC', 'MCI', 'AD']
     colors = ['tab:blue', 'tab:orange', 'tab:green']
     plt.figure(figsize=(8, 6))
-    i = 2
-    for group in enumerate(group_names):
+    #i = 2
+    for i, group in enumerate(group_names):
         x_group = I_norm2_group[i]   # shape (n_subjects, n_parcels)
         y_group = X_norm2_group[i]
 
