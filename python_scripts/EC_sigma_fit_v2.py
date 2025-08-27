@@ -447,7 +447,7 @@ for COND in range(1,4):
                                 iter_check=iter_check, plot_evol=False, plot_evol_last=False)
     end_time = time.time()
     #print(f"Execution time group: {end_time - start_time:.4f} seconds")
-
+    print("errors group: ", error_iter_group[-1], errorFC_iter_group[-1], errorCOVtau_iter_group[-1])
     ## ploting the error iter
     figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(training_dir, figure_name)
@@ -569,6 +569,7 @@ for i in range(1,4):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
+        print(f"errors sub{sub}: ", error_iter_sub_aux[-1], errorFC_iter_sub_aux[-1], errorCOVtau_iter_sub_aux[-1])
         figure_name = f"error_iter_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
         save_path = os.path.join(training_dir, figure_name)
         plt.figure()
