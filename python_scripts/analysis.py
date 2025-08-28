@@ -1028,8 +1028,6 @@ import statsmodels.formula.api as smf
 # print(results.summary())
 import pymc as pm
 import arviz as az
-pm.config.optimizer = "fast_compile"
-pm.config.exception_verbosity = "high"
 
 parcel_idx, parcels = pd.factorize(df_cohort["parcel"])
 
