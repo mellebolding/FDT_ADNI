@@ -997,12 +997,11 @@ if A_FITTING:
     plt.tight_layout()
     #plt.show()
 
-dfs = []
-print(len(ABeta_burden), len(Tau_burden), len(I_norm2_sub))
-for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, I_norm2_sub)):
+df_list = []
+for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_list, Tau_list, FDTI_list)):
     nsub, nparcel = AB.shape
-    # Make a dataframe in "long" format
-    df_cohort = pd.DataFrame({
+    
+    df = pd.DataFrame({
         "subject": np.repeat([f"C{cohort_idx}_S{i}" for i in range(nsub)], nparcel),
         "parcel": np.tile(np.arange(nparcel), nsub),
         "ABeta_local": AB.ravel(),
@@ -1010,9 +1009,8 @@ for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, I_nor
         "FDT_I": FDTI.ravel(),
         "cohort": cohort_idx
     })
-    dfs.append(df_cohort)
+    df_list.append(df)
 
-# Combine all cohorts
-df = pd.concat(dfs, ignore_index=True)
+df_cohort = pd.concat(df_list, ignore_index=True)
 
 print(df.head())
