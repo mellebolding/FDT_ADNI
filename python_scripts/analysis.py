@@ -998,7 +998,7 @@ if A_FITTING:
     #plt.show()
 
 dfs = []
-print(ABeta_burden[0].shape, Tau_burden[0].shape, I_norm2_sub[0].shape)
+print(len(ABeta_burden), len(Tau_burden), len(I_norm2_sub))
 for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, I_norm2_sub)):
     nsub, nparcel = AB.shape
     # Make a dataframe in "long" format
