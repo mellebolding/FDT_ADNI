@@ -997,8 +997,7 @@ if A_FITTING:
     plt.tight_layout()
     #plt.show()
 
-print(ABeta_burden[1].shape, Tau_burden[1].shape, I_norm2_sub[2].shape)
-print(I_norm2_sub)
+
 df_list = []
 for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, I_norm2_sub)):
     nsub, nparcel = AB.shape
