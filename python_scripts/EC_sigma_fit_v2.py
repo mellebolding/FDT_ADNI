@@ -626,6 +626,7 @@ for i in range(3):
     plot_FC_matrix(Ceff_diff, title=f"Ceff diff group-{group_names[i]} minus mean subj", size=1.1, dpi=300)
     plot_FC_matrix(Ceff_means, title=f"Ceff means sub", size=1.1, dpi=300)
     plot_FC_matrix(Ceff_group_list, title=f"Ceff means group", size=1.1, dpi=300)
+
 out = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 predicted_a = out["predicted_a"]
 predicted_a_group = out["predicted_a_group"]
