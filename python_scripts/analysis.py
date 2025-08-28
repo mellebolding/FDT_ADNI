@@ -1026,64 +1026,63 @@ import statsmodels.formula.api as smf
 # )
 # results = model.fit()
 # print(results.summary())
-import pymc as pm
-import arviz as az
-import pandas as pd
+import jax
+import jax.numpy as jnp
 import numpy as np
+import pandas as pd
+import numpyro
+import numpyro.distributions as dist
+from numpyro.infer import MCMC, NUTS
 
-# Example: assume df has columns:
-# 'subject', 'parcel', 'ABeta_local', 'Tau_local', 'ABeta_global', 'Tau_global', 'FDT_I'
+# Example: df with columns: subject, parcel, ABeta_local, Tau_local, ABeta_global, Tau_global, FDT_I
+# Make sure your data is already in long format (parcel-wise)
 
+# Encode subject indices
+subjects = df["subject"].unique()
+subject_idx = {s: i for i, s in enumerate(subjects)}
+df["subject_idx"] = df["subject"].map(subject_idx)
 
+n_subjects = len(subjects)
+n_obs = len(df)
 
-# Store results per parcel
-parcel_traces = {}
+# Prepare data
+ABeta_local = df["ABeta_local"].values
+Tau_local = df["Tau_local"].values
+ABeta_global = df["ABeta_global"].values
+Tau_global = df["Tau_global"].values
+FDT_I = df["FDT_I"].values
+subject_idx_array = df["subject_idx"].values
 
-for parcel in df["parcel"].unique():
-    df_p = df[df["parcel"] == parcel].copy()
+def hierarchical_model(ABeta_local, Tau_local, ABeta_global, Tau_global, subject_idx, FDT_I=None):
+    # Hyperpriors for random intercepts
+    mu_a = numpyro.sample("mu_a", dist.Normal(0, 1))
+    sigma_a = numpyro.sample("sigma_a", dist.Exponential(1.0))
+    
+    # Random intercept per subject
+    a_subject = numpyro.sample("a_subject", dist.Normal(mu_a, sigma_a).expand([n_subjects]))
+    
+    # Fixed effects
+    beta_ABeta = numpyro.sample("beta_ABeta", dist.Normal(0, 1))
+    beta_Tau = numpyro.sample("beta_Tau", dist.Normal(0, 1))
+    beta_inter = numpyro.sample("beta_inter", dist.Normal(0, 1))
+    beta_ABeta_global = numpyro.sample("beta_ABeta_global", dist.Normal(0, 1))
+    beta_Tau_global = numpyro.sample("beta_Tau_global", dist.Normal(0, 1))
+    
+    sigma = numpyro.sample("sigma", dist.Exponential(1.0))
+    
+    mu = (
+        a_subject[subject_idx]
+        + beta_ABeta * ABeta_local
+        + beta_Tau * Tau_local
+        + beta_inter * ABeta_local * Tau_local
+        + beta_ABeta_global * ABeta_global
+        + beta_Tau_global * Tau_global
+    )
+    
+    numpyro.sample("obs", dist.Normal(mu, sigma), obs=FDT_I)
 
-    subjects = df_p["subject"].unique()
-    subj_idx = pd.Categorical(df_p["subject"]).codes
-
-    with pm.Model() as model:
-        # Hyperpriors for intercept and slopes
-        mu_a = pm.Normal("mu_a", mu=0, sigma=1)
-        sigma_a = pm.HalfNormal("sigma_a", 1)
-
-        mu_b_AB = pm.Normal("mu_b_AB", mu=0, sigma=1)
-        sigma_b_AB = pm.HalfNormal("sigma_b_AB", 1)
-
-        mu_b_Tau = pm.Normal("mu_b_Tau", mu=0, sigma=1)
-        sigma_b_Tau = pm.HalfNormal("sigma_b_Tau", 1)
-
-        mu_b_inter = pm.Normal("mu_b_inter", mu=0, sigma=1)
-        sigma_b_inter = pm.HalfNormal("sigma_b_inter", 1)
-
-        # Subject-level random effects
-        a_subj = pm.Normal("a_subj", mu=mu_a, sigma=sigma_a, shape=len(subjects))
-        b_AB_subj = pm.Normal("b_AB_subj", mu=mu_b_AB, sigma=sigma_b_AB, shape=len(subjects))
-        b_Tau_subj = pm.Normal("b_Tau_subj", mu=mu_b_Tau, sigma=sigma_b_Tau, shape=len(subjects))
-        b_inter_subj = pm.Normal("b_inter_subj", mu=mu_b_inter, sigma=sigma_b_inter, shape=len(subjects))
-
-        # Expected value
-        mu = (
-            a_subj[subj_idx] 
-            + b_AB_subj[subj_idx] * df_p["ABeta_local"].values
-            + b_Tau_subj[subj_idx] * df_p["Tau_local"].values
-            + b_inter_subj[subj_idx] * (df_p["ABeta_local"].values * df_p["Tau_local"].values)
-            + 0.0 * df_p["ABeta_global"].values  # optionally add global effects
-            + 0.0 * df_p["Tau_global"].values
-        )
-
-        # Likelihood
-        sigma = pm.HalfNormal("sigma", 1)
-        y_obs = pm.Normal("y_obs", mu=mu, sigma=sigma, observed=df_p["FDT_I"].values)
-
-        # Sampling
-        trace = pm.sample(draws=1000, tune=1000, cores=2, chains=2, target_accept=0.9,jit_compile=False)
-
-    parcel_traces[parcel] = trace
-    print(f"Parcel {parcel} done!")
-
-# Example: summary for parcel 0
-az.summary(parcel_traces[0])
+# Run MCMC
+nuts_kernel = NUTS(hierarchical_model)
+mcmc = MCMC(nuts_kernel, num_warmup=1000, num_samples=2000, num_chains=2)
+mcmc.run(jax.random.PRNGKey(0), ABeta_local, Tau_local, ABeta_global, Tau_global, subject_idx_array, FDT_I)
+mcmc.print_summary()
