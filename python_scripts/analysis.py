@@ -1026,4 +1026,4 @@ for parcel in df["parcel"].unique():
         data=df_p
     ).fit()
     results.append({"parcel": parcel, "coef": model.params, "p": model.pvalues})
-print(df.head())
+print(results)
