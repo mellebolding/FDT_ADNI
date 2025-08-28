@@ -256,14 +256,13 @@ def predict_a(a_fitted, ABeta_all, Tau_all, coef_matrix):
     beta_coef  = coef_matrix["ABeta"].values[None, :]
     tau_coef   = coef_matrix["Tau"].values[None, :]
     inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :]
-    print("a shape:", a_fitted, "ABeta shape:", ABeta_all.shape, "Tau shape:", Tau_all.shape)
-
+    
     scale = (1+const
             + beta_coef * ABeta_all
             + tau_coef * Tau_all
             + inter_coef * (ABeta_all * Tau_all))
 
-    return np.array(a_fitted) * scale
+    return np.vstack(a_fitted) * scale
 
 
 def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
