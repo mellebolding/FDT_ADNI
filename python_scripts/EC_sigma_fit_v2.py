@@ -256,6 +256,7 @@ def predict_a(a_fitted, ABeta_all, Tau_all, coef_matrix):
     beta_coef  = coef_matrix["ABeta"].values[None, :]
     tau_coef   = coef_matrix["Tau"].values[None, :]
     inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :]
+    print("a shape:", a_fitted.shape, "ABeta shape:", ABeta_all.shape, "Tau shape:", Tau_all.shape)
 
     scale = (1+const
             + beta_coef * ABeta_all
