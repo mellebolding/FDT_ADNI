@@ -836,10 +836,10 @@ if A_FITTING:
 I_norm2_select = np.array([I_norm2_sub[0,0,:], I_norm2_sub[1,0,:], I_norm2_sub[2,0,:]])
 X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
 
-I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
-I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
-#print(I_norm2_select.shape, I_norm2_group.shape)
-I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
+# I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
+# I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
+# print(I_norm2_select.shape, I_norm2_group.shape)
+# I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
 
 # figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group, I_norm1=I_norm1_group, I_norm2=I_norm2_group)
 # if A_FITTING: figures_I_tmax_norm1_norm2(group=True, subject=False, I_tmax=X_norm2_group_a, I_norm1=I_norm1_group_a, I_norm2=I_norm2_group_a,a=A_FITTING)
@@ -998,7 +998,7 @@ if A_FITTING:
     #plt.show()
 
 df_list = []
-for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_list, Tau_list, FDTI_list)):
+for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, I_norm2_sub)):
     nsub, nparcel = AB.shape
     
     df = pd.DataFrame({
