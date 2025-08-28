@@ -1002,7 +1002,7 @@ print(I_norm2_sub)
 df_list = []
 for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, I_norm2_sub)):
     nsub, nparcel = AB.shape
-    
+    FDTI = FDTI[:nsub, :]
     df = pd.DataFrame({
         "subject": np.repeat([f"C{cohort_idx}_S{i}" for i in range(nsub)], nparcel),
         "parcel": np.tile(np.arange(nparcel), nsub),
