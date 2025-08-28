@@ -257,10 +257,12 @@ def predict_a(a_fitted, ABeta_all, Tau_all, coef_matrix):
     tau_coef   = coef_matrix["Tau"].values[None, :]
     inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :]
 
-    return a_fitted * (1+const
+    scale = (1+const
             + beta_coef * ABeta_all
             + tau_coef * Tau_all
             + inter_coef * (ABeta_all * Tau_all))
+
+    return a_fitted * scale
 
 
 def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
