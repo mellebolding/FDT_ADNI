@@ -1018,12 +1018,11 @@ df["Tau_global"]   = df.groupby("subject")["Tau_local"].transform("mean")
 
 import statsmodels.formula.api as smf
 
-results = []
-for parcel in df["parcel"].unique():
-    df_p = df[df["parcel"] == parcel]
-    model = smf.ols(
-        "FDT_I ~ ABeta_local * Tau_local + ABeta_global + Tau_global",
-        data=df_p
-    ).fit()
-    results.append({"parcel": parcel, "coef": model.params, "p": model.pvalues})
-print(results)
+model = smf.mixedlm(
+    "FDT_I ~ ABeta_local * Tau_local + ABeta_global + Tau_global",
+    data=df,
+    groups=df["parcel"],
+    re_formula="~ABeta_local + Tau_local"  # random slopes
+)
+results = model.fit()
+print(results.summary())
