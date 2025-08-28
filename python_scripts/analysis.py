@@ -1028,6 +1028,9 @@ import statsmodels.formula.api as smf
 # print(results.summary())
 import pymc as pm
 import arviz as az
+import pytensor.config as ptconfig
+ptconfig.mode = 'FAST_COMPILE'
+
 parcel_idx, parcels = pd.factorize(df_cohort["parcel"])
 
 with pm.Model() as hierarchical_model:
