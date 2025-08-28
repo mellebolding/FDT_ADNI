@@ -248,16 +248,16 @@ def calc_H_freq(
         f_diff = filterps.filt_pow_spetra_multiple_subjects(all_HC_fMRI, tr, version)
         return f_diff 
 
-def predict_a(ABeta_all, Tau_all, coef_matrix):
+def predict_a(a_fitted, ABeta_all, Tau_all, coef_matrix):
     """
-    Predict 'a' given ABeta, Tau, and a coefficient matrix.
+    Predict a' given a_fitted, ABeta, Tau, and a coefficient matrix.
     """
     const      = coef_matrix["const"].values[None, :]
     beta_coef  = coef_matrix["ABeta"].values[None, :]
     tau_coef   = coef_matrix["Tau"].values[None, :]
     inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :]
 
-    return (const
+    return a_fitted * (1+const
             + beta_coef * ABeta_all
             + tau_coef * Tau_all
             + inter_coef * (ABeta_all * Tau_all))
@@ -352,7 +352,7 @@ times = np.arange(t0, tfinal+dt, dt)
 sigma_mean = 0.45
 CEFF_FITTING = True
 SIGMA_FITTING = False
-A_FITTING = False
+A_FITTING = True
 if SIGMA_FITTING: NOISE_TYPE = 'hetero'
 else: NOISE_TYPE = 'homo'
 COMPETITIVE_COUPLING = False
