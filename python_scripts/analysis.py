@@ -1013,5 +1013,17 @@ for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, I_nor
     df_list.append(df)
 
 df_cohort = pd.concat(df_list, ignore_index=True)
+df["ABeta_global"] = df.groupby("subject")["ABeta_local"].transform("mean")
+df["Tau_global"]   = df.groupby("subject")["Tau_local"].transform("mean")
 
+import statsmodels.formula.api as smf
+
+results = []
+for parcel in df["parcel"].unique():
+    df_p = df[df["parcel"] == parcel]
+    model = smf.ols(
+        "FDT_I ~ ABeta_local * Tau_local + ABeta_global + Tau_global",
+        data=df_p
+    ).fit()
+    results.append({"parcel": parcel, "coef": model.params, "p": model.pvalues})
 print(df.head())
