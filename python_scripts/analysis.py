@@ -1026,59 +1026,11 @@ import statsmodels.formula.api as smf
 # )
 # results = model.fit()
 # print(results.summary())
-import pymc as pm
-import arviz as az
-import pymc as pm
-import pytensor.config as ptconfig
+import bambi as bmb
+import pandas as pd
 
-# -----------------------------
-# Force Python mode compilation
-ptconfig.mode = "FAST_COMPILE"
-ptconfig.exception_verbosity = "high"
-# -----------------------------
-
-# Example data: df with columns:
-# 'subject', 'parcel', 'FDT_I', 'ABeta_local', 'Tau_local', 'ABeta_global', 'Tau_global'
-# Make sure your df is already prepared like before
-# df = pd.concat(df_list, ignore_index=True)
-
-subjects = df["subject"].unique()
-n_subjects = len(subjects)
-n_parcels = df["parcel"].nunique()
-
-# Map subjects to integer indices
-subject_idx = df["subject"].astype("category").cat.codes.values
-
-with pm.Model() as hierarchical_model:
-    # Hyperpriors for random intercepts
-    mu_a = pm.Normal("mu_a", mu=0, sigma=1)
-    sigma_a = pm.HalfNormal("sigma_a", sigma=1)
-
-    # Random intercept per subject
-    a_subject = pm.Normal("a_subject", mu=mu_a, sigma=sigma_a, shape=n_subjects)
-
-    # Fixed effects
-    beta_ABeta_local = pm.Normal("beta_ABeta_local", mu=0, sigma=1)
-    beta_Tau_local = pm.Normal("beta_Tau_local", mu=0, sigma=1)
-    beta_inter = pm.Normal("beta_ABeta_Tau", mu=0, sigma=1)
-    beta_ABeta_global = pm.Normal("beta_ABeta_global", mu=0, sigma=1)
-    beta_Tau_global = pm.Normal("beta_Tau_global", mu=0, sigma=1)
-    
-    # Expected value
-    mu = (
-        a_subject[subject_idx]
-        + beta_ABeta_local * df["ABeta_local"].values
-        + beta_Tau_local * df["Tau_local"].values
-        + beta_inter * df["ABeta_local"].values * df["Tau_local"].values
-        + beta_ABeta_global * df["ABeta_global"].values
-        + beta_Tau_global * df["Tau_global"].values
-    )
-
-    # Likelihood
-    sigma_y = pm.HalfNormal("sigma_y", sigma=1)
-    FDT_obs = pm.Normal("FDT_obs", mu=mu, sigma=sigma_y, observed=df["FDT_I"].values)
-
-    # Sample
-    trace = pm.sample(1000, tune=1000, target_accept=0.9, cores=2, progressbar=True)
-# Summarize posterior
-az.summary(trace, var_names=["mu_a","mu_b_ABeta","mu_b_Tau","mu_b_inter"])
+# df contains: subject, parcel, ABeta_local, Tau_local, FDT_I
+model = bmb.Model("FDT_I ~ ABeta_local * Tau_local + (1|subject)", data=df)
+fitted = model.fit(draws=1000, tune=1000, cores=2)
+summary = fitted.summary()
+print(summary)
