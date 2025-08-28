@@ -256,14 +256,14 @@ def predict_a(a_fitted, ABeta_all, Tau_all, coef_matrix):
     beta_coef  = coef_matrix["ABeta"].values[None, :]
     tau_coef   = coef_matrix["Tau"].values[None, :]
     inter_coef = coef_matrix["ABeta_x_Tau"].values[None, :]
-    print("a shape:", a_fitted.shape, "ABeta shape:", ABeta_all.shape, "Tau shape:", Tau_all.shape)
+    print("a shape:", np.array(a_fitted.shape), "ABeta shape:", ABeta_all.shape, "Tau shape:", Tau_all.shape)
 
     scale = (1+const
             + beta_coef * ABeta_all
             + tau_coef * Tau_all
             + inter_coef * (ABeta_all * Tau_all))
 
-    return a_fitted * scale
+    return np.array(a_fitted) * scale
 
 
 def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
@@ -451,7 +451,7 @@ for COND in range(1,4):
                                 iter_check=iter_check, plot_evol=False, plot_evol_last=False)
     end_time = time.time()
     #print(f"Execution time group: {end_time - start_time:.4f} seconds")
-    print("errors group: ", error_iter_group[-1], errorFC_iter_group[-1], errorCOVtau_iter_group[-1])
+    #print("errors group: ", error_iter_group[-1], errorFC_iter_group[-1], errorCOVtau_iter_group[-1])
     ## ploting the error iter
     figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
     save_path = os.path.join(training_dir, figure_name)
@@ -576,7 +576,7 @@ for i in range(1,4):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
-        print(f"errors sub{sub}: ", error_iter_sub_aux[-1], errorFC_iter_sub_aux[-1], errorCOVtau_iter_sub_aux[-1])
+        #print(f"errors sub{sub}: ", error_iter_sub_aux[-1], errorFC_iter_sub_aux[-1], errorCOVtau_iter_sub_aux[-1])
         figure_name = f"error_iter_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
         save_path = os.path.join(training_dir, figure_name)
         plt.figure()
@@ -622,13 +622,13 @@ for i in range(1,4):
     a_list_sub.append(np.array(a_list_sub_temp))
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
-for i in range(3):
-    Ceff_group_list = np.array(Ceff_group_list)
-    Ceff_means = np.array(Ceff_means)
-    Ceff_diff = Ceff_group_list[i] - Ceff_means[i]
-    plot_FC_matrix(Ceff_diff, title=f"Ceff diff group-{group_names[i]} minus mean subj", size=1.1, dpi=300)
-    plot_FC_matrix(Ceff_means[i], title=f"Ceff means sub", size=1.1, dpi=300)
-    plot_FC_matrix(Ceff_group_list[i], title=f"Ceff means group", size=1.1, dpi=300)
+# for i in range(3):
+#     Ceff_group_list = np.array(Ceff_group_list)
+#     Ceff_means = np.array(Ceff_means)
+#     Ceff_diff = Ceff_group_list[i] - Ceff_means[i]
+#     plot_FC_matrix(Ceff_diff, title=f"Ceff diff group-{group_names[i]} minus mean subj", size=1.1, dpi=300)
+#     plot_FC_matrix(Ceff_means[i], title=f"Ceff means sub", size=1.1, dpi=300)
+#     plot_FC_matrix(Ceff_group_list[i], title=f"Ceff means group", size=1.1, dpi=300)
 
 out = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 predicted_a = out["predicted_a"]
