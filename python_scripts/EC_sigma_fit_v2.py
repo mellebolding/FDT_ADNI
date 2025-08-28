@@ -298,7 +298,7 @@ DL = ADNI_A.ADNI_A()
 subdata = DL.get_subjectData('002_S_0413')
 SC = subdata['002_S_0413']['SC'] # Structural connectivity
 
-NPARCELLS = 20 #tot: 379
+NPARCELLS = 379 #tot: 379
 # Loading the timeseries data for all subjects and dividing them into groups
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
@@ -632,8 +632,7 @@ for i in range(1,4):
 out = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 predicted_a = out["predicted_a"]
 predicted_a_group = out["predicted_a_group"]
-print("a (subject):", predicted_a.shape)
-print("a_group :", predicted_a_group.shape)
+
 print("a_diff group: ", predicted_a_group - np.array(a_list_group)[:, None])
 print("a_diff sub: ", predicted_a - np.vstack(a_list_sub))
 
