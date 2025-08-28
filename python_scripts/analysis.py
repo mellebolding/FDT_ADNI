@@ -1034,8 +1034,7 @@ import numpy as np
 # Example: assume df has columns:
 # 'subject', 'parcel', 'ABeta_local', 'Tau_local', 'ABeta_global', 'Tau_global', 'FDT_I'
 
-# Set PyMC/PyTensor to pure Python mode to avoid C++ compilation
-pm.set_tt_config(mode="FAST_COMPILE")  # bypass C++ compilation
+
 
 # Store results per parcel
 parcel_traces = {}
@@ -1081,7 +1080,7 @@ for parcel in df["parcel"].unique():
         y_obs = pm.Normal("y_obs", mu=mu, sigma=sigma, observed=df_p["FDT_I"].values)
 
         # Sampling
-        trace = pm.sample(draws=1000, tune=1000, cores=2, chains=2, target_accept=0.9)
+        trace = pm.sample(draws=1000, tune=1000, cores=2, chains=2, target_accept=0.9,jit_compile=False)
 
     parcel_traces[parcel] = trace
     print(f"Parcel {parcel} done!")
