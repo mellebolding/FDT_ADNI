@@ -279,8 +279,8 @@ def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
     ABeta_burden_all = np.vstack(ABeta_burden)
     Tau_burden_all   = np.vstack(Tau_burden)
 
-    predicted_a = predict_a(ABeta_burden_all, Tau_burden_all, coef_matrix)
-    predicted_a_group = predict_a(ABeta_burden_group, Tau_burden_group, coef_matrix)
+    predicted_a = predict_a(a_list_sub,ABeta_burden_all, Tau_burden_all, coef_matrix)
+    predicted_a_group = predict_a(a_list_sub,ABeta_burden_group, Tau_burden_group, coef_matrix)
 
     return {
         "predicted_a": predicted_a,
