@@ -1026,11 +1026,65 @@ import statsmodels.formula.api as smf
 # )
 # results = model.fit()
 # print(results.summary())
-import bambi as bmb
+import pymc as pm
+import arviz as az
 import pandas as pd
+import numpy as np
 
-# df contains: subject, parcel, ABeta_local, Tau_local, FDT_I
-model = bmb.Model("FDT_I ~ ABeta_local * Tau_local + (1|subject)", data=df)
-fitted = model.fit(draws=1000, tune=1000, cores=2)
-summary = fitted.summary()
-print(summary)
+# Example: assume df has columns:
+# 'subject', 'parcel', 'ABeta_local', 'Tau_local', 'ABeta_global', 'Tau_global', 'FDT_I'
+
+# Set PyMC/PyTensor to pure Python mode to avoid C++ compilation
+pm.set_tt_config(mode="FAST_COMPILE")  # bypass C++ compilation
+
+# Store results per parcel
+parcel_traces = {}
+
+for parcel in df["parcel"].unique():
+    df_p = df[df["parcel"] == parcel].copy()
+
+    subjects = df_p["subject"].unique()
+    subj_idx = pd.Categorical(df_p["subject"]).codes
+
+    with pm.Model() as model:
+        # Hyperpriors for intercept and slopes
+        mu_a = pm.Normal("mu_a", mu=0, sigma=1)
+        sigma_a = pm.HalfNormal("sigma_a", 1)
+
+        mu_b_AB = pm.Normal("mu_b_AB", mu=0, sigma=1)
+        sigma_b_AB = pm.HalfNormal("sigma_b_AB", 1)
+
+        mu_b_Tau = pm.Normal("mu_b_Tau", mu=0, sigma=1)
+        sigma_b_Tau = pm.HalfNormal("sigma_b_Tau", 1)
+
+        mu_b_inter = pm.Normal("mu_b_inter", mu=0, sigma=1)
+        sigma_b_inter = pm.HalfNormal("sigma_b_inter", 1)
+
+        # Subject-level random effects
+        a_subj = pm.Normal("a_subj", mu=mu_a, sigma=sigma_a, shape=len(subjects))
+        b_AB_subj = pm.Normal("b_AB_subj", mu=mu_b_AB, sigma=sigma_b_AB, shape=len(subjects))
+        b_Tau_subj = pm.Normal("b_Tau_subj", mu=mu_b_Tau, sigma=sigma_b_Tau, shape=len(subjects))
+        b_inter_subj = pm.Normal("b_inter_subj", mu=mu_b_inter, sigma=sigma_b_inter, shape=len(subjects))
+
+        # Expected value
+        mu = (
+            a_subj[subj_idx] 
+            + b_AB_subj[subj_idx] * df_p["ABeta_local"].values
+            + b_Tau_subj[subj_idx] * df_p["Tau_local"].values
+            + b_inter_subj[subj_idx] * (df_p["ABeta_local"].values * df_p["Tau_local"].values)
+            + 0.0 * df_p["ABeta_global"].values  # optionally add global effects
+            + 0.0 * df_p["Tau_global"].values
+        )
+
+        # Likelihood
+        sigma = pm.HalfNormal("sigma", 1)
+        y_obs = pm.Normal("y_obs", mu=mu, sigma=sigma, observed=df_p["FDT_I"].values)
+
+        # Sampling
+        trace = pm.sample(draws=1000, tune=1000, cores=2, chains=2, target_accept=0.9)
+
+    parcel_traces[parcel] = trace
+    print(f"Parcel {parcel} done!")
+
+# Example: summary for parcel 0
+az.summary(parcel_traces[0])
