@@ -1018,11 +1018,52 @@ df["Tau_global"]   = df.groupby("subject")["Tau_local"].transform("mean")
 
 import statsmodels.formula.api as smf
 
-model = smf.mixedlm(
-    "FDT_I ~ ABeta_local * Tau_local + ABeta_global + Tau_global",
-    data=df,
-    groups=df["parcel"],
-    re_formula="~ABeta_local + Tau_local"  # random slopes
-)
-results = model.fit()
-print(results.summary())
+# model = smf.mixedlm(
+#     "FDT_I ~ ABeta_local * Tau_local + ABeta_global + Tau_global",
+#     data=df,
+#     groups=df["parcel"],
+#     re_formula="~ABeta_local + Tau_local"  # random slopes
+# )
+# results = model.fit()
+# print(results.summary())
+import pymc as pm
+import arviz as az
+parcel_idx, parcels = pd.factorize(df_cohort["parcel"])
+
+with pm.Model() as hierarchical_model:
+    # Hyperpriors for intercepts and slopes
+    mu_a = pm.Normal("mu_a", mu=0, sigma=1)
+    sigma_a = pm.Exponential("sigma_a", 1.0)
+    
+    mu_b_ABeta = pm.Normal("mu_b_ABeta", mu=0, sigma=1)
+    sigma_b_ABeta = pm.Exponential("sigma_b_ABeta", 1.0)
+    
+    mu_b_Tau = pm.Normal("mu_b_Tau", mu=0, sigma=1)
+    sigma_b_Tau = pm.Exponential("sigma_b_Tau", 1.0)
+    
+    mu_b_inter = pm.Normal("mu_b_inter", mu=0, sigma=1)
+    sigma_b_inter = pm.Exponential("sigma_b_inter", 1.0)
+    
+    # Random intercepts and slopes per parcel
+    a = pm.Normal("a", mu=mu_a, sigma=sigma_a, shape=len(parcels))
+    b_ABeta = pm.Normal("b_ABeta", mu=mu_b_ABeta, sigma=sigma_b_ABeta, shape=len(parcels))
+    b_Tau = pm.Normal("b_Tau", mu=mu_b_Tau, sigma=sigma_b_Tau, shape=len(parcels))
+    b_inter = pm.Normal("b_inter", mu=mu_b_inter, sigma=sigma_b_inter, shape=len(parcels))
+    
+    # Expected value
+    mu = (
+        a[parcel_idx] +
+        b_ABeta[parcel_idx] * df_cohort["ABeta_local"].values +
+        b_Tau[parcel_idx] * df_cohort["Tau_local"].values +
+        b_inter[parcel_idx] * df_cohort["ABeta_local"].values * df_cohort["Tau_local"].values
+    )
+    
+    # Likelihood
+    sigma = pm.Exponential("sigma", 1.0)
+    FDT_obs = pm.Normal("FDT_obs", mu=mu, sigma=sigma, observed=df_cohort["FDT_I"].values)
+    
+    # Sample
+    trace = pm.sample(2000, tune=1000, target_accept=0.95, cores=2)
+
+# Summarize posterior
+az.summary(trace, var_names=["mu_a","mu_b_ABeta","mu_b_Tau","mu_b_inter"])
