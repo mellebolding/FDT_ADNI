@@ -36,6 +36,7 @@ from nilearn import surface, datasets, plotting
 import nibabel as nib
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
+import ADNI_A
 
 ### Loads data from npz file ######################################
 def load_appended_records(filepath, filters=None, verbose=False):
@@ -689,6 +690,33 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS,a=False):
     view.save_as_html(f'surface_plot_{name}_N{NPARCELLS}_{NOISE_TYPE}_a{a}.html')
     view
 
+def load_PET_data(NPARCELLS):
+    DL = ADNI_A.ADNI_A()
+    HC_IDs = DL.get_groupSubjects('HC')
+    MCI_IDs = DL.get_groupSubjects('MCI')
+    AD_IDs = DL.get_groupSubjects('AD')
+    HC_ABeta = []
+    HC_Tau = []
+    MCI_ABeta = []
+    MCI_Tau = []
+    AD_ABeta = []
+    AD_Tau = []
+    for subject in HC_IDs:
+        data = DL.get_subjectData(subject,printInfo=False)
+        HC_ABeta.append(np.vstack(data[subject]['ABeta'])) 
+        HC_Tau.append(np.vstack(data[subject]['Tau']))
+    for subject in MCI_IDs:
+        data = DL.get_subjectData(subject,printInfo=False)
+        MCI_ABeta.append(np.vstack(data[subject]['ABeta']))
+        MCI_Tau.append(np.vstack(data[subject]['Tau']))
+    for subject in AD_IDs:
+        data = DL.get_subjectData(subject,printInfo=False)
+        AD_ABeta.append(np.vstack(data[subject]['ABeta']))
+        AD_Tau.append(np.vstack(data[subject]['Tau']))
+    ABeta_burden = [np.array(HC_ABeta)[:,:NPARCELLS,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
+    Tau_burden = [np.array(HC_Tau)[:,:NPARCELLS,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
+    return ABeta_burden, Tau_burden
+
 # Dictionary mapping parcel indices (1-based) to their names
 Parcel_names = {
     1: "Right_V1", 2: "Right_MST", 3: "Right_V6", 4: "Right_V2", 5: "Right_V3", 6: "Right_V4", 7: "Right_V8",
@@ -792,6 +820,7 @@ I_tmax_sub = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level
 I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "subject"})), axis=0)
 I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 X_norm2_sub = np.squeeze(np.array(get_field(all_values, "X_Inorm2", filters={"level": "subject"})), axis=0)
+ABeta_burden, Tau_burden = load_PET_data(NPARCELLS)
 
 #print("a_sub: ", min(a_values_sub[0][0,:]), max(a_values_sub[0][0,:]))
 #print("a_sub_org: ", a_original_sub[0].shape)
@@ -966,80 +995,23 @@ if A_FITTING:
     ax.legend(groups)
 
     plt.tight_layout()
-    plt.show()
+    #plt.show()
 
-# import numpy as np
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# from sklearn.decomposition import PCA
-# from sklearn.model_selection import cross_val_score, StratifiedKFold
-# from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-# from scipy.stats import f_oneway
+dfs = []
+for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, I_norm1_sub)):
+    nsub, nparcel = AB.shape
+    # Make a dataframe in "long" format
+    df_cohort = pd.DataFrame({
+        "subject": np.repeat([f"C{cohort_idx}_S{i}" for i in range(nsub)], nparcel),
+        "parcel": np.tile(np.arange(nparcel), nsub),
+        "ABeta_local": AB.ravel(),
+        "Tau_local": Tau.ravel(),
+        "FDT_I": FDTI.ravel(),
+        "cohort": cohort_idx
+    })
+    dfs.append(df_cohort)
 
-# # Assume you have already computed the top 18 parcels:
-# # e.g., top_parcel_indices = [list of 18 indices]
+# Combine all cohorts
+df = pd.concat(dfs, ignore_index=True)
 
-# # Select only those parcels
-# X_top18 = I_tmax_sub[:, :, top_parcels]  # shape: (3, n_subs, 18)
-
-# # Reshape to (n_subjects, n_parcels)
-# n_groups, n_subs, n_parcels = X_top18.shape
-
-# X = X_top18.reshape(-1, n_parcels)  # (total_subjects, 18)
-# # Remove any subject (row) that has NaN in any of the top 18 parcels
-# mask = ~np.isnan(X).any(axis=1)
-# X = X[mask]
-
-
-# # Create group labels
-# groupss = np.array([[g]*n_subs for g in groups]).flatten()  # length = total_subjects
-# groupss = groupss[mask]
-# # -----------------
-# # PCA for visualization
-# # -----------------
-# from sklearn.decomposition import PCA
-# import matplotlib.pyplot as plt
-
-# pca = PCA(n_components=2)
-# X_pca = pca.fit_transform(X)
-
-# plt.figure(figsize=(8,6))
-# colors = {'HC':'tab:blue', 'MCI':'tab:orange', 'AD':'tab:green'}
-# for g in np.unique(groupss):
-#     idx = groupss == g
-#     plt.scatter(X_pca[idx,0], X_pca[idx,1], label=g, color=colors[g], alpha=0.7)
-# plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]*100:.1f}%)")
-# plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]*100:.1f}%)")
-# plt.title("PCA on top 18 parcels by group difference")
-# plt.legend()
-# plt.tight_layout()
-# plt.show()
-
-# # -----------------
-# # ANOVA per parcel
-# # -----------------
-# from scipy.stats import f_oneway
-# parcel_names_top18 = [Parcel_names[i] for i in top_parcels]  # actual names
-
-# anova_results = []
-# for i in range(n_parcels):
-#     vals_per_group = [X_top18[g, :, i] for g in range(n_groups)]
-#     f_val, p_val = f_oneway(*vals_per_group)
-#     anova_results.append((parcel_names_top18[i], f_val, p_val))
-
-# anova_df = pd.DataFrame(anova_results, columns=["Parcel", "F-value", "p-value"])
-# anova_df.sort_values("p-value", inplace=True)
-# print("\nTop parcels by ANOVA p-value:")
-# print(anova_df)
-
-# # -----------------
-# # LDA classification
-# # -----------------
-# from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-# from sklearn.model_selection import cross_val_score, StratifiedKFold
-
-# clf = LDA()
-# cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-# scores = cross_val_score(clf, X, groupss, cv=cv)
-
-# print(f"\nLDA classification accuracy (5-fold CV): {np.mean(scores)*100:.2f}% ± {np.std(scores)*100:.2f}%")
+print(df.head())
