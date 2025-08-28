@@ -1028,43 +1028,57 @@ import statsmodels.formula.api as smf
 # print(results.summary())
 import pymc as pm
 import arviz as az
+import pymc as pm
+import pytensor.config as ptconfig
 
-parcel_idx, parcels = pd.factorize(df_cohort["parcel"])
+# -----------------------------
+# Force Python mode compilation
+ptconfig.mode = "FAST_COMPILE"
+ptconfig.exception_verbosity = "high"
+# -----------------------------
+
+# Example data: df with columns:
+# 'subject', 'parcel', 'FDT_I', 'ABeta_local', 'Tau_local', 'ABeta_global', 'Tau_global'
+# Make sure your df is already prepared like before
+# df = pd.concat(df_list, ignore_index=True)
+
+subjects = df["subject"].unique()
+n_subjects = len(subjects)
+n_parcels = df["parcel"].nunique()
+
+# Map subjects to integer indices
+subject_idx = df["subject"].astype("category").cat.codes.values
 
 with pm.Model() as hierarchical_model:
-    # Hyperpriors for intercepts and slopes
+    # Hyperpriors for random intercepts
     mu_a = pm.Normal("mu_a", mu=0, sigma=1)
-    sigma_a = pm.Exponential("sigma_a", 1.0)
-    
-    mu_b_ABeta = pm.Normal("mu_b_ABeta", mu=0, sigma=1)
-    sigma_b_ABeta = pm.Exponential("sigma_b_ABeta", 1.0)
-    
-    mu_b_Tau = pm.Normal("mu_b_Tau", mu=0, sigma=1)
-    sigma_b_Tau = pm.Exponential("sigma_b_Tau", 1.0)
-    
-    mu_b_inter = pm.Normal("mu_b_inter", mu=0, sigma=1)
-    sigma_b_inter = pm.Exponential("sigma_b_inter", 1.0)
-    
-    # Random intercepts and slopes per parcel
-    a = pm.Normal("a", mu=mu_a, sigma=sigma_a, shape=len(parcels))
-    b_ABeta = pm.Normal("b_ABeta", mu=mu_b_ABeta, sigma=sigma_b_ABeta, shape=len(parcels))
-    b_Tau = pm.Normal("b_Tau", mu=mu_b_Tau, sigma=sigma_b_Tau, shape=len(parcels))
-    b_inter = pm.Normal("b_inter", mu=mu_b_inter, sigma=sigma_b_inter, shape=len(parcels))
+    sigma_a = pm.HalfNormal("sigma_a", sigma=1)
+
+    # Random intercept per subject
+    a_subject = pm.Normal("a_subject", mu=mu_a, sigma=sigma_a, shape=n_subjects)
+
+    # Fixed effects
+    beta_ABeta_local = pm.Normal("beta_ABeta_local", mu=0, sigma=1)
+    beta_Tau_local = pm.Normal("beta_Tau_local", mu=0, sigma=1)
+    beta_inter = pm.Normal("beta_ABeta_Tau", mu=0, sigma=1)
+    beta_ABeta_global = pm.Normal("beta_ABeta_global", mu=0, sigma=1)
+    beta_Tau_global = pm.Normal("beta_Tau_global", mu=0, sigma=1)
     
     # Expected value
     mu = (
-        a[parcel_idx] +
-        b_ABeta[parcel_idx] * df_cohort["ABeta_local"].values +
-        b_Tau[parcel_idx] * df_cohort["Tau_local"].values +
-        b_inter[parcel_idx] * df_cohort["ABeta_local"].values * df_cohort["Tau_local"].values
+        a_subject[subject_idx]
+        + beta_ABeta_local * df["ABeta_local"].values
+        + beta_Tau_local * df["Tau_local"].values
+        + beta_inter * df["ABeta_local"].values * df["Tau_local"].values
+        + beta_ABeta_global * df["ABeta_global"].values
+        + beta_Tau_global * df["Tau_global"].values
     )
-    
-    # Likelihood
-    sigma = pm.Exponential("sigma", 1.0)
-    FDT_obs = pm.Normal("FDT_obs", mu=mu, sigma=sigma, observed=df_cohort["FDT_I"].values)
-    
-    # Sample
-    trace = pm.sample(2000, tune=1000, target_accept=0.95, cores=2)
 
+    # Likelihood
+    sigma_y = pm.HalfNormal("sigma_y", sigma=1)
+    FDT_obs = pm.Normal("FDT_obs", mu=mu, sigma=sigma_y, observed=df["FDT_I"].values)
+
+    # Sample
+    trace = pm.sample(1000, tune=1000, target_accept=0.9, cores=2, progressbar=True)
 # Summarize posterior
 az.summary(trace, var_names=["mu_a","mu_b_ABeta","mu_b_Tau","mu_b_inter"])
