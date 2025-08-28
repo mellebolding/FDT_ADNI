@@ -634,6 +634,8 @@ predicted_a = out["predicted_a"]
 predicted_a_group = out["predicted_a_group"]
 print("a (subject):", predicted_a.shape)
 print("a_group :", predicted_a_group.shape)
+print("a_diff group: ", predicted_a_group - np.array(a_list_group)[:, None])
+print("a_diff sub: ", predicted_a - np.vstack(a_list_sub))
 
 results = out["results"]
 coef_matrix = out["coef_matrix"]
