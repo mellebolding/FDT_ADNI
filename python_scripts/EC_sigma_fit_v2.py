@@ -554,6 +554,7 @@ for COND in range(3):
     error_iter_sub = np.ones((len(ID), 200)) * np.nan
 
     f_diff = calc_H_freq(ts_gr, 3000, filterps.FiltPowSpetraVersion.v2021)[1]
+    f_diff = f_diff[:,:NPARCELLS] # frequencies of subjects
 
 
     for sub in range(len(ID)):
