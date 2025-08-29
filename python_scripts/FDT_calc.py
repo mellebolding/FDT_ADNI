@@ -143,7 +143,6 @@ def FDT_group_Itmax_norm1_norm2(sigma_group, Ceff_group, omega, a_param, gconst=
         D = np.diag(sigma_group_2**2 * np.ones(2*Ndim))
         V_0 = solve_continuous_lyapunov(Gamma, D)
 
-
         I_tmax_s0 = Its_Langevin_ND(Gamma, sigma_group_2, V_0, tmax, ts0)[0:Ndim]
 
 
@@ -234,10 +233,10 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
     return intR_tmax_s0_subject, intRnorm1_tmax_s0_subject, intRnorm2_tmax_s0_subject
 ####################################################################
 
-NPARCELLS = 20
+NPARCELLS = 379
 
 NOISE_TYPE = "HOMO"
-A_FITTING = False
+A_FITTING = True
 if A_FITTING:
     all_records = load_appended_records(
     filepath=os.path.join(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
