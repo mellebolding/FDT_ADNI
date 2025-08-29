@@ -570,6 +570,7 @@ for COND in range(3):
         SC_N = SCs[subj_id][:NPARCELLS, :NPARCELLS]
         SC_N /= np.max(SC_N)
         SC_N *= 0.2
+        print("sig group: ", sigma_group)
         if SIGMA_FITTING: sigma_ini = sigma_group[COND].copy()
 
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
