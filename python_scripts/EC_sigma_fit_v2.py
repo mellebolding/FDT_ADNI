@@ -15,42 +15,40 @@ sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 base_folder = os.path.join(repo_root, 'ADNI-A_DATA')
 connectome_dir = os.path.join(base_folder, 'connectomes')
 results_dir = os.path.join(repo_root, 'Result_plots')
-ECgroup_subfolder = os.path.join(results_dir, 'EC_group')
+#ECgroup_subfolder = os.path.join(results_dir, 'EC_group')
 Ceff_sigma_subfolder = os.path.join(results_dir, 'Ceff_sigma_results')
-ECsub_subfolder = os.path.join(results_dir, 'EC_sub')
-FCgroup_subfolder = os.path.join(results_dir, 'FC_group')
-FCsub_subfolder = os.path.join(results_dir, 'FC_sub')
-sigma_subfolder = os.path.join(results_dir, 'sig_sub')
-sigma_group_subfolder = os.path.join(results_dir, 'sig_group')
-FDT_parcel_subfolder = os.path.join(results_dir, 'FDT_parcel')
-FDT_subject_subfolder = os.path.join(results_dir, 'FDT_sub')
-Inorm1_group_subfolder = os.path.join(results_dir, 'Inorm1_group')
-Inorm2_group_subfolder = os.path.join(results_dir, 'Inorm2_group')
-Inorm1_sub_subfolder = os.path.join(results_dir, 'Inorm1_sub')
-Inorm2_sub_subfolder = os.path.join(results_dir, 'Inorm2_sub')
-training_dir = os.path.join(results_dir, 'training_conv')
+#ECsub_subfolder = os.path.join(results_dir, 'EC_sub')
+#FCgroup_subfolder = os.path.join(results_dir, 'FC_group')
+#FCsub_subfolder = os.path.join(results_dir, 'FC_sub')
+#sigma_subfolder = os.path.join(results_dir, 'sig_sub')
+#sigma_group_subfolder = os.path.join(results_dir, 'sig_group')
+#FDT_parcel_subfolder = os.path.join(results_dir, 'FDT_parcel')
+#FDT_subject_subfolder = os.path.join(results_dir, 'FDT_sub')
+#Inorm1_group_subfolder = os.path.join(results_dir, 'Inorm1_group')
+#Inorm2_group_subfolder = os.path.join(results_dir, 'Inorm2_group')
+#Inorm1_sub_subfolder = os.path.join(results_dir, 'Inorm1_sub')
+#Inorm2_sub_subfolder = os.path.join(results_dir, 'Inorm2_sub')
+#training_dir = os.path.join(results_dir, 'training_conv')
 error_fitting_group_subfolder = os.path.join(results_dir, 'error_fitting_group')
 error_fitting_sub_subfolder = os.path.join(results_dir, 'error_fitting_sub')
 os.makedirs(results_dir, exist_ok=True)
-os.makedirs(ECgroup_subfolder, exist_ok=True)
-os.makedirs(ECsub_subfolder, exist_ok=True)
-os.makedirs(FCgroup_subfolder, exist_ok=True)
+# os.makedirs(ECgroup_subfolder, exist_ok=True)
+# os.makedirs(ECsub_subfolder, exist_ok=True)
+# os.makedirs(FCgroup_subfolder, exist_ok=True)
 os.makedirs(Ceff_sigma_subfolder, exist_ok=True)
-os.makedirs(FCsub_subfolder, exist_ok=True)
-os.makedirs(sigma_subfolder, exist_ok=True)
-os.makedirs(sigma_group_subfolder, exist_ok=True)
-os.makedirs(FDT_parcel_subfolder, exist_ok=True)
-os.makedirs(FDT_subject_subfolder, exist_ok=True)
-os.makedirs(Inorm1_group_subfolder, exist_ok=True)
-os.makedirs(Inorm2_group_subfolder, exist_ok=True)
-os.makedirs(Inorm1_sub_subfolder, exist_ok=True)
-os.makedirs(Inorm2_sub_subfolder, exist_ok=True)
-os.makedirs(training_dir, exist_ok=True)
+# os.makedirs(FCsub_subfolder, exist_ok=True)
+# os.makedirs(sigma_subfolder, exist_ok=True)
+# os.makedirs(sigma_group_subfolder, exist_ok=True)
+# os.makedirs(FDT_parcel_subfolder, exist_ok=True)
+# os.makedirs(FDT_subject_subfolder, exist_ok=True)
+# os.makedirs(Inorm1_group_subfolder, exist_ok=True)
+# os.makedirs(Inorm2_group_subfolder, exist_ok=True)
+# os.makedirs(Inorm1_sub_subfolder, exist_ok=True)
+# os.makedirs(Inorm2_sub_subfolder, exist_ok=True)
+# os.makedirs(training_dir, exist_ok=True)
 os.makedirs(error_fitting_group_subfolder, exist_ok=True)
 os.makedirs(error_fitting_sub_subfolder, exist_ok=True)
 
-import os
-import sys
 from functions_FDT_numba_v9 import *
 import scipy.io
 import numpy as np
@@ -358,9 +356,9 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-NPARCELLS = 17 #tot: 379
+NPARCELLS = 19 #tot: 379
 CEFF_FITTING = True
-SIGMA_FITTING = False
+SIGMA_FITTING = True
 A_FITTING = True
 
 
