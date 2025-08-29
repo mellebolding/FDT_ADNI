@@ -424,6 +424,7 @@ tfinal = 200
 dt = 0.01
 times = np.arange(t0, tfinal+dt, dt)
 sigma_mean = 0.45
+sigma_ini = sigma_mean * np.ones(NPARCELLS)
 if SIGMA_FITTING: NOISE_TYPE = 'hetero'
 else: NOISE_TYPE = 'homo'
 COMPETITIVE_COUPLING = False
@@ -463,6 +464,7 @@ AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
 ####### Group level #######
 TSemp_zsc_list = [] # store the zscored TS for each group
 Ceff_group_list = [] # store the fitted Ceff for each group
+sigma_group_list = [] # store the fitted sigma for each group
 for COND in range(3):
     if COND == 0: ## --> HC
         f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
@@ -497,7 +499,6 @@ for COND in range(3):
     SC_N /= np.max(SC_N)
     SC_N *= 0.2
     Ceff_ini = SC_N.copy()
-    sigma_ini = sigma_mean * np.ones(NPARCELLS)
 
     start_time = time.time()
     Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
@@ -514,6 +515,7 @@ for COND in range(3):
     ## save the results
     a_list_group.append(a_group)
     Ceff_group_list.append(Ceff_group)
+    sigma_group_list.append(sigma_group)
 
     append_record_to_npz(
     Ceff_sigma_subfolder,
@@ -545,7 +547,7 @@ for COND in range(3):
         ID = AD_IDs
         SCs = AD_SC
 
-    sigma_ini = sigma_mean * np.ones(NPARCELLS)
+    if SIGMA_FITTING: sigma_ini = sigma_group[COND].copy()
     Ceff_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     sigma_sub = np.zeros((len(ID), NPARCELLS))
     a_sub = np.zeros((len(ID), NPARCELLS))
@@ -564,8 +566,6 @@ for COND in range(3):
         SC_N /= np.max(SC_N)
         SC_N *= 0.2
 
-        #TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
-        print("shapes:, ", TSemp_zsc_list[COND][sub].shape, SC_N.shape, f_diff[sub].shape, sigma_ini.shape)
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
                                             LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
@@ -576,37 +576,7 @@ for COND in range(3):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
-        #print(f"errors sub{sub}: ", error_iter_sub_aux[-1], errorFC_iter_sub_aux[-1], errorCOVtau_iter_sub_aux[-1])
-        figure_name = f"error_iter_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
-        save_path = os.path.join(training_dir, figure_name)
-        plt.figure()
-        plt.plot(np.arange(1, len(error_iter_sub[sub]) + 1) * 100, error_iter_sub[sub], 'o-', label='error @100 iter')
-        plt.xlabel('iter')
-        plt.legend()
-
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.close() 
-
-        fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
-        save_path = os.path.join(FCsub_subfolder, fig_name)
-        plot_FC_matrices(FCemp_sub[sub], FCsim_sub[sub], title1=f"FCemp sub.{sub+1}", title2=f"FCsim sub.{sub+1}", save_path=save_path, size=1, dpi=300)
-        fig_name = f"ECmatrix_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
-        save_path = os.path.join(ECsub_subfolder, fig_name)
-        plot_FC_matrix(Ceff_sub[sub], title=f"Ceff fitted sub. {sub+1}", save_path=save_path, size=1.1, dpi=300)
-
-        fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
-        save_path = os.path.join(sigma_subfolder, fig_name)
-        plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
-        plt.plot(range(1, NPARCELLS + 1), sigma_group, '.-', color='tab:blue', alpha=1, lw=2, label='sigma fit normalized (group)')
-        plt.plot(range(1, NPARCELLS + 1), sigma_sub[sub], '.-', color='tab:red', alpha=1, label=f'sigma fit normalized (sub. {sub+1})')
-        plt.axhline(np.mean(sigma_sub[sub]), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_sub[sub]):.5f}')
-        plt.xlabel('Parcels')
-        ticks = np.arange(1, NPARCELLS + 1)
-        labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
-        plt.xticks(ticks, labels)
-        plt.legend()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.close()
+    
 
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
