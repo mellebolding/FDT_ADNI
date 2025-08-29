@@ -593,8 +593,8 @@ for COND in range(3):
         sigma=sigma_sub[sub],
         Ceff=Ceff_sub[sub],
         omega=omega)
-        print("shape sigma: ", sigma_sub[sub].shape, sigma_ini.shape)
-        show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
+        print("shape sigma: ", sigma_sub[sub].shape, sigma_ini)
+        show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini[COND], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
     a_list_sub.append(np.array(a_list_sub_temp))
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
