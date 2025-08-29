@@ -351,7 +351,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, Ceff, sigma, sigma_in
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-NPARCELLS = 19 #tot: 379
+NPARCELLS = 16 #tot: 379
 CEFF_FITTING = True
 SIGMA_FITTING = False
 A_FITTING = True
@@ -529,52 +529,22 @@ for COND in range(3):
 
 ### subject level
 Ceff_means = []
-for i in range(1,4):
-    COND = i
+for COND in range(3):
     a_list_sub_temp = []
     Ceff_sub_temp = []
-    if COND == 1: ## --> HC
-        #f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+    if COND == 0: ## --> HC
         ts_gr = HC_MRI
         ID = HC_IDs
         SCs = HC_SC
-
-    elif COND == 2: ## --> MCI
-        #f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+    elif COND == 1: ## --> MCI
         ts_gr = MCI_MRI
         ID = MCI_IDs
         SCs = MCI_SC
-
-    elif COND == 3: ## --> AD
-        #f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)
+    elif COND == 2: ## --> AD
         ts_gr = AD_MRI
         ID = AD_IDs
         SCs = AD_SC
 
-    # min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
-    # ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    # for sub in range(len(ID)):
-    #     subj_id = ID[sub]
-    #     ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
-    # TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
-    # TSemp_fit_group = np.zeros((len(ID), NPARCELLS, min_ntimes))
-    # TSemp_fit_group = TSemp_zsc[:,:NPARCELLS, :].copy()
-
-    # TSemp_fit_subs = []
-    # for sub in range(len(ID)):
-    #     subj_id = ID[sub]
-    #     subj_ts = ts_gr[subj_id][:min_ntimes, :NPARCELLS].T.copy()
-
-    #     # z-score **per subject** (individually, not across group)
-    #     subj_zsc = zscore_time_series(subj_ts[np.newaxis, :, :], 
-    #                                 mode='global', detrend=True)[0, :, :]
-
-    #     TSemp_fit_subs.append(subj_zsc)
-
-    # TSemp_fit_sub = np.array(TSemp_fit_subs)  # shape: (n_subjects, NPARCELLS, min_ntimes)
-
-
-    sigma_ini = sigma_mean * np.ones(NPARCELLS)
     Ceff_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
     sigma_sub = np.zeros((len(ID), NPARCELLS))
     a_sub = np.zeros((len(ID), NPARCELLS))
@@ -583,20 +553,17 @@ for i in range(1,4):
     error_iter_sub = np.ones((len(ID), 200)) * np.nan
 
     f_diff = calc_H_freq(ts_gr, 3000, filterps.FiltPowSpetraVersion.v2021)[1]
-    f_diff = f_diff[:,:NPARCELLS]  # frequencies of subjects
 
 
     for sub in range(len(ID)):
         subj_id = ID[sub]
-        omega = 2 * np.pi * f_diff[sub,:] # omega per subject
+        omega = 2 * np.pi * f_diff[sub,:NPARCELLS] # omega per subject
         SC_N = SCs[subj_id][:NPARCELLS, :NPARCELLS]
         SC_N /= np.max(SC_N)
         SC_N *= 0.2
-
-        #TSemp_fit_sub = TSemp_zsc[sub, :, :].copy()  # time series for the subject
         
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
-                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND-1][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
+                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_group, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=False, sigma_reset=sigma_reset,fit_a=A_FITTING,
                                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma*10, epsCOVtau_sigma=epsCOVtau_sigma*10,
@@ -605,37 +572,7 @@ for i in range(1,4):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
-        #print(f"errors sub{sub}: ", error_iter_sub_aux[-1], errorFC_iter_sub_aux[-1], errorCOVtau_iter_sub_aux[-1])
-        figure_name = f"error_iter_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub}_{NOISE_TYPE}.png"
-        save_path = os.path.join(training_dir, figure_name)
-        plt.figure()
-        plt.plot(np.arange(1, len(error_iter_sub[sub]) + 1) * 100, error_iter_sub[sub], 'o-', label='error @100 iter')
-        plt.xlabel('iter')
-        plt.legend()
-
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.close() 
-
-        fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
-        save_path = os.path.join(FCsub_subfolder, fig_name)
-        plot_FC_matrices(FCemp_sub[sub], FCsim_sub[sub], title1=f"FCemp sub.{sub+1}", title2=f"FCsim sub.{sub+1}", save_path=save_path, size=1, dpi=300)
-        fig_name = f"ECmatrix_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
-        save_path = os.path.join(ECsub_subfolder, fig_name)
-        plot_FC_matrix(Ceff_sub[sub], title=f"Ceff fitted sub. {sub+1}", save_path=save_path, size=1.1, dpi=300)
-
-        fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_sub_{sub+1}_{NOISE_TYPE}.png"
-        save_path = os.path.join(sigma_subfolder, fig_name)
-        plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
-        plt.plot(range(1, NPARCELLS + 1), sigma_group, '.-', color='tab:blue', alpha=1, lw=2, label='sigma fit normalized (group)')
-        plt.plot(range(1, NPARCELLS + 1), sigma_sub[sub], '.-', color='tab:red', alpha=1, label=f'sigma fit normalized (sub. {sub+1})')
-        plt.axhline(np.mean(sigma_sub[sub]), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_sub[sub]):.5f}')
-        plt.xlabel('Parcels')
-        ticks = np.arange(1, NPARCELLS + 1)
-        labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
-        plt.xticks(ticks, labels)
-        plt.legend()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.close()
+        show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, Ceff_sub[sub], sigma_sub[sub], sigma_group, a_sub[sub], FCemp_sub[sub])
 
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
