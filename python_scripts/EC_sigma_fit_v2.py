@@ -576,8 +576,6 @@ for COND in range(3):
                                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
-    
-
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
         append_record_to_npz(
@@ -589,6 +587,8 @@ for COND in range(3):
         sigma=sigma_sub[sub],
         Ceff=Ceff_sub[sub],
         omega=omega)
+
+        show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, Ceff_sub[sub], sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub])
     a_list_sub.append(np.array(a_list_sub_temp))
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
@@ -625,5 +625,3 @@ append_record_to_npz(
         level="group",
         a = predicted_a_group,
         original_a = np.array(a_list_group))
-
-
