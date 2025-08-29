@@ -570,7 +570,6 @@ for COND in range(3):
         SC_N = SCs[subj_id][:NPARCELLS, :NPARCELLS]
         SC_N /= np.max(SC_N)
         SC_N *= 0.2
-        print("sig group: ", sigma_group_list)
         if SIGMA_FITTING: sigma_ini = sigma_group_list[COND].copy()
 
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
@@ -594,7 +593,6 @@ for COND in range(3):
         sigma=sigma_sub[sub],
         Ceff=Ceff_sub[sub],
         omega=omega)
-        print("shape sigma: ", sigma_sub[sub].shape, sigma_ini)
         show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
     a_list_sub.append(np.array(a_list_sub_temp))
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
