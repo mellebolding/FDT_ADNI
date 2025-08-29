@@ -29,7 +29,8 @@ Inorm2_group_subfolder = os.path.join(results_dir, 'Inorm2_group')
 Inorm1_sub_subfolder = os.path.join(results_dir, 'Inorm1_sub')
 Inorm2_sub_subfolder = os.path.join(results_dir, 'Inorm2_sub')
 training_dir = os.path.join(results_dir, 'training_conv')
-error_fitting_subfolder = os.path.join(results_dir, 'error_fitting')
+error_fitting_group_subfolder = os.path.join(results_dir, 'error_fitting_group')
+error_fitting_sub_subfolder = os.path.join(results_dir, 'error_fitting_sub')
 os.makedirs(results_dir, exist_ok=True)
 os.makedirs(ECgroup_subfolder, exist_ok=True)
 os.makedirs(ECsub_subfolder, exist_ok=True)
@@ -45,7 +46,8 @@ os.makedirs(Inorm2_group_subfolder, exist_ok=True)
 os.makedirs(Inorm1_sub_subfolder, exist_ok=True)
 os.makedirs(Inorm2_sub_subfolder, exist_ok=True)
 os.makedirs(training_dir, exist_ok=True)
-os.makedirs(error_fitting_subfolder, exist_ok=True)
+os.makedirs(error_fitting_group_subfolder, exist_ok=True)
+os.makedirs(error_fitting_sub_subfolder, exist_ok=True)
 
 import os
 import sys
@@ -292,14 +294,15 @@ def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
         "results": results
     }
 
-def show_error(error_iter, errorFC_iter, errorCOVtau_iter, Ceff, sigma, sigma_ini, a, FCemp):
+def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, FCemp, FCsim, label):
     
     # want to give an indication of the fitting quality
     # options to show: final error, FC fit, COVtau fit, sigma fit, a fit
     
     if error_iter is not None:
-        figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
-        save_path = os.path.join(error_fitting_subfolder, figure_name)
+        figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+        if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, figure_name)
+        else: save_path = os.path.join(error_fitting_sub_subfolder, figure_name)
         plt.figure(figsize=(8,5))
         plt.plot(np.arange(1, len(error_iter) + 1) * 100, error_iter, 'o-', color='tab:blue', label='Error @100 iter')
         plt.plot(np.arange(1, len(errorFC_iter) + 1) * 100, errorFC_iter, 's-', color='tab:orange', label='Error FC @100 iter')
@@ -314,16 +317,19 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, Ceff, sigma, sigma_in
         
 
     ## plotting the FC and Ceff matrices
-    fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
-    save_path = os.path.join(error_fitting_subfolder, fig_name)
-    plot_FC_matrices(FCemp, Ceff, title1="group FCemp", title2="Ceff", save_path=save_path, size=1, dpi=300)
-    fig_name = f"Diff_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
-    save_path = os.path.join(error_fitting_subfolder, fig_name)
-    plot_FC_matrix(Ceff-FCemp, title="diff Ceff-FCemp", size=1.1, save_path=save_path,dpi=300)
+    fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+    if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
+    else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
+    plot_FC_matrices(FCemp, FCsim, title1="FCemp", title2="FCsim", save_path=save_path, size=1, dpi=300)
+    fig_name = f"Diff_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+    if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
+    else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
+    plot_FC_matrix(FCsim-FCemp, title="diff FCsim-FCemp", size=1.1, save_path=save_path,dpi=300)
 
 ## plot the sigma
-    fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
-    save_path = os.path.join(error_fitting_subfolder, fig_name)
+    fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+    if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
+    else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), sigma_ini, '.--', color='gray', alpha=0.5, label='Initial guess')
     plt.plot(range(1, NPARCELLS+1), sigma, '.-', color='tab:blue', alpha=1, label='sigma fit normalized')
@@ -337,12 +343,13 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, Ceff, sigma, sigma_in
     plt.close()
 
     a_ini = -0.02 * np.ones(NPARCELLS)
-    fig_name = f"bifur_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
-    save_path = os.path.join(error_fitting_subfolder, fig_name)
+    fig_name = f"bifur_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+    if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
+    else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), a_ini, '.--', color='gray', alpha=0.5, label='Initial value')
     plt.plot(range(1, NPARCELLS+1), a, '.-', color='tab:blue', alpha=1, label='a fit normalized')
-    plt.axhline(np.mean(sigma), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_group):.5f}')
+    plt.axhline(np.mean(a), color='tab:red', linestyle='--', label=f'{np.mean(a):.5f}')
     plt.xlabel('Parcels')
     ticks = np.arange(1, NPARCELLS + 1)
     labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
@@ -351,7 +358,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, Ceff, sigma, sigma_in
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-NPARCELLS = 16 #tot: 379
+NPARCELLS = 17 #tot: 379
 CEFF_FITTING = True
 SIGMA_FITTING = False
 A_FITTING = True
@@ -526,7 +533,7 @@ for COND in range(3):
     Ceff=Ceff_group,
     omega=omega)
 
-    show_error(error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, Ceff_group, sigma_group, sigma_ini, a_group, FCemp_group)
+    show_error(error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, sigma_group, sigma_ini, a_group, FCemp_group, FCsim_group, label="group")
 
 
 ### subject level
@@ -588,7 +595,7 @@ for COND in range(3):
         Ceff=Ceff_sub[sub],
         omega=omega)
 
-        show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, Ceff_sub[sub], sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub])
+        show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
     a_list_sub.append(np.array(a_list_sub_temp))
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
