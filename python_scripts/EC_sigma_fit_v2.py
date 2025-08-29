@@ -599,6 +599,7 @@ for COND in range(3):
     a_list_sub.append(np.array(a_list_sub_temp))
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
+
 # for i in range(3):
 #     Ceff_group_list = np.array(Ceff_group_list)
 #     Ceff_means = np.array(Ceff_means)
