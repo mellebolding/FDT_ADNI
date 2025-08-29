@@ -12,7 +12,6 @@ sys.path.insert(0, repo_root)
 sys.path.insert(0, os.path.join(repo_root, 'support_files'))
 sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 
-
 base_folder = os.path.join(repo_root, 'ADNI-A_DATA')
 connectome_dir = os.path.join(base_folder, 'connectomes')
 results_dir = os.path.join(repo_root, 'Result_plots')
@@ -30,6 +29,7 @@ Inorm2_group_subfolder = os.path.join(results_dir, 'Inorm2_group')
 Inorm1_sub_subfolder = os.path.join(results_dir, 'Inorm1_sub')
 Inorm2_sub_subfolder = os.path.join(results_dir, 'Inorm2_sub')
 training_dir = os.path.join(results_dir, 'training_conv')
+error_fitting_subfolder = os.path.join(results_dir, 'error_fitting')
 os.makedirs(results_dir, exist_ok=True)
 os.makedirs(ECgroup_subfolder, exist_ok=True)
 os.makedirs(ECsub_subfolder, exist_ok=True)
@@ -45,6 +45,7 @@ os.makedirs(Inorm2_group_subfolder, exist_ok=True)
 os.makedirs(Inorm1_sub_subfolder, exist_ok=True)
 os.makedirs(Inorm2_sub_subfolder, exist_ok=True)
 os.makedirs(training_dir, exist_ok=True)
+os.makedirs(error_fitting_subfolder, exist_ok=True)
 
 import os
 import sys
@@ -291,6 +292,71 @@ def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
         "results": results
     }
 
+def show_error(error_iter, errorFC_iter, errorCOVtau_iter, Ceff, sigma, sigma_ini, a, FCemp):
+    
+    # want to give an indication of the fitting quality
+    # options to show: final error, FC fit, COVtau fit, sigma fit, a fit
+    
+    if error_iter is not None:
+        figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
+        save_path = os.path.join(error_fitting_subfolder, figure_name)
+        plt.figure(figsize=(8,5))
+        plt.plot(np.arange(1, len(error_iter) + 1) * 100, error_iter, 'o-', color='tab:blue', label='Error @100 iter')
+        plt.plot(np.arange(1, len(errorFC_iter) + 1) * 100, errorFC_iter, 's-', color='tab:orange', label='Error FC @100 iter')
+        plt.plot(np.arange(1, len(errorCOVtau_iter) + 1) * 100, errorCOVtau_iter, '^-', color='tab:green', label='Error COVtau @100 iter')
+        plt.xlabel('Iteration')
+        plt.ylabel('Error')
+        plt.title(f"Error Curves - Group {group_names[COND]}")
+        plt.legend(loc='upper right', fontsize=10)
+        plt.grid(True)
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+
+    ## plotting the FC and Ceff matrices
+    fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
+    save_path = os.path.join(error_fitting_subfolder, fig_name)
+    plot_FC_matrices(FCemp, Ceff, title1="group FCemp", title2="Ceff", save_path=save_path, size=1, dpi=300)
+    fig_name = f"Diff_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
+    save_path = os.path.join(error_fitting_subfolder, fig_name)
+    plot_FC_matrix(Ceff-FCemp, title="diff Ceff-FCemp", size=1.1, save_path=save_path,dpi=300)
+
+## plot the sigma
+    fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
+    save_path = os.path.join(error_fitting_subfolder, fig_name)
+    plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
+    plt.plot(range(1, NPARCELLS+1), sigma_ini, '.--', color='gray', alpha=0.5, label='Initial guess')
+    plt.plot(range(1, NPARCELLS+1), sigma, '.-', color='tab:blue', alpha=1, label='sigma fit normalized')
+    plt.axhline(np.mean(sigma), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_group):.5f}')
+    plt.xlabel('Parcels')
+    ticks = np.arange(1, NPARCELLS + 1)
+    labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
+    plt.xticks(ticks, labels)
+    plt.legend()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
+
+    a_ini = -0.02 * np.ones(NPARCELLS)
+    fig_name = f"bifur_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND]}_{NOISE_TYPE}.png"
+    save_path = os.path.join(error_fitting_subfolder, fig_name)
+    plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
+    plt.plot(range(1, NPARCELLS+1), a_ini, '.--', color='gray', alpha=0.5, label='Initial value')
+    plt.plot(range(1, NPARCELLS+1), a, '.-', color='tab:blue', alpha=1, label='a fit normalized')
+    plt.axhline(np.mean(sigma), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_group):.5f}')
+    plt.xlabel('Parcels')
+    ticks = np.arange(1, NPARCELLS + 1)
+    labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
+    plt.xticks(ticks, labels)
+    plt.legend()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
+
+NPARCELLS = 19 #tot: 379
+CEFF_FITTING = True
+SIGMA_FITTING = False
+A_FITTING = True
+
+
 ###### Loading the data ######
 DL = ADNI_A.ADNI_A()
 
@@ -298,7 +364,6 @@ DL = ADNI_A.ADNI_A()
 subdata = DL.get_subjectData('002_S_0413')
 SC = subdata['002_S_0413']['SC'] # Structural connectivity
 
-NPARCELLS = 379 #tot: 379
 # Loading the timeseries data for all subjects and dividing them into groups
 HC_IDs = DL.get_groupSubjects('HC')
 HC_MRI = {}
@@ -311,7 +376,6 @@ for subject in HC_IDs:
     HC_SC[subject] = data[subject]['SC']
     HC_ABeta.append(np.vstack(data[subject]['ABeta'])) 
     HC_Tau.append(np.vstack(data[subject]['Tau']))
-
 
 MCI_IDs = DL.get_groupSubjects('MCI')
 MCI_MRI = {}
@@ -337,8 +401,16 @@ for subject in AD_IDs:
     AD_ABeta.append(np.vstack(data[subject]['ABeta']))
     AD_Tau.append(np.vstack(data[subject]['Tau']))
 
-### Set conditions
+group_names = ['HC', 'MCI', 'AD']
+group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
 
+ABeta_burden = [np.array(HC_ABeta)[:,:NPARCELLS,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
+Tau_burden = [np.array(HC_Tau)[:,:NPARCELLS,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
+
+a_list_group = []
+a_list_sub = []
+
+### Set conditions
 Tau = 1
 TR = 2
 a_param = -0.02
@@ -352,9 +424,6 @@ tfinal = 200
 dt = 0.01
 times = np.arange(t0, tfinal+dt, dt)
 sigma_mean = 0.45
-CEFF_FITTING = True
-SIGMA_FITTING = False
-A_FITTING = True
 if SIGMA_FITTING: NOISE_TYPE = 'hetero'
 else: NOISE_TYPE = 'homo'
 COMPETITIVE_COUPLING = False
@@ -363,59 +432,51 @@ maxC = 0.2
 iter_check_group = 100
 fit_Ceff=CEFF_FITTING
 competitive_coupling=COMPETITIVE_COUPLING
-epsFC_Ceff = 4e-4
-epsCOVtau_Ceff = 1e-4
-
 fit_sigma=SIGMA_FITTING
 sigma_reset=False
-epsFC_sigma = 8e-5
-epsCOVtau_sigma = 3e-5
-    
-MAXiter = 10000
-error_tol = 1e-3
-patience = 5
-learning_rate_factor = 1.0
 Ceff_norm=CEFF_NORMALIZATION
 maxC=maxC
 iter_check=iter_check_group
 
-group_names = ['HC', 'MCI', 'AD']
-group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
-a_list_group = []
-a_list_sub = []
-cond_index_map = {'HC': 0, 'MCI': 1, 'AD': 2}
-I_FDT_all = np.full((3, NPARCELLS), np.nan)
-Inorm1_tmax_s0_group = np.zeros((3, NPARCELLS))
-Inorm2_tmax_s0_group = np.zeros((3, NPARCELLS))
+# Learning rate settings
+epsFC_Ceff = 4e-4
+epsCOVtau_Ceff = 1e-4
+epsFC_sigma = 8e-5
+epsCOVtau_sigma = 3e-5
+MAXiter = 10000
+error_tol = 1e-3
+patience = 5
+learning_rate_factor = 1.0
 
+# Clear the previous file
 clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
+
+# Calculate the mean SC matrices per group
 HC_SC_matrices = np.array(list(HC_SC.values()))
 HC_SC_avg = np.mean(HC_SC_matrices, axis=0)
 MCI_SC_matrices = np.array(list(MCI_SC.values()))  # Shape: (Nsubjects, NPARCELLS, NPARCELLS)
 MCI_SC_avg = np.mean(MCI_SC_matrices, axis=0)
 AD_SC_matrices = np.array(list(AD_SC.values()))  # Shape: (Nsubjects, NPARCELLS, NPARCELLS)
 AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
-ABeta_burden = [np.array(HC_ABeta)[:,:NPARCELLS,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
-Tau_burden = [np.array(HC_Tau)[:,:NPARCELLS,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
-#print(f"HC ABeta shape: {np.array(HC_ABeta).shape}")
 
-### Group level
-TSemp_zsc_list = []
-Ceff_group_list = []
-for COND in range(1,4):
-    if COND == 1: ## --> HC
+
+####### Group level #######
+TSemp_zsc_list = [] # store the zscored TS for each group
+Ceff_group_list = [] # store the fitted Ceff for each group
+for COND in range(3):
+    if COND == 0: ## --> HC
         f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
         ts_gr = HC_MRI
         ID = HC_IDs
         SC = HC_SC_avg  # Use the average SC of the HC group
 
-    elif COND == 2: ## --> MCI
+    elif COND == 1: ## --> MCI
         f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
         ts_gr = MCI_MRI
         ID = MCI_IDs
         SC = MCI_SC_avg  # Use the average SC of the MCI group
 
-    elif COND == 3: ## --> AD
+    elif COND == 2: ## --> AD
         f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
         ts_gr = AD_MRI
         ID = AD_IDs
@@ -449,44 +510,11 @@ for COND in range(1,4):
                                 Ceff_norm=Ceff_norm, maxC=maxC,
                                 iter_check=iter_check, plot_evol=False, plot_evol_last=False)
     end_time = time.time()
-    #print(f"Execution time group: {end_time - start_time:.4f} seconds")
-    #print("errors group: ", error_iter_group[-1], errorFC_iter_group[-1], errorCOVtau_iter_group[-1])
-    ## ploting the error iter
-    figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
-    save_path = os.path.join(training_dir, figure_name)
-    plt.figure()
-    plt.plot(np.arange(1, len(error_iter_group) + 1) * 100, error_iter_group, 'o-', label='error @100 iter')
-    plt.xlabel('iter')
-    plt.legend()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.close()
-
-    ## plotting the FC and Ceff matrices
-    fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
-    save_path = os.path.join(FCgroup_subfolder, fig_name)
-    plot_FC_matrices(FCemp_group, FCsim_group, title1="group FCemp", title2="group FCsim", save_path=save_path, size=1, dpi=300)
-    fig_name = f"ECmatrix_a{A_FITTING}_N{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
-    save_path = os.path.join(ECgroup_subfolder, fig_name)
-    plot_FC_matrix(Ceff_group, title="group Ceff fitted", size=1.1, save_path=save_path,dpi=300)
-
-    ## plot the sigma
-    fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_group_{group_names[COND - 1]}_{NOISE_TYPE}.png"
-    save_path = os.path.join(sigma_group_subfolder, fig_name)
-    plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
-    plt.plot(range(1, NPARCELLS+1), sigma_ini, '.--', color='gray', alpha=0.5, label='Initial guess')
-    plt.plot(range(1, NPARCELLS+1), sigma_group, '.-', color='tab:blue', alpha=1, label='sigma fit normalized')
-    plt.axhline(np.mean(sigma_group), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_group):.5f}')
-    plt.xlabel('Parcels')
-    ticks = np.arange(1, NPARCELLS + 1)
-    labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
-    plt.xticks(ticks, labels)
-    plt.legend()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.close()
-
+    
     ## save the results
     a_list_group.append(a_group)
     Ceff_group_list.append(Ceff_group)
+
     append_record_to_npz(
     Ceff_sigma_subfolder,
     f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
@@ -495,6 +523,8 @@ for COND in range(1,4):
     sigma=sigma_group,
     Ceff=Ceff_group,
     omega=omega)
+
+    show_error(error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, Ceff_group, sigma_group, sigma_ini, a_group, FCemp_group)
 
 
 ### subject level
