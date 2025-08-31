@@ -356,10 +356,10 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-NPARCELLS = 19 #tot: 379
+NPARCELLS = 379 #tot: 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
-A_FITTING = True
+A_FITTING = False
 
 
 ###### Loading the data ######
