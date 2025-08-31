@@ -885,7 +885,7 @@ RSNs = {
 if A_FITTING: 
     RSN_significance_group(I_norm2_group_a, a=A_FITTING)
     RSN_radar_plot(I_norm2_group_a, a=A_FITTING)
-RSN_significance_group(I_norm2_group, a=False)
+#RSN_significance_group(I_norm2_group, a=False)
 RSN_radar_plot(I_norm2_group, a=False)
 # plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
 # if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
