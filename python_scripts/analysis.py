@@ -212,6 +212,8 @@ def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False, sub=False):
         I_norm2_group = np.nanmean(I_norm2_group, axis=2)
         X_norm2_group = np.nanmean(X_norm2_group, axis=2)
 
+    print(I_norm2_group.shape, X_norm2_group.shape)
+
     for i, group in enumerate(group_names):
         x = I_norm2_group[i]
         y = X_norm2_group[i]
