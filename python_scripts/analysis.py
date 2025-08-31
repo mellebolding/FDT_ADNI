@@ -850,7 +850,7 @@ X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2
 
 I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
 I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
-if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_sub_a, a=True)
+if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_group_a, a=True)
 if A_FITTING: I_vs_Xnorm2(I_norm2_sub, X_norm2_sub,I_norm2_sub_a,X_norm2_sub_a, a=True, sub=True)
 # I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
 # print(I_norm2_select.shape, I_norm2_group.shape)
