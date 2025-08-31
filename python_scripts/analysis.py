@@ -793,8 +793,8 @@ Parcel_names = {
 ####################################################################
 
 NPARCELLS = 379
-NOISE_TYPE = "HETERO"
-A_FITTING = False
+NOISE_TYPE = "HOMO"
+A_FITTING = True
 all_values = None
 all_values_a = None
 if A_FITTING:
