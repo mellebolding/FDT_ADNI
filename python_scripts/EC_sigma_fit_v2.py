@@ -611,8 +611,8 @@ out = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
 predicted_a = out["predicted_a"]
 predicted_a_group = out["predicted_a_group"]
 
-print("a_diff group: ", predicted_a_group - np.array(a_list_group)[:, None])
-print("a_diff sub: ", predicted_a - np.vstack(a_list_sub))
+# print("a_diff group: ", predicted_a_group - np.array(a_list_group)[:, None])
+# print("a_diff sub: ", predicted_a - np.vstack(a_list_sub))
 
 results = out["results"]
 coef_matrix = out["coef_matrix"]
