@@ -814,7 +814,6 @@ if A_FITTING:
     a_original_group = np.squeeze(np.array(get_field(all_values_a, "original_a", filters={"level": "group"})))
     a_original_sub = get_field(all_values_a, "original_a", filters={"level": "subject"})[0][0]
 
-
 all_values = load_appended_records(
     filepath=os.path.join(FDT_values_subfolder, f"FDT_values_N{NPARCELLS}_{NOISE_TYPE}.npz")
 )
