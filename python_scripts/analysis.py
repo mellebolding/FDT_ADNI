@@ -793,7 +793,7 @@ Parcel_names = {
 ####################################################################
 
 NPARCELLS = 379
-NOISE_TYPE = "hetero"
+NOISE_TYPE = "HETERO"
 A_FITTING = False
 all_values = None
 all_values_a = None
