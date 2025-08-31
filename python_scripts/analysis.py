@@ -217,6 +217,9 @@ def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False, sub=False):
     for i, group in enumerate(group_names):
         x = I_norm2_group[i]
         y = X_norm2_group[i]
+        mask = ~np.isnan(x) & ~np.isnan(y)
+        x = x[mask]
+        y = y[mask]
 
         # scatter
         plt.scatter(x, y, color=colors[i], alpha=0.7)
