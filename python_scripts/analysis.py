@@ -200,7 +200,7 @@ def RSN_radar_plot(I_norm2_group, a=False):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False):
+def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False, sub=False):
     """
     Scatter plot: I_norm2_group (x-axis) vs X_norm2_group (y-axis) for each group,
     with a linear fit per group + slope and R² in legend.
@@ -208,6 +208,9 @@ def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False):
     group_names = ['HC', 'MCI', 'AD']
     colors = ['tab:blue', 'tab:orange', 'tab:green']
     plt.figure(figsize=(8, 6))
+    if sub: 
+        I_norm2_group = np.nanmean(I_norm2_group, axis=2)
+        X_norm2_group = np.nanmean(X_norm2_group, axis=2)
 
     for i, group in enumerate(group_names):
         x = I_norm2_group[i]
@@ -307,10 +310,6 @@ def I_vs_Xnorm22(I_norm2_group, X_norm2_group, a=False):
     plt.legend()
     plt.tight_layout()
     plt.show()
-
-
-
-
 
 
 def figures_I_tmax_norm1_norm2(group, subject,I_tmax, I_norm1, I_norm2,a=False):
@@ -837,6 +836,7 @@ I_norm2_select = np.array([I_norm2_sub[0,0,:], I_norm2_sub[1,0,:], I_norm2_sub[2
 X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
 
 # I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False)
+I_vs_Xnorm2(I_norm2_sub, X_norm2_sub, a=False, sub=True)
 # I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
 # print(I_norm2_select.shape, I_norm2_group.shape)
 I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
