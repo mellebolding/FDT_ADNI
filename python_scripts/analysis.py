@@ -250,7 +250,9 @@ def I_vs_Xnorm2(I_norm2_group, X_norm2_group, a=False, sub=False):
 
     plt.xlabel('I_norm2')
     plt.ylabel('X_norm2')
-    plt.title(f'I_norm2 vs X_norm2 per group {NOISE_TYPE} a{a}')
+    if sub: 
+        plt.title(f'I_norm2 vs X_norm2 per subject {NOISE_TYPE} a{a}')
+    else: plt.title(f'I_norm2 vs X_norm2 per group {NOISE_TYPE} a{a}')
     plt.legend()
     plt.tight_layout()
     plt.show()
