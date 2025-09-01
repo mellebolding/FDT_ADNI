@@ -208,14 +208,14 @@ def I_vs_Xnorm2(I_norm2_group, X_norm2_group, I_a=None,X_a=None,a=False, sub=Fal
     group_names = ['HC', 'MCI', 'AD']
     colors = ['tab:blue', 'tab:orange', 'tab:green']
     plt.figure(figsize=(8, 6))
+    if a: 
+        group_names = ['HC_a', 'MCI_a', 'AD_a']
+        colors = ['navy', 'red', 'darkgreen']
     if I_a is not None and X_a is not None:
         I_norm2_group = np.concatenate((I_norm2_group, I_a), axis=0)
         X_norm2_group = np.concatenate((X_norm2_group, X_a), axis=0)
         group_names = ['HC', 'MCI', 'AD', 'HC_a', 'MCI_a', 'AD_a']
         colors = ['tab:blue', 'tab:orange', 'tab:green', 'navy', 'red', 'darkgreen']
-    if a: 
-        group_names = ['HC_a', 'MCI_a', 'AD_a']
-        colors = ['navy', 'red', 'darkgreen']
     if sub: 
         I_norm2_group = np.nanmean(I_norm2_group, axis=2)
         X_norm2_group = np.nanmean(X_norm2_group, axis=2)
