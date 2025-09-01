@@ -13,7 +13,6 @@ def stat_permutation_test(group_data1, group_data2, **stats_params):
                            vectorized=True, alternative=alternative)
     return res.statistic, res.pvalue
 
-
 def custom_permutation():
     custom_long_name = 'Permutation test'
     custom_short_name = 'Permutation'
