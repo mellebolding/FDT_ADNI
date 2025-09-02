@@ -706,7 +706,7 @@ def brain_map_3D(name, I_tmax_group, COND, NPARCELLS,a=False):
     view
 
 def load_PET_data(NPARCELLS):
-    DL = ADNI_A.ADNI_A()
+    DL = ADNI_A.ADNI_A(normalizeBurden=False)
     HC_IDs = DL.get_groupSubjects('HC')
     MCI_IDs = DL.get_groupSubjects('MCI')
     AD_IDs = DL.get_groupSubjects('AD')
