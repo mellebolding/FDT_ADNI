@@ -856,7 +856,7 @@ groups = ["HC", "MCI", "AD"]
 
 # Compute means and build dataframe
 df_list = []
-for arr, group in zip(arrays, groups):
+for arr, group in zip(ABeta_burden, groups):
     means = arr.mean(axis=1)  # mean across 379
     temp_df = pd.DataFrame({
         "cond": group,   # group label
