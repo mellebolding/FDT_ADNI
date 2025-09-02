@@ -270,15 +270,15 @@ Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
 omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
 
 # Extract subject-level data
-HC_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "1"}))
-HC_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "1"}))
-HC_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "1"}))
-MCI_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "2"}))
-MCI_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "2"}))
-MCI_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "2"}))
-AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "3"}))
-AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "3"}))
-AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "3"}))
+HC_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "0"}))
+HC_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "0"}))
+HC_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "0"}))
+MCI_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "1"}))
+MCI_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "1"}))
+MCI_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "1"}))
+AD_subs_sig = np.array(get_field(all_records, "sigma", filters={"level": "subject", "condition": "2"}))
+AD_subs_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "subject", "condition": "2"}))
+AD_subs_omega = np.array(get_field(all_records, "omega", filters={"level": "subject", "condition": "2"}))
 
 # lists, as the arrays are not the same length
 sigma_subs = [HC_subs_sig, MCI_subs_sig, AD_subs_sig]
