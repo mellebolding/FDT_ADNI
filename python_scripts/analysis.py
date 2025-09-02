@@ -835,7 +835,7 @@ I_tmax_sub = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level
 I_norm1_sub = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "subject"})), axis=0)
 I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"level": "subject"})), axis=0)
 X_norm2_sub = np.squeeze(np.array(get_field(all_values, "X_Inorm2", filters={"level": "subject"})), axis=0)
-ABeta_burden, Tau_burden = load_PET_data(max(NPARCELLS,360))
+ABeta_burden, Tau_burden = load_PET_data(min(NPARCELLS,360))
 
 #print("a_sub: ", min(a_values_sub[0][0,:]), max(a_values_sub[0][0,:]))
 #print("a_sub_org: ", a_original_sub[0].shape)
