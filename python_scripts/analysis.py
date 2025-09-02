@@ -30,7 +30,7 @@ from scipy.linalg import solve_continuous_lyapunov
 import pandas as pd
 import matplotlib.pyplot as plt
 from functions_violinplots_WN3_v0 import plot_violins_HC_MCI_AD
-from functions_boxplots_WN3_v0 import plot_boxplots_HC_MCI_AD
+from functions_boxplots_WN3_v0 import plot_boxes_HC_MCI_AD
 import p_values as p_values
 import statannotations_permutation
 from nilearn import surface, datasets, plotting
