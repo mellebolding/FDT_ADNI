@@ -125,7 +125,7 @@ def plot_boxes_HC_MCI_AD(ax, data,
         })
         df_list.append(temp_df)
 
-    df = pd.concat(df_list, ignore_index=True)
+    data = pd.concat(df_list, ignore_index=True)
     # create seaborn context
     sns.set_context('notebook', font_scale=font_scale)
 
