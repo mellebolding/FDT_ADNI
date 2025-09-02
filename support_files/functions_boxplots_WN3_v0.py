@@ -114,6 +114,18 @@ def plot_boxes_HC_MCI_AD(ax, data,
                  filename='filename',
                  dpi=300):
 
+    groups = ["HC", "MCI", "AD"]
+
+    df_list = []
+    for arr, group in zip(data, groups):
+        means = arr.mean(axis=1)  # mean across 379
+        temp_df = pd.DataFrame({
+            "cond": group,   # group label
+            "value": means   # mean per subject
+        })
+        df_list.append(temp_df)
+
+    df = pd.concat(df_list, ignore_index=True)
     # create seaborn context
     sns.set_context('notebook', font_scale=font_scale)
 
