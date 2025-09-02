@@ -1,5 +1,13 @@
+###############################################
+# Script for fitting Ceff, sigma and bifurcation params at group and subject level
+###############################################
+
 import os
 import sys
+
+
+#### Setting up paths ####
+
 # Absolute :path to the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -49,6 +57,9 @@ os.makedirs(Ceff_sigma_subfolder, exist_ok=True)
 os.makedirs(error_fitting_group_subfolder, exist_ok=True)
 os.makedirs(error_fitting_sub_subfolder, exist_ok=True)
 
+
+#### Importing necessary packages and functions ####
+
 from functions_FDT_numba_v9 import *
 import scipy.io
 import numpy as np
@@ -79,6 +90,7 @@ import time
 import p_values as p_values
 import statannotations_permutation
 
+
 def append_to_npz(filename, **new_data):
     """
     Appends new variables to an existing .npz file or creates one if it doesn't exist.
@@ -100,6 +112,9 @@ def append_to_npz(filename, **new_data):
     np.savez(filename, **existing_data)
 
 def clear_npz_file(folder, filename):
+    """
+    Clears the contents of a .npz file by overwriting it with an empty 'records' array.
+    """
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, filename)
     # Save an empty records array, overwriting any existing file
@@ -252,6 +267,7 @@ def calc_H_freq(
 def predict_a(a_fitted, ABeta_all, Tau_all, coef_matrix):
     """
     Predict a' given a_fitted, ABeta, Tau, and a coefficient matrix.
+    Here a_fitted, ABeta_all, and Tau_all are lists with 2D arrays of shape (n_subjects, n_parcels).
     """
     const      = coef_matrix["const"].values[None, :]
     beta_coef  = coef_matrix["ABeta"].values[None, :]
@@ -293,9 +309,10 @@ def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
     }
 
 def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, FCemp, FCsim, label):
-    
-    # want to give an indication of the fitting quality
-    # options to show: final error, FC fit, COVtau fit, sigma fit, a fit
+    """
+    Want to give an indication of the fitting quality?
+    options to show: final error, FC fit, COVtau fit, sigma fit, a fit
+    """
     
     if error_iter is not None:
         figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
@@ -324,7 +341,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
     plot_FC_matrix(FCsim-FCemp, title="diff FCsim-FCemp", size=1.1, save_path=save_path,dpi=300)
 
-## plot the sigma
+    ## plot the sigma
     fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
     if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
     else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
@@ -340,6 +357,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
+    ## plot the a
     a_ini = -0.02 * np.ones(NPARCELLS)
     fig_name = f"bifur_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
     if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
@@ -355,19 +373,20 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     plt.legend()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
+#############################################################
 
-NPARCELLS = 10 #tot: 379
+
+##### Base parameters settings ######
+
+NPARCELLS = 10 # max 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
 A_FITTING = True
 
 
 ###### Loading the data ######
-DL = ADNI_A.ADNI_A(normalizeBurden=False)
 
-# example of individual
-subdata = DL.get_subjectData('002_S_0413')
-SC = subdata['002_S_0413']['SC'] # Structural connectivity
+DL = ADNI_A.ADNI_A(normalizeBurden=False)
 
 # Loading the timeseries data for all subjects and dividing them into groups
 HC_IDs = DL.get_groupSubjects('HC')
@@ -408,15 +427,17 @@ for subject in AD_IDs:
 
 group_names = ['HC', 'MCI', 'AD']
 group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
+a_list_group = []
+a_list_sub = []
 
+### Prepare the PET data
+# Use only the first 360 regions as the subcortical regions do not have PET data
 protein_index = min(NPARCELLS,360)
 ABeta_burden = [np.array(HC_ABeta)[:,:protein_index,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
 Tau_burden = [np.array(HC_Tau)[:,:protein_index,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
 
-a_list_group = []
-a_list_sub = []
 
-### Set conditions
+### Set parameters
 Tau = 1
 TR = 2
 a_param = -0.02
@@ -445,7 +466,7 @@ Ceff_norm=CEFF_NORMALIZATION
 maxC=maxC
 iter_check=iter_check_group
 
-# Learning rate settings
+## Learning rate settings
 epsFC_Ceff = 4e-4
 epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
@@ -536,7 +557,7 @@ for COND in range(3):
     show_error(error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, sigma_group, sigma_ini, a_group, FCemp_group, FCsim_group, label="group")
 
 
-### subject level
+####### Group level #######
 Ceff_means = []
 for COND in range(3):
     a_list_sub_temp = []
@@ -600,6 +621,7 @@ for COND in range(3):
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
 
+### for plotting FC and Ceff matrices (should be incorporated elsewhere)
 # for i in range(3):
 #     Ceff_group_list = np.array(Ceff_group_list)
 #     Ceff_means = np.array(Ceff_means)
@@ -608,6 +630,8 @@ for COND in range(3):
 #     plot_FC_matrix(Ceff_means[i], title=f"Ceff means sub", size=1.1, dpi=300)
 #     plot_FC_matrix(Ceff_group_list[i], title=f"Ceff means group", size=1.1, dpi=300)
 
+
+##### Fitting a values to PET data #####
 a_sub_cortical = [arr[:, :protein_index] for arr in a_list_sub]   # cortical parcels
 a_sub_subcort = [arr[:, protein_index:] for arr in a_list_sub]    # subcortical parcels (19)
 a_group_cortical = [arr[:protein_index] for arr in a_list_group]
