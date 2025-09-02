@@ -852,6 +852,20 @@ I_norm2_select = np.array([I_norm2_sub[0,0,:], I_norm2_sub[1,0,:], I_norm2_sub[2
 X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
 #plot_boxplots_HC_MCI_AD()
 print(ABeta_burden[0].shape, Tau_burden[0].shape)
+groups = ["HC", "MCI", "AD"]
+
+# Compute means and build dataframe
+df_list = []
+for arr, group in zip(arrays, groups):
+    means = arr.mean(axis=1)  # mean across 379
+    temp_df = pd.DataFrame({
+        "cond": group,   # group label
+        "value": means   # mean per subject
+    })
+    df_list.append(temp_df)
+
+df = pd.concat(df_list, ignore_index=True)
+print(df.head())
 
 # I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
 # I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
