@@ -166,8 +166,8 @@ def plot_boxes_HC_MCI_AD(ax, data,
     y_max = data['value'].max()
     y_min = data['value'].min()
     y_range = y_max - y_min
-    base_y = y_max + 0.2 * y_range  # Increased offset for comparison lines
-    height = 0.03 * y_range  # Increased height for comparison lines
+    base_y = y_max + 0.05 * y_range  # Increased offset for comparison lines
+    height = 0.02 * y_range  # Increased height for comparison lines
     ax.set_ylim(y_min - 0.1 * y_range, y_max + 1 * y_range)
 
     for i, (group1, group2) in enumerate(comparisons):
