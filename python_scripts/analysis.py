@@ -717,6 +717,7 @@ def load_PET_data(NPARCELLS):
     AD_ABeta = []
     AD_Tau = []
     for subject in HC_IDs:
+        print(subject)
         data = DL.get_subjectData(subject,printInfo=False)
         HC_ABeta.append(np.vstack(data[subject]['ABeta'])) 
         HC_Tau.append(np.vstack(data[subject]['Tau']))
