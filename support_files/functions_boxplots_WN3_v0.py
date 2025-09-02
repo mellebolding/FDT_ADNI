@@ -214,3 +214,4 @@ def plot_boxes_HC_MCI_AD(ax, data,
         #plt.savefig(filename + '.png', bbox_inches='tight', dpi=dpi)
         plt.tight_layout()
         plt.show()
+        plt.close()
