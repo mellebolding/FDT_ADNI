@@ -720,8 +720,8 @@ def load_PET_data(NPARCELLS):
         print(subject)
         data = DL.get_subjectData(subject,printInfo=False)
         HC_ABeta.append(np.vstack(data[subject]['ABeta'])) 
-        print(HC_ABeta)
         HC_Tau.append(np.vstack(data[subject]['Tau']))
+    print(HC_ABeta)
     for subject in MCI_IDs:
         data = DL.get_subjectData(subject,printInfo=False)
         MCI_ABeta.append(np.vstack(data[subject]['ABeta']))
