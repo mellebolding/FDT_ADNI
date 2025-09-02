@@ -356,14 +356,14 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-NPARCELLS = 379 #tot: 379
+NPARCELLS = 18 #tot: 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
 A_FITTING = True
 
 
 ###### Loading the data ######
-DL = ADNI_A.ADNI_A()
+DL = ADNI_A.ADNI_A(normalizeBurden=False)
 
 # example of individual
 subdata = DL.get_subjectData('002_S_0413')
@@ -607,10 +607,18 @@ for COND in range(3):
 #     plot_FC_matrix(Ceff_means[i], title=f"Ceff means sub", size=1.1, dpi=300)
 #     plot_FC_matrix(Ceff_group_list[i], title=f"Ceff means group", size=1.1, dpi=300)
 
+a_sub_cortical = [arr[:, :protein_index] for arr in a_list_sub]   # cortical parcels
+a_sub_subcort = [arr[:, protein_index:] for arr in a_list_sub]    # subcortical parcels (19)
+a_group_cortical = [arr[:protein_index] for arr in a_list_group]
+a_group_subcortical = [arr[protein_index:] for arr in a_list_group]
 
-out = calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden)
+# Step 2: recombine later if needed
+a_sub_recombined = [np.hstack((cort, subc)) for cort, subc in zip(a_sub_cortical, a_sub_subcort)]
+out = calc_a_values(a_sub_cortical, a_group_cortical, ABeta_burden, Tau_burden)
 predicted_a = out["predicted_a"]
 predicted_a_group = out["predicted_a_group"]
+a_sub_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a, a_sub_subcort)]
+a_group_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a_group, a_group_subcortical)]
 
 # print("a_diff group: ", predicted_a_group - np.array(a_list_group)[:, None])
 # print("a_diff sub: ", predicted_a - np.vstack(a_list_sub))
@@ -624,12 +632,12 @@ append_record_to_npz(
         Ceff_sigma_subfolder,
         f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
         level="subject",
-        a = predicted_a,
+        a = a_sub_recombined,
         original_a = a_list_sub)
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
         f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
         level="group",
-        a = predicted_a_group,
+        a = a_group_recombined,
         original_a = np.array(a_list_group))
