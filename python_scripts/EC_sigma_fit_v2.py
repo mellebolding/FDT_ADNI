@@ -409,8 +409,9 @@ for subject in AD_IDs:
 group_names = ['HC', 'MCI', 'AD']
 group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
 
-ABeta_burden = [np.array(HC_ABeta)[:,:NPARCELLS,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
-Tau_burden = [np.array(HC_Tau)[:,:NPARCELLS,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
+protein_index = min(NPARCELLS,360)
+ABeta_burden = [np.array(HC_ABeta)[:,:protein_index,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
+Tau_burden = [np.array(HC_Tau)[:,:protein_index,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
 
 a_list_group = []
 a_list_sub = []
