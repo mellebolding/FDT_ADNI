@@ -30,7 +30,8 @@ from scipy.linalg import solve_continuous_lyapunov
 import pandas as pd
 import matplotlib.pyplot as plt
 from functions_violinplots_WN3_v0 import plot_violins_HC_MCI_AD
-import p_values as p_values  # Make sure this is working!
+from functions_boxplots_WN3_v0 import plot_boxplots_HC_MCI_AD
+import p_values as p_values
 import statannotations_permutation
 from nilearn import surface, datasets, plotting
 import nibabel as nib
@@ -849,11 +850,13 @@ if A_FITTING:
  
 I_norm2_select = np.array([I_norm2_sub[0,0,:], I_norm2_sub[1,0,:], I_norm2_sub[2,0,:]])
 X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
+#plot_boxplots_HC_MCI_AD()
+print(ABeta_burden[0].shape, Tau_burden[0].shape)
 
-I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
-I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
-if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_group_a, a=True)
-if A_FITTING: I_vs_Xnorm2(I_norm2_sub, X_norm2_sub,I_norm2_sub_a,X_norm2_sub_a, a=True, sub=True)
+# I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
+# I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
+# if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_group_a, a=True)
+# if A_FITTING: I_vs_Xnorm2(I_norm2_sub, X_norm2_sub,I_norm2_sub_a,X_norm2_sub_a, a=True, sub=True)
 # I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
 # print(I_norm2_select.shape, I_norm2_group.shape)
 # I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
