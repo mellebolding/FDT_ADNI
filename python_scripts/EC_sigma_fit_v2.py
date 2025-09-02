@@ -356,7 +356,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-NPARCELLS = 18 #tot: 379
+NPARCELLS = 10 #tot: 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
 A_FITTING = True
@@ -618,8 +618,12 @@ predicted_a = out["predicted_a"]
 predicted_a_group = out["predicted_a_group"]
 print(a_sub_subcort[0].shape, predicted_a[0].shape)
 print(a_group_subcortical[0].shape, predicted_a_group[0].shape)
-a_sub_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a, a_sub_subcort)]
-a_group_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a_group, a_group_subcortical)]
+if protein_index > 360: 
+    a_sub_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a, a_sub_subcort)]
+    a_group_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a_group, a_group_subcortical)]
+else:
+    a_sub_recombined = predicted_a
+    a_group_recombined = predicted_a_group
 
 # print("a_diff group: ", predicted_a_group - np.array(a_list_group)[:, None])
 # print("a_diff sub: ", predicted_a - np.vstack(a_list_sub))
