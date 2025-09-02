@@ -801,8 +801,8 @@ Parcel_names = {
 }
 ####################################################################
 
-NPARCELLS = 379
-NOISE_TYPE = "HOMO"
+NPARCELLS = 10
+NOISE_TYPE = 'hetero'#"HOMO"
 A_FITTING = True
 all_values = None
 all_values_a = None
