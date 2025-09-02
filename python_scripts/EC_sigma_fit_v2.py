@@ -522,6 +522,7 @@ for COND in range(3):
     a_list_group.append(a_group)
     Ceff_group_list.append(Ceff_group)
     sigma_group_list.append(sigma_group)
+    print('sigma_group', sigma_group)
 
     append_record_to_npz(
     Ceff_sigma_subfolder,
