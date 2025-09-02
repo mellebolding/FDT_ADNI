@@ -117,6 +117,7 @@ def plot_boxes_HC_MCI_AD(ax, data,
     groups = ["HC", "MCI", "AD"]
 
     df_list = []
+    print(data[0][0,:])
     for arr, group in zip(data, groups):
         means = arr.mean(axis=1)  # mean across 379
         temp_df = pd.DataFrame({
@@ -126,6 +127,7 @@ def plot_boxes_HC_MCI_AD(ax, data,
         df_list.append(temp_df)
 
     data = pd.concat(df_list, ignore_index=True)
+
     # create seaborn context
     sns.set_context('notebook', font_scale=font_scale)
 
