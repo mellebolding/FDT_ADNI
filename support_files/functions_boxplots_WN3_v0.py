@@ -197,7 +197,7 @@ def plot_boxes_HC_MCI_AD(ax, data,
     
     # Change axis labels, ticks, and title
     ax.set_xticks([0, 1, 2])
-    ax.set_xticklabels(["Healthy Controls", "MCI", "Alzheimer's"])
+    ax.set_xticklabels(["HC", "MCI", "AD"])
     ax.set_xlabel('')
     ax.set_ylabel(metric)
     ax.set_title(plot_title)
