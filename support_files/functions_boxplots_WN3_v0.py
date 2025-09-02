@@ -168,7 +168,7 @@ def plot_boxes_HC_MCI_AD(ax, data,
     y_range = y_max - y_min
     base_y = y_max + 0.05 * y_range  # Increased offset for comparison lines
     height = 0.02 * y_range  # Increased height for comparison lines
-    ax.set_ylim(y_min - 0.1 * y_range, y_max + 1 * y_range)
+    ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.5 * y_range)
 
     for i, (group1, group2) in enumerate(comparisons):
         x1, x2 = ['HC', 'MCI', 'AD'].index(group1), ['HC', 'MCI', 'AD'].index(group2)
