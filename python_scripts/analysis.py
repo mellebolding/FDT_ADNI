@@ -1020,7 +1020,7 @@ if A_FITTING:
 
 
 df_list = []
-for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, X_norm2_sub_a)):
+for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, X_norm2_sub_a[:,:,0:min(NPARCELLS,360)])):
     nsub, nparcel = AB.shape
     FDTI = FDTI[:nsub, :]
     df = pd.DataFrame({
