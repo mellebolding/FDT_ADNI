@@ -1270,7 +1270,7 @@ df_subject_features = df_subject_features.merge(df_corr_AB_X, left_on="subject",
 df_subject_features = df_subject_features.merge(df_corr_Tau_I, left_on="subject", right_index=True)
 df_subject_features = df_subject_features.merge(df_corr_Tau_X, left_on="subject", right_index=True)
 
-
+pd.set_option("display.max_columns", None)
 print(df_subject_features.head())
 
 
