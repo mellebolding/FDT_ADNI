@@ -1048,7 +1048,7 @@ from sklearn.model_selection import LeaveOneOut
 rng = np.random.default_rng(42)
 
 
-def subject_pca_features(df, feature, n_components=3):
+def subject_pca_features(df, feature, n_components=2):
     """
     Extract first n_components of parcel-wise distribution of 'feature' across subjects.
     Returns dataframe: subject × components
@@ -1128,8 +1128,8 @@ df_subject_features = df_subject_features.merge(df_pca_I, left_on="subject", rig
 df_subject_features = df_subject_features.merge(df_pca_X, left_on="subject", right_index=True)
 
 # --- 4. Merge inter-feature correlations ---
-for df_corr in [df_corr_AB_Tau, df_corr_AB_I, df_corr_AB_X, df_corr_Tau_I, df_corr_Tau_X]:
-    df_subject_features = df_subject_features.merge(df_corr, left_on="subject", right_index=True)
+# for df_corr in [df_corr_AB_Tau, df_corr_AB_I, df_corr_AB_X, df_corr_Tau_I, df_corr_Tau_X]:
+#     df_subject_features = df_subject_features.merge(df_corr, left_on="subject", right_index=True)
 
 # --- Final dataframe ---
 pd.set_option("display.max_rows", None)
