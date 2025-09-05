@@ -236,7 +236,7 @@ def X_sub_Itmax_norm1_norm2(sigma_subs, Ceff_subs, omega_subs, NPARCELLS, a_para
 #### Base parameters ####
 NPARCELLS = 379
 NOISE_TYPE = "Hetero"
-A_FITTING = True
+A_FITTING = False
 
 ### Load the Ceff and sigma fitting results ###
 if A_FITTING:
