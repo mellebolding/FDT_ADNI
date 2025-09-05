@@ -1045,6 +1045,163 @@ df_cohort["I_global"]     = df_cohort.groupby("subject")["I_local"].transform("m
 df_cohort["X_global"]     = df_cohort.groupby("subject")["X_local"].transform("mean")
 
 print(df_cohort.head())
+
+
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.model_selection import GroupKFold, GridSearchCV
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from collections import Counter, defaultdict
+rng = np.random.default_rng(42)
+
+# ------------------------------------------------------------------
+# EXPECTED INPUT
+# One long dataframe where each row = a parcel from a subject.
+# Columns (example): ['subject_id','group','parcel_idx','ABeta','Tau','I_N2','X_N2',
+#                     'ABeta_mean','Tau_mean','I_N2_mean','X_N2_mean']
+# You can choose any subset of feature columns below.
+# ------------------------------------------------------------------
+
+def run_subjectwise_svm(
+    df,
+    feature_cols=('parcel_idx','ABeta','Tau','I_N2','X_N2',   # base 5
+                  'ABeta_mean','Tau_mean','I_N2_mean','X_N2_mean'),  # +4 optional
+    label_col='cohort',
+    group_col='subject',
+    n_test_subjects=4,
+    n_repeats=50,
+    inner_cv_splits=5,
+    kernel='linear',   # 'linear' or 'rbf'
+    Cs=(0.01, 0.1, 1, 10, 100),
+    gamma_vals=('scale',)  # Only used if kernel='rbf'
+):
+    # Make sure only the selected features exist
+    feature_cols = [c for c in feature_cols if c in df.columns]
+    X_all = df[feature_cols].to_numpy()
+    y_all = df[label_col].to_numpy()
+    groups_all = df[group_col].to_numpy()
+
+    # List of unique subjects and their labels
+    subjects = df[[group_col, label_col]].drop_duplicates()
+    subj_ids = subjects[group_col].to_numpy()
+    subj_labels = subjects[label_col].to_numpy()
+
+    # Helper: sample exactly n_test_subjects, roughly stratified by label
+    def sample_test_subjects():
+        test_ids = []
+        by_class = {}
+        for g in np.unique(subj_labels):
+            by_class[g] = subj_ids[subj_labels == g]
+        # proportional target per class (rounded)
+        total = len(subj_ids)
+        target_per_class = {g: int(round(len(by_class[g]) * n_test_subjects / total))
+                            for g in by_class}
+        # Fix rounding to sum exactly n_test_subjects
+        diff = n_test_subjects - sum(target_per_class.values())
+        # Adjust classes with largest remainder (simple heuristic)
+        remainders = {g: (len(by_class[g]) * n_test_subjects / total) - target_per_class[g]
+                      for g in by_class}
+        for g in sorted(remainders, key=remainders.get, reverse=True)[:abs(diff)]:
+            target_per_class[g] += np.sign(diff)
+
+        for g in by_class:
+            k = max(0, min(target_per_class[g], len(by_class[g])))
+            pick = rng.choice(by_class[g], size=k, replace=False)
+            test_ids.extend(pick.tolist())
+
+        # If still off due to edge cases, pad randomly from remaining
+        if len(test_ids) < n_test_subjects:
+            remaining = [s for s in subj_ids if s not in test_ids]
+            extra = rng.choice(remaining, size=n_test_subjects - len(test_ids), replace=False)
+            test_ids.extend(extra.tolist())
+        elif len(test_ids) > n_test_subjects:
+            test_ids = rng.choice(test_ids, size=n_test_subjects, replace=False).tolist()
+        return set(test_ids)
+
+    # Build model + inner CV
+    param_grid = {'svc__C': Cs}
+    if kernel == 'rbf':
+        param_grid['svc__gamma'] = gamma_vals
+
+    out = {
+        'parcel_acc': [],
+        'subject_acc': [],
+        'reports': [],
+        'confusions': []
+    }
+
+    for rep in range(n_repeats):
+        test_subjects = sample_test_subjects()
+        is_test = df[group_col].isin(test_subjects).to_numpy()
+        X_train, y_train, groups_train = X_all[~is_test], y_all[~is_test], groups_all[~is_test]
+        X_test,  y_test,  groups_test  = X_all[is_test],  y_all[is_test],  groups_all[is_test]
+
+        # Inner group-aware CV (keeps subjects separate)
+        inner_cv = GroupKFold(n_splits=min(inner_cv_splits, len(np.unique(groups_train))))
+        pipe = Pipeline([
+            ('scaler', StandardScaler()),
+            ('svc', SVC(kernel=kernel, class_weight='balanced', probability=False))
+        ])
+        clf = GridSearchCV(
+            pipe,
+            param_grid=param_grid,
+            cv=inner_cv.split(X_train, y_train, groups_train),
+            scoring='accuracy',
+            n_jobs=-1
+        )
+        clf.fit(X_train, y_train)
+
+        # Parcel-level predictions
+        y_pred = clf.predict(X_test)
+        parcel_acc = accuracy_score(y_test, y_pred)
+        out['parcel_acc'].append(parcel_acc)
+
+        # Subject-level majority vote
+        subj_preds = defaultdict(list)
+        subj_trues = {}
+        for yi, yp, sid in zip(y_test, y_pred, groups_test):
+            subj_preds[sid].append(yp)
+            subj_trues[sid] = yi
+        y_true_subj = []
+        y_pred_subj = []
+        for sid, preds in subj_preds.items():
+            maj = Counter(preds).most_common(1)[0][0]
+            y_pred_subj.append(maj)
+            y_true_subj.append(subj_trues[sid])
+        subject_acc = accuracy_score(y_true_subj, y_pred_subj)
+        out['subject_acc'].append(subject_acc)
+
+        # Optional: keep per-run diagnostics
+        out['reports'].append(classification_report(y_test, y_pred, output_dict=True))
+        out['confusions'].append(confusion_matrix(y_test, y_pred, labels=np.unique(y_all)))
+
+    # Summary
+    def mean_std(x): 
+        return float(np.mean(x)), float(np.std(x))
+    parcel_mean, parcel_std = mean_std(out['parcel_acc'])
+    subject_mean, subject_std = mean_std(out['subject_acc'])
+
+    print(f"Parcel-level accuracy over {n_repeats} runs (holdout {n_test_subjects} subjects): "
+          f"{parcel_mean:.3f} ± {parcel_std:.3f}")
+    print(f"Subject-level accuracy over {n_repeats} runs (majority vote): "
+          f"{subject_mean:.3f} ± {subject_std:.3f}")
+    print("Example best params (last run):", clf.best_params_)
+
+    return out
+
+results = run_subjectwise_svm(
+    df_cohort,
+    feature_cols=('parcel','ABeta_local','Tau_local','I_local','X_local',
+                  'ABeta_global','Tau_global','I_global','X_global'),
+    n_test_subjects=4,
+    n_repeats=100,      # increase for tighter CIs
+    kernel='linear',    # start linear; try 'rbf' after
+    Cs=(0.01, 0.1, 1, 10, 100)
+)
+
+
+
 import statsmodels.formula.api as smf
 
 import jax
