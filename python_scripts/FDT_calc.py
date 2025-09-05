@@ -266,7 +266,7 @@ MCI_group_omega = np.array(get_field(all_records, "omega", filters={"level": "gr
 AD_group_sig = np.array(get_field(all_records, "sigma", filters={"level": "group", "condition": "2"}))
 AD_group_Ceff = np.array(get_field(all_records, "Ceff", filters={"level": "group", "condition": "2"}))
 AD_group_omega = np.array(get_field(all_records, "omega", filters={"level": "group", "condition": "2"}))
-print(HC_group_sig)
+print(MCI_group_sig)
 sigma_group = np.array([HC_group_sig[0], MCI_group_sig[0], AD_group_sig[0]])
 Ceff_group = np.array([HC_group_Ceff[0], MCI_group_Ceff[0], AD_group_Ceff[0]])
 omega = np.array([HC_group_omega[0], MCI_group_omega[0], AD_group_omega[0]])
