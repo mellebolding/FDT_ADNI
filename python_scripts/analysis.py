@@ -1099,10 +1099,10 @@ for cohort_idx, (AB, Tau, I, X) in enumerate(
 
 df_cohort = pd.concat(df_list, ignore_index=True)
 
-df_pca_AB = subject_pca_features(df_cohort, "ABeta_local", n_components=3)
-df_pca_Tau = subject_pca_features(df_cohort, "Tau_local", n_components=3)
-df_pca_I = subject_pca_features(df_cohort, "I_local", n_components=3)
-df_pca_X = subject_pca_features(df_cohort, "X_local", n_components=3)
+df_pca_AB = subject_pca_features(df_cohort, "ABeta_local")
+df_pca_Tau = subject_pca_features(df_cohort, "Tau_local")
+df_pca_I = subject_pca_features(df_cohort, "I_local")
+df_pca_X = subject_pca_features(df_cohort, "X_local")
 df_corr_AB_Tau = subject_cross_correlation(df_cohort, "ABeta_local", "Tau_local")
 df_corr_AB_I   = subject_cross_correlation(df_cohort, "ABeta_local", "I_local")
 df_corr_AB_X   = subject_cross_correlation(df_cohort, "ABeta_local", "X_local")
