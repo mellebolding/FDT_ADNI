@@ -835,26 +835,23 @@ I_norm2_sub = np.squeeze(np.array(get_field(all_values, "I_norm2", filters={"lev
 X_norm2_sub = np.squeeze(np.array(get_field(all_values, "X_Inorm2", filters={"level": "subject"})), axis=0)
 ABeta_burden, Tau_burden = load_PET_data(min(NPARCELLS,360))
 
-#print("a_sub: ", min(a_values_sub[0][0,:]), max(a_values_sub[0][0,:]))
-#print("a_sub_org: ", a_original_sub[0].shape)
-
 if A_FITTING:
     a_002 = -0.02 * np.ones(a_values_group.shape)
     diff_a_group = np.subtract(a_values_group, a_original_group)
     diff_a_sub = np.subtract(a_values_sub[0], a_original_sub[0])
     diff_I_norm1_a_subHC = np.subtract(I_norm1_sub_a[0], I_norm1_sub[0])
     diff_org_a_group = np.subtract(a_values_group, a_002)
-#print("diff a sub: ", diff_a_sub)
+
  
 I_norm2_select = np.array([I_norm2_sub[0,0,:], I_norm2_sub[1,0,:], I_norm2_sub[2,0,:]])
 X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
 
-plot_boxes_HC_MCI_AD(data=ABeta_burden,saveplot=1,metric='ABeta burden',plot_title='Abeta burden subject-average across groups',filename=f'Abeta_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
+#plot_boxes_HC_MCI_AD(data=ABeta_burden,saveplot=1,metric='ABeta burden',plot_title='Abeta burden subject-average across groups',filename=f'Abeta_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
 #plot_boxes_HC_MCI_AD(ax=ax,data=Tau_burden,saveplot=1,metric='Tau burden',plot_title='Tau burden subject-average across groups',filename=f'Tau_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
-I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
-I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
-if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_group_a, a=True)
-if A_FITTING: I_vs_Xnorm2(I_norm2_sub, X_norm2_sub,I_norm2_sub_a,X_norm2_sub_a, a=True, sub=True)
+# I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
+# I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
+# if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_group_a, a=True)
+# if A_FITTING: I_vs_Xnorm2(I_norm2_sub, X_norm2_sub,I_norm2_sub_a,X_norm2_sub_a, a=True, sub=True)
 # I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
 # print(I_norm2_select.shape, I_norm2_group.shape)
 # I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
@@ -1016,33 +1013,40 @@ if A_FITTING:
 
 
 df_list = []
-for cohort_idx, (AB, Tau, FDTI) in enumerate(zip(ABeta_burden, Tau_burden, X_norm2_sub_a[:,:,0:min(NPARCELLS,360)])):
+
+for cohort_idx, (AB, Tau, I, X) in enumerate(
+        zip(ABeta_burden,
+            Tau_burden,
+            I_norm2_sub_a[:, :, 0:min(NPARCELLS, 360)],
+            X_norm2_sub_a[:, :, 0:min(NPARCELLS, 360)])):
+
     nsub, nparcel = AB.shape
-    FDTI = FDTI[:nsub, :]
+    I = I[:nsub, :]
+    X = X[:nsub, :]
+
     df = pd.DataFrame({
         "subject": np.repeat([f"C{cohort_idx}_S{i}" for i in range(nsub)], nparcel),
         "parcel": np.tile(np.arange(nparcel), nsub),
         "ABeta_local": AB.ravel(),
         "Tau_local": Tau.ravel(),
-        "FDT_I": FDTI.ravel(),
+        "I_local": I.ravel(),
+        "X_local": X.ravel(),
         "cohort": cohort_idx
     })
     df_list.append(df)
 
+# Combine all cohorts
 df_cohort = pd.concat(df_list, ignore_index=True)
-df["ABeta_global"] = df.groupby("subject")["ABeta_local"].transform("mean")
-df["Tau_global"]   = df.groupby("subject")["Tau_local"].transform("mean")
+
+# Add subject-level means
+df_cohort["ABeta_global"] = df_cohort.groupby("subject")["ABeta_local"].transform("mean")
+df_cohort["Tau_global"]   = df_cohort.groupby("subject")["Tau_local"].transform("mean")
+df_cohort["I_global"]     = df_cohort.groupby("subject")["I_local"].transform("mean")
+df_cohort["X_global"]     = df_cohort.groupby("subject")["X_local"].transform("mean")
+
 
 import statsmodels.formula.api as smf
 
-# model = smf.mixedlm(
-#     "FDT_I ~ ABeta_local * Tau_local + ABeta_global + Tau_global",
-#     data=df,
-#     groups=df["parcel"],
-#     re_formula="~ABeta_local + Tau_local"  # random slopes
-# )
-# results = model.fit()
-# print(results.summary())
 import jax
 import jax.numpy as jnp
 import numpy as np
