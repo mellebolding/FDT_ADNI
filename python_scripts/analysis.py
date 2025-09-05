@@ -1070,10 +1070,10 @@ def run_subjectwise_svm(
     label_col='cohort',
     group_col='subject',
     n_test_subjects=4,
-    n_repeats=50,
+    n_repeats=10,
     inner_cv_splits=5,
     kernel='linear',   # 'linear' or 'rbf'
-    Cs=(0.01, 0.1, 1, 10, 100),
+    Cs=(0.1, 1, 10),
     gamma_vals=('scale',)  # Only used if kernel='rbf'
 ):
     # Make sure only the selected features exist
