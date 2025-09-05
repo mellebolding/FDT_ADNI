@@ -1049,7 +1049,6 @@ df_cohort["Tau_dif"]   = df_cohort["Tau_mean"] - df_cohort["Tau_local"]
 df_cohort["I_dif"]     = df_cohort["I_mean"] - df_cohort["I_local"]
 df_cohort["X_dif"]     = df_cohort["X_mean"] - df_cohort["X_local"]
 
-print(df_cohort.head())
 
 
 from sklearn.pipeline import Pipeline
@@ -1214,6 +1213,66 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from collections import defaultdict, Counter
+from sklearn.decomposition import PCA
+
+def subject_pca_features(df, feature, n_components=3):
+    """
+    Extract first n_components of parcel-wise distribution of 'feature' across subjects.
+    Returns dataframe: subject × components
+    """
+    # pivot: rows=subject, cols=parcel values of the feature
+    mat = df.pivot(index="subject", columns="parcel", values=feature).to_numpy()
+    
+    pca = PCA(n_components=n_components, random_state=42)
+    comps = pca.fit_transform(mat)  # shape (n_subjects, n_components)
+    
+    return pd.DataFrame(
+        comps,
+        index=df["subject"].unique(),
+        columns=[f"{feature}_PC{i+1}" for i in range(n_components)]
+    )
+df_pca_AB = subject_pca_features(df_cohort, "ABeta_local", n_components=3)
+df_pca_Tau = subject_pca_features(df_cohort, "Tau_local", n_components=3)
+df_pca_I = subject_pca_features(df_cohort, "I_local", n_components=3)
+df_pca_X = subject_pca_features(df_cohort, "X_local", n_components=3)
+
+def subject_cross_correlation(df, f1, f2):
+    corrs = {}
+    for subj, sub_df in df.groupby("subject"):
+        corrs[subj] = np.corrcoef(sub_df[f1], sub_df[f2])[0,1]
+    return pd.DataFrame.from_dict(corrs, orient="index", columns=[f"{f1}_vs_{f2}_corr"])
+    
+df_corr_AB_Tau = subject_cross_correlation(df_cohort, "ABeta_local", "Tau_local")
+df_corr_AB_I   = subject_cross_correlation(df_cohort, "ABeta_local", "I_local")
+df_corr_AB_X   = subject_cross_correlation(df_cohort, "ABeta_local", "X_local")
+df_corr_Tau_I  = subject_cross_correlation(df_cohort, "Tau_local", "I_local")
+df_corr_Tau_X  = subject_cross_correlation(df_cohort, "Tau_local", "X_local")
+df_corr_I_X    = subject_cross_correlation(df_cohort, "I_local", "X_local")
+
+# Basic stats
+df_stats = (
+    df_cohort.groupby("subject")
+    .agg({f: ["mean", "std"] for f in ["ABeta_local", "Tau_local", "I_local", "X_local"]})
+)
+df_stats.columns = ["_".join(c) for c in df_stats.columns]
+df_stats = df_stats.reset_index()
+
+# Add PCA
+df_subject_features = df_stats.merge(df_pca_AB, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_pca_Tau, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_pca_I, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_pca_X, left_on="subject", right_index=True)
+
+# Add correlations
+df_subject_features = df_subject_features.merge(df_corr_AB_Tau, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_corr_AB_I, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_corr_AB_X, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_corr_Tau_I, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_corr_Tau_X, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_corr_I_X, left_on="subject", right_index=True)
+
+print(df_subject_features.head())
+
 
 def run_subjectwise_lasso_logreg(
     df,
