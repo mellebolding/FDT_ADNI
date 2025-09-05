@@ -849,13 +849,13 @@ if A_FITTING:
 I_norm2_select = np.array([I_norm2_sub[0,0,:], I_norm2_sub[1,0,:], I_norm2_sub[2,0,:]])
 X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
 
-fig, ax = plt.subplots(figsize=(6, 5))
-plot_boxes_HC_MCI_AD(ax=ax,data=ABeta_burden,saveplot=1,metric='ABeta burden',plot_title='Abeta burden subject-average across groups',filename=f'Abeta_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
+#fig, ax = plt.subplots(figsize=(6, 5))
+#plot_boxes_HC_MCI_AD(ax=ax,data=ABeta_burden,saveplot=1,metric='ABeta burden',plot_title='Abeta burden subject-average across groups',filename=f'Abeta_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
 #plot_boxes_HC_MCI_AD(ax=ax,data=Tau_burden,saveplot=1,metric='Tau burden',plot_title='Tau burden subject-average across groups',filename=f'Tau_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
 I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
-# I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
-# if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_group_a, a=True)
-# if A_FITTING: I_vs_Xnorm2(I_norm2_sub, X_norm2_sub,I_norm2_sub_a,X_norm2_sub_a, a=True, sub=True)
+I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
+if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_group_a, a=True)
+if A_FITTING: I_vs_Xnorm2(I_norm2_sub, X_norm2_sub,I_norm2_sub_a,X_norm2_sub_a, a=True, sub=True)
 # I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
 # print(I_norm2_select.shape, I_norm2_group.shape)
 # I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
@@ -893,11 +893,11 @@ RSNs = {
 }
 
 
-if A_FITTING: 
-    RSN_significance_group(I_norm2_group_a, a=A_FITTING)
-    RSN_radar_plot(I_norm2_group_a, a=A_FITTING)
-RSN_significance_group(I_norm2_group, a=False)
-RSN_radar_plot(I_norm2_group, a=False)
+# if A_FITTING: 
+#     RSN_significance_group(I_norm2_group_a, a=A_FITTING)
+#     RSN_radar_plot(I_norm2_group_a, a=A_FITTING)
+# RSN_significance_group(I_norm2_group, a=False)
+# RSN_radar_plot(I_norm2_group, a=False)
 # plot_means_per_RSN('I_tmax', I_tmax_group, NPARCELLS)
 # if A_FITTING: plot_means_per_RSN('I_tmax_a', I_tmax_group_a, NPARCELLS,a=A_FITTING)
 # plot_means_per_RSN('I_norm1', I_norm1_group, NPARCELLS)
