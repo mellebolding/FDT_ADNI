@@ -1196,16 +1196,98 @@ def run_subjectwise_svm(
 
     return out
 
-results = run_subjectwise_svm(
-    df_cohort,
-    feature_cols=('parcel','ABeta_local','Tau_local','I_local','X_local',
-                  'ABeta_dif','Tau_dif','I_dif','X_dif'),
-    n_test_subjects=4,
-    n_repeats=50,      # increase for tighter CIs
-    kernel='rbf',    # start linear; try 'rbf' after
-    Cs=(0.1, 1, 10)
-)
+# results = run_subjectwise_svm(
+#     df_cohort,
+#     feature_cols=('parcel','ABeta_local','Tau_local','I_local','X_local',
+#                   'ABeta_dif','Tau_dif','I_dif','X_dif'),
+#     n_test_subjects=4,
+#     n_repeats=50,      # increase for tighter CIs
+#     kernel='rbf',    # start linear; try 'rbf' after
+#     Cs=(0.1, 1, 10)
+# )
 
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.model_selection import GroupKFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from collections import defaultdict, Counter
+
+def run_subjectwise_lasso_logreg(
+    df,
+    feature_cols=('ABeta_local','Tau_local','I_local','X_local',
+                  'ABeta_global_dif','Tau_global_dif','I_global_dif','X_global_dif'),
+    label_col='cohort',
+    group_col='subject',
+    n_splits=5,
+    Cs=10,   # number of C values to test on log scale
+    max_iter=5000
+):
+    """
+    Subject-wise LASSO logistic regression framework.
+    """
+    # restrict to available features
+    feature_cols = [c for c in feature_cols if c in df.columns]
+    X_all = df[feature_cols].to_numpy()
+    y_all = df[label_col].to_numpy()
+    groups_all = df[group_col].to_numpy()
+
+    # subject-wise CV
+    cv = GroupKFold(n_splits=n_splits)
+
+    # pipeline with scaling + logistic regression
+    pipe = Pipeline([
+        ('scaler', StandardScaler()),
+        ('logreg', LogisticRegressionCV(
+            Cs=np.logspace(-3, 3, Cs),
+            cv=cv.split(X_all, y_all, groups_all),
+            penalty='l1',
+            solver='saga',
+            class_weight='balanced',
+            max_iter=max_iter,
+            scoring='accuracy',
+            n_jobs=-1
+        ))
+    ])
+
+    # fit model
+    pipe.fit(X_all, y_all)
+
+    # parcel-level predictions (subject-wise CV already enforced in inner loop)
+    y_pred = pipe.predict(X_all)
+
+    parcel_acc = accuracy_score(y_all, y_pred)
+
+    # subject-level majority vote
+    subj_preds = defaultdict(list)
+    subj_trues = {}
+    for yi, yp, sid in zip(y_all, y_pred, groups_all):
+        subj_preds[sid].append(yp)
+        subj_trues[sid] = yi
+
+    y_true_subj, y_pred_subj = [], []
+    for sid, preds in subj_preds.items():
+        maj = Counter(preds).most_common(1)[0][0]
+        y_pred_subj.append(maj)
+        y_true_subj.append(subj_trues[sid])
+
+    subject_acc = accuracy_score(y_true_subj, y_pred_subj)
+
+    # Diagnostics
+    print("Parcel-level accuracy:", parcel_acc)
+    print("Subject-level accuracy:", subject_acc)
+    print("Classification report:")
+    print(classification_report(y_all, y_pred))
+    print("Confusion matrix:")
+    print(confusion_matrix(y_all, y_pred, labels=np.unique(y_all)))
+    print("Chosen C:", pipe.named_steps['logreg'].C_)
+
+    return pipe, y_pred, y_pred_subj
+
+results = run_subjectwise_svm(
+    df_cohort)
 
 
 import statsmodels.formula.api as smf
