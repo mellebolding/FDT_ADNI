@@ -1032,6 +1032,19 @@ from sklearn.model_selection import GroupKFold, GridSearchCV
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from collections import Counter, defaultdict
 from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.model_selection import GroupKFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from collections import defaultdict, Counter
+from sklearn.decomposition import PCA
+
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.inspection import permutation_importance
+from sklearn.model_selection import LeaveOneGroupOut, cross_val_score
+from sklearn.model_selection import LeaveOneOut
 rng = np.random.default_rng(42)
 
 
@@ -1261,22 +1274,6 @@ def run_subjectwise_svm(
 #     kernel='rbf',    # start linear; try 'rbf' after
 #     Cs=(0.1, 1, 10)
 # )
-
-import numpy as np
-import pandas as pd
-from sklearn.linear_model import LogisticRegressionCV
-from sklearn.model_selection import GroupKFold
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from collections import defaultdict, Counter
-from sklearn.decomposition import PCA
-
-
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.inspection import permutation_importance
-from sklearn.model_selection import LeaveOneGroupOut, cross_val_score
-from sklearn.model_selection import LeaveOneOut
 
 feature_columns = [c for c in df_subject_features.columns if c not in ["subject", "cohort"]]
 X = df_subject_features[feature_columns].values
