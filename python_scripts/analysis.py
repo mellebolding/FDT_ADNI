@@ -1277,9 +1277,10 @@ from sklearn.inspection import permutation_importance
 from sklearn.model_selection import LeaveOneGroupOut, cross_val_score
 from sklearn.model_selection import LeaveOneOut
 
-feature_columns = [c for c in df.df_subject_features if c not in ["subject", "cohort"]]  
-X = df[feature_columns].values
-y = df["cohort"].values  # <-- classification target (adjust if needed)
+feature_columns = [c for c in df_subject_features.columns if c not in ["subject", "cohort"]]
+X = df_subject_features[feature_columns].values
+y = df_subject_features["cohort"].values
+
 
 # --- Random Forest ---
 rf = RandomForestClassifier(
