@@ -1275,33 +1275,42 @@ print(df_subject_features.head())
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import LeaveOneGroupOut, cross_val_score
-import numpy as np
+from sklearn.model_selection import LeaveOneOut
 
-# Features and labels
-X = df[df_subject_features].values
-y = df["cohort"].values
-groups = df["subject"].values  # prevent leakage
+feature_columns = [c for c in df.df_subject_features if c not in ["subject", "cohort"]]  
+X = df[feature_columns].values
+y = df["cohort"].values  # <-- classification target (adjust if needed)
 
-# Random forest
+# --- Random Forest ---
 rf = RandomForestClassifier(
     n_estimators=500,
     random_state=42,
     class_weight="balanced"
 )
 
-# Cross-validation (subject-wise)
-logo = LeaveOneGroupOut()
-scores = cross_val_score(rf, X, y, cv=logo.split(X, y, groups))
-print("Mean CV accuracy:", scores.mean())
+# Cross-validation: leave-one-subject-out (since only ~36 subjects)
+loo = LeaveOneOut()
+scores = []
+for train_idx, test_idx in loo.split(X):
+    rf.fit(X[train_idx], y[train_idx])
+    scores.append(rf.score(X[test_idx], y[test_idx]))
 
-# Fit once for feature importance
+print("Leave-One-Out CV Accuracy:", np.mean(scores))
+
+# --- Fit on full dataset for feature importance ---
 rf.fit(X, y)
+
+# Permutation importance
 perm_importance = permutation_importance(rf, X, y, n_repeats=30, random_state=42)
 
-importance = dict(zip(df_subject_features, perm_importance.importances_mean))
-importance_sorted = dict(sorted(importance.items(), key=lambda x: -x[1]))
-print("Permutation importance (sorted):", importance_sorted)
+importance = pd.DataFrame({
+    "feature": feature_columns,
+    "importance_mean": perm_importance.importances_mean,
+    "importance_std": perm_importance.importances_std
+}).sort_values("importance_mean", ascending=False)
 
+print("\nPermutation importance:")
+print(importance)
 
 def run_subjectwise_lasso_logreg(
     df,
