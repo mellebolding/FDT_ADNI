@@ -1132,7 +1132,9 @@ for df_corr in [df_corr_AB_Tau, df_corr_AB_I, df_corr_AB_X, df_corr_Tau_I, df_co
     df_subject_features = df_subject_features.merge(df_corr, left_on="subject", right_index=True)
 
 # --- Final dataframe ---
+pd.option_context("display.max_rows", 1000)
 print(df_subject_features.head())
+
 # ------------------------------------------------------------------
 # EXPECTED INPUT
 # One long dataframe where each row = a parcel from a subject.
