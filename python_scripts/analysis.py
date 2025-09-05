@@ -823,7 +823,7 @@ if A_FITTING:
     a_original_sub = get_field(all_values_a, "original_a", filters={"level": "subject"})[0][0]
 
 all_values = load_appended_records(
-    filepath=os.path.join(FDT_values_subfolder, f"FDT_values_aFalse_N{NPARCELLS}_{NOISE_TYPE}.npz")
+    filepath=os.path.join(FDT_values_subfolder, f"FDT_values_N{NPARCELLS}_{NOISE_TYPE}.npz")
 )
 I_tmax_group = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "group"})), axis=0)
 I_norm1_group = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "group"})), axis=0)
