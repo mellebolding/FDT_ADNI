@@ -1044,7 +1044,7 @@ df_cohort["Tau_global"]   = df_cohort.groupby("subject")["Tau_local"].transform(
 df_cohort["I_global"]     = df_cohort.groupby("subject")["I_local"].transform("mean")
 df_cohort["X_global"]     = df_cohort.groupby("subject")["X_local"].transform("mean")
 
-
+print(df_cohort.head())
 import statsmodels.formula.api as smf
 
 import jax
@@ -1055,24 +1055,6 @@ import numpyro
 import numpyro.distributions as dist
 from numpyro.infer import MCMC, NUTS
 
-# Example: df with columns: subject, parcel, ABeta_local, Tau_local, ABeta_global, Tau_global, FDT_I
-# Make sure your data is already in long format (parcel-wise)
-
-# Encode subject indices
-subjects = df["subject"].unique()
-subject_idx = {s: i for i, s in enumerate(subjects)}
-df["subject_idx"] = df["subject"].map(subject_idx)
-
-n_subjects = len(subjects)
-n_obs = len(df)
-
-# Prepare data
-ABeta_local = df["ABeta_local"].values
-Tau_local = df["Tau_local"].values
-ABeta_global = df["ABeta_global"].values
-Tau_global = df["Tau_global"].values
-FDT_I = df["FDT_I"].values
-subject_idx_array = df["subject_idx"].values
 
 def hierarchical_model(ABeta_local, Tau_local, ABeta_global, Tau_global, subject_idx, FDT_I=None):
     # Hyperpriors for random intercepts
@@ -1103,7 +1085,7 @@ def hierarchical_model(ABeta_local, Tau_local, ABeta_global, Tau_global, subject
     numpyro.sample("obs", dist.Normal(mu, sigma), obs=FDT_I)
 
 # Run MCMC
-nuts_kernel = NUTS(hierarchical_model)
-mcmc = MCMC(nuts_kernel, num_warmup=1000, num_samples=2000, num_chains=2)
-mcmc.run(jax.random.PRNGKey(0), ABeta_local, Tau_local, ABeta_global, Tau_global, subject_idx_array, FDT_I)
-mcmc.print_summary()
+# nuts_kernel = NUTS(hierarchical_model)
+# mcmc = MCMC(nuts_kernel, num_warmup=1000, num_samples=2000, num_chains=2)
+# mcmc.run(jax.random.PRNGKey(0), ABeta_local, Tau_local, ABeta_global, Tau_global, subject_idx_array, FDT_I)
+# mcmc.print_summary()
