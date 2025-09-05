@@ -1048,7 +1048,7 @@ from sklearn.model_selection import LeaveOneOut
 rng = np.random.default_rng(42)
 
 
-def subject_pca_features(df, feature, n_components=2):
+def subject_pca_features(df, feature, n_components=1):
     """
     Extract first n_components of parcel-wise distribution of 'feature' across subjects.
     Returns dataframe: subject × components
