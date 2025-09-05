@@ -1247,7 +1247,7 @@ df_corr_AB_I   = subject_cross_correlation(df_cohort, "ABeta_local", "I_local")
 df_corr_AB_X   = subject_cross_correlation(df_cohort, "ABeta_local", "X_local")
 df_corr_Tau_I  = subject_cross_correlation(df_cohort, "Tau_local", "I_local")
 df_corr_Tau_X  = subject_cross_correlation(df_cohort, "Tau_local", "X_local")
-df_corr_I_X    = subject_cross_correlation(df_cohort, "I_local", "X_local")
+#df_corr_I_X    = subject_cross_correlation(df_cohort, "I_local", "X_local")
 
 # Basic stats
 df_stats = (
