@@ -849,8 +849,7 @@ if A_FITTING:
 I_norm2_select = np.array([I_norm2_sub[0,0,:], I_norm2_sub[1,0,:], I_norm2_sub[2,0,:]])
 X_norm2_select = np.array([X_norm2_sub[0,0,:], X_norm2_sub[1,0,:], X_norm2_sub[2,0,:]])
 
-#fig, ax = plt.subplots(figsize=(6, 5))
-#plot_boxes_HC_MCI_AD(ax=ax,data=ABeta_burden,saveplot=1,metric='ABeta burden',plot_title='Abeta burden subject-average across groups',filename=f'Abeta_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
+plot_boxes_HC_MCI_AD(data=ABeta_burden,saveplot=1,metric='ABeta burden',plot_title='Abeta burden subject-average across groups',filename=f'Abeta_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
 #plot_boxes_HC_MCI_AD(ax=ax,data=Tau_burden,saveplot=1,metric='Tau burden',plot_title='Tau burden subject-average across groups',filename=f'Tau_burden_N{NPARCELLS}_{NOISE_TYPE}_a{A_FITTING}')
 I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
 I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)

@@ -104,7 +104,7 @@ def plot_boxes_W_N3(ax, data,
         plt.tight_layout()
         plt.show()
 
-def plot_boxes_HC_MCI_AD(ax, data,
+def plot_boxes_HC_MCI_AD(data,
                  font_scale=1.4,
                  point_size = 6,
                  metric='metric?',
@@ -136,6 +136,7 @@ def plot_boxes_HC_MCI_AD(ax, data,
     swarmplot_palette = {'HC': '#1B9E77', 'MCI': '#D95F02', 'AD': '#7570B3'}
 
     # Plot the box
+    fig, ax = plt.subplots(figsize=(6, 5))
     sns.boxplot(y="value",
                 x="cond",
                 data=data,
