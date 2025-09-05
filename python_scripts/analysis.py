@@ -1201,7 +1201,7 @@ results = run_subjectwise_svm(
     feature_cols=('parcel','ABeta_local','Tau_local','I_local','X_local',
                   'ABeta_dif','Tau_dif','I_dif','X_dif'),
     n_test_subjects=4,
-    n_repeats=10,      # increase for tighter CIs
+    n_repeats=100,      # increase for tighter CIs
     kernel='linear',    # start linear; try 'rbf' after
     Cs=(0.1, 1, 10)
 )
