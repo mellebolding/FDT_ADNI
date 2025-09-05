@@ -1385,8 +1385,8 @@ def run_subjectwise_lasso_logreg(
 
     return pipe, y_pred, y_pred_subj
 
-results = run_subjectwise_svm(
-    df_cohort)
+# results = run_subjectwise_svm(
+#     df_cohort)
 
 
 import statsmodels.formula.api as smf
