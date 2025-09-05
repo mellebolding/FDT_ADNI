@@ -1147,7 +1147,7 @@ def run_subjectwise_svm(
         inner_cv = GroupKFold(n_splits=min(inner_cv_splits, len(np.unique(groups_train))))
         pipe = Pipeline([
             ('scaler', StandardScaler()),
-            ('svc', LinearSVC(class_weight="balanced", max_iter=5000))#SVC(kernel=kernel, class_weight='balanced', probability=False))
+            ('svc', SVC(kernel=kernel, class_weight='balanced', probability=False))#LinearSVC(class_weight="balanced", max_iter=5000))
         ])
         clf = GridSearchCV(
             pipe,
