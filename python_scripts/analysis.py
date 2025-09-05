@@ -1038,16 +1038,16 @@ for cohort_idx, (AB, Tau, I, X) in enumerate(
 # Combine all cohorts
 df_cohort = pd.concat(df_list, ignore_index=True)
 
-df_cohort["ABeta_mean"] = df_cohort.groupby("subject")["ABeta_local"].transform("mean")
-df_cohort["Tau_mean"]   = df_cohort.groupby("subject")["Tau_local"].transform("mean")
-df_cohort["I_mean"]     = df_cohort.groupby("subject")["I_local"].transform("mean")
-df_cohort["X_mean"]     = df_cohort.groupby("subject")["X_local"].transform("mean")
+# df_cohort["ABeta_mean"] = df_cohort.groupby("subject")["ABeta_local"].transform("mean")
+# df_cohort["Tau_mean"]   = df_cohort.groupby("subject")["Tau_local"].transform("mean")
+# df_cohort["I_mean"]     = df_cohort.groupby("subject")["I_local"].transform("mean")
+# df_cohort["X_mean"]     = df_cohort.groupby("subject")["X_local"].transform("mean")
 
-# Difference between mean and local value
-df_cohort["ABeta_dif"] = df_cohort["ABeta_mean"] - df_cohort["ABeta_local"]
-df_cohort["Tau_dif"]   = df_cohort["Tau_mean"] - df_cohort["Tau_local"]
-df_cohort["I_dif"]     = df_cohort["I_mean"] - df_cohort["I_local"]
-df_cohort["X_dif"]     = df_cohort["X_mean"] - df_cohort["X_local"]
+# # Difference between mean and local value
+# df_cohort["ABeta_dif"] = df_cohort["ABeta_mean"] - df_cohort["ABeta_local"]
+# df_cohort["Tau_dif"]   = df_cohort["Tau_mean"] - df_cohort["Tau_local"]
+# df_cohort["I_dif"]     = df_cohort["I_mean"] - df_cohort["I_local"]
+# df_cohort["X_dif"]     = df_cohort["X_mean"] - df_cohort["X_local"]
 
 
 
