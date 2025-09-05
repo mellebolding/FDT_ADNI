@@ -1053,6 +1053,7 @@ from sklearn.svm import SVC
 from sklearn.model_selection import GroupKFold, GridSearchCV
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from collections import Counter, defaultdict
+from sklearn.svm import LinearSVC
 rng = np.random.default_rng(42)
 
 # ------------------------------------------------------------------
@@ -1141,7 +1142,7 @@ def run_subjectwise_svm(
         inner_cv = GroupKFold(n_splits=min(inner_cv_splits, len(np.unique(groups_train))))
         pipe = Pipeline([
             ('scaler', StandardScaler()),
-            ('svc', SVC(kernel=kernel, class_weight='balanced', probability=False))
+            ('svc', LinearSVC(class_weight="balanced", max_iter=5000))#SVC(kernel=kernel, class_weight='balanced', probability=False))
         ])
         clf = GridSearchCV(
             pipe,
