@@ -1270,8 +1270,37 @@ df_subject_features = df_subject_features.merge(df_corr_AB_X, left_on="subject",
 df_subject_features = df_subject_features.merge(df_corr_Tau_I, left_on="subject", right_index=True)
 df_subject_features = df_subject_features.merge(df_corr_Tau_X, left_on="subject", right_index=True)
 
-pd.set_option("display.max_columns", None)
+
 print(df_subject_features.head())
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.inspection import permutation_importance
+from sklearn.model_selection import LeaveOneGroupOut, cross_val_score
+import numpy as np
+
+# Features and labels
+X = df[df_subject_features].values
+y = df["cohort"].values
+groups = df["subject"].values  # prevent leakage
+
+# Random forest
+rf = RandomForestClassifier(
+    n_estimators=500,
+    random_state=42,
+    class_weight="balanced"
+)
+
+# Cross-validation (subject-wise)
+logo = LeaveOneGroupOut()
+scores = cross_val_score(rf, X, y, cv=logo.split(X, y, groups))
+print("Mean CV accuracy:", scores.mean())
+
+# Fit once for feature importance
+rf.fit(X, y)
+perm_importance = permutation_importance(rf, X, y, n_repeats=30, random_state=42)
+
+importance = dict(zip(df_subject_features, perm_importance.importances_mean))
+importance_sorted = dict(sorted(importance.items(), key=lambda x: -x[1]))
+print("Permutation importance (sorted):", importance_sorted)
 
 
 def run_subjectwise_lasso_logreg(
