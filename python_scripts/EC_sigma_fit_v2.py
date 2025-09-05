@@ -381,7 +381,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
 NPARCELLS = 379 # max 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
-A_FITTING = True
+A_FITTING = False
 
 
 ###### Loading the data ######
