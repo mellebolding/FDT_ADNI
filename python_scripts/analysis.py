@@ -1038,11 +1038,16 @@ for cohort_idx, (AB, Tau, I, X) in enumerate(
 # Combine all cohorts
 df_cohort = pd.concat(df_list, ignore_index=True)
 
-# Add subject-level means
-df_cohort["ABeta_global"] = df_cohort.groupby("subject")["ABeta_local"].transform("mean")
-df_cohort["Tau_global"]   = df_cohort.groupby("subject")["Tau_local"].transform("mean")
-df_cohort["I_global"]     = df_cohort.groupby("subject")["I_local"].transform("mean")
-df_cohort["X_global"]     = df_cohort.groupby("subject")["X_local"].transform("mean")
+df_cohort["ABeta_mean"] = df_cohort.groupby("subject")["ABeta_local"].transform("mean")
+df_cohort["Tau_mean"]   = df_cohort.groupby("subject")["Tau_local"].transform("mean")
+df_cohort["I_mean"]     = df_cohort.groupby("subject")["I_local"].transform("mean")
+df_cohort["X_mean"]     = df_cohort.groupby("subject")["X_local"].transform("mean")
+
+# Difference between mean and local value
+df_cohort["ABeta_dif"] = df_cohort["ABeta_mean"] - df_cohort["ABeta_local"]
+df_cohort["Tau_dif"]   = df_cohort["Tau_mean"] - df_cohort["Tau_local"]
+df_cohort["I_dif"]     = df_cohort["I_mean"] - df_cohort["I_local"]
+df_cohort["X_dif"]     = df_cohort["X_mean"] - df_cohort["X_local"]
 
 print(df_cohort.head())
 
@@ -1067,7 +1072,7 @@ rng = np.random.default_rng(42)
 def run_subjectwise_svm(
     df,
     feature_cols=('parcel_idx','ABeta','Tau','I_N2','X_N2',   # base 5
-                  'ABeta_mean','Tau_mean','I_N2_mean','X_N2_mean'),  # +4 optional
+                  'ABeta_dif','Tau_dif','I_N2_dif','X_N2_dif'),  # +4 optional
     label_col='cohort',
     group_col='subject',
     n_test_subjects=4,
@@ -1194,7 +1199,7 @@ def run_subjectwise_svm(
 results = run_subjectwise_svm(
     df_cohort,
     feature_cols=('parcel','ABeta_local','Tau_local','I_local','X_local',
-                  'ABeta_global','Tau_global','I_global','X_global'),
+                  'ABeta_dif','Tau_dif','I_dif','X_dif'),
     n_test_subjects=4,
     n_repeats=100,      # increase for tighter CIs
     kernel='linear',    # start linear; try 'rbf' after
