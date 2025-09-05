@@ -823,7 +823,7 @@ if A_FITTING:
     a_original_sub = get_field(all_values_a, "original_a", filters={"level": "subject"})[0][0]
 
 all_values = load_appended_records(
-    filepath=os.path.join(FDT_values_subfolder, f"FDT_values_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
+    filepath=os.path.join(FDT_values_subfolder, f"FDT_values_aFalse_N{NPARCELLS}_{NOISE_TYPE}.npz")
 )
 I_tmax_group = np.squeeze(np.array(get_field(all_values, "I_tmax", filters={"level": "group"})), axis=0)
 I_norm1_group = np.squeeze(np.array(get_field(all_values, "I_norm1", filters={"level": "group"})), axis=0)
@@ -856,7 +856,6 @@ I_vs_Xnorm2(I_norm2_group_a, X_norm2_group_a, a=True)
 I_vs_Xnorm2(I_norm2_sub_a, X_norm2_sub_a, a=True, sub=True)
 if A_FITTING: I_vs_Xnorm2(I_norm2_group, X_norm2_group,I_norm2_group_a,X_norm2_group_a, a=True)
 if A_FITTING: I_vs_Xnorm2(I_norm2_sub, X_norm2_sub,I_norm2_sub_a,X_norm2_sub_a, a=True, sub=True)
-print(I_norm2_group[0].shape, X_norm2_sub[0].shape)
 # I_vs_Xnorm2(I_norm2_select, X_norm2_select, a=False)
 # print(I_norm2_select.shape, I_norm2_group.shape)
 # I_vs_Xnorm22(I_norm2_sub, X_norm2_sub, a=False)
