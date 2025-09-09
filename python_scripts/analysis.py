@@ -1080,6 +1080,40 @@ def subject_ica_features(df_long, measure_col, n_components=20):
     # The transform gives us the component scores for each subject
     subject_component_scores = ica.fit_transform(data_matrix)
 
+    spatial_weights = ica.components_
+
+    # Choose one IC to visualize (e.g., IC #0)
+    ic_index = 0
+    ic_weights = spatial_weights[ic_index, :]
+
+    # To make it a connectome plot, we need a connectivity matrix.
+    # We can use the outer product of the weights as a proxy for this.
+    connectome_matrix = np.outer(ic_weights, ic_weights)
+
+    # Define the parcel labels for the plot
+    parcel_labels = data_matrix.columns.to_list()
+
+    # Plotting the connectome using Nilearn's plot_connectome
+    # Since we don't have an atlas, we need to create dummy coordinates for the plot
+    # This part is a bit of a workaround to use Nilearn's plotting function
+    # You can generate a circular layout for the coordinates
+    theta = np.linspace(0, 2 * np.pi, len(parcel_labels))
+    x = np.cos(theta)
+    y = np.sin(theta)
+    # The z-axis can be all zeros
+    node_coords = np.vstack([x, y, np.zeros_like(x)]).T
+
+    plotting.plot_connectome(
+        connectome_matrix,
+        node_coords,
+        node_size=10,
+        title=f'Connectome of Independent Component {ic_index + 1}',
+        node_labels=parcel_labels,
+        edge_cmap='viridis',
+        edge_threshold='20%' # Only show top 20% of edges
+    )
+    plotting.show()
+
     # Store these new features in a DataFrame
     return pd.DataFrame(
         subject_component_scores, 
@@ -1130,6 +1164,8 @@ df_ica_AB = subject_ica_features(df_cohort, "ABeta_local", n_components=20)
 df_ica_Tau = subject_ica_features(df_cohort, "Tau_local", n_components=20)
 df_ica_I = subject_ica_features(df_cohort, "I_local", n_components=20)
 df_ica_X = subject_ica_features(df_cohort, "X_local", n_components=20)
+
+
 print(df_ica_I.head())
 df_corr_AB_Tau = subject_cross_correlation(df_cohort, "ABeta_local", "Tau_local")
 df_corr_AB_I   = subject_cross_correlation(df_cohort, "ABeta_local", "I_local")
