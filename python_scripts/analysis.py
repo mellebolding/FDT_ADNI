@@ -1130,21 +1130,22 @@ df_ica_AB = subject_ica_features(df_cohort, "ABeta_local", n_components=20)
 df_ica_Tau = subject_ica_features(df_cohort, "Tau_local", n_components=20)
 df_ica_I = subject_ica_features(df_cohort, "I_local", n_components=20)
 df_ica_X = subject_ica_features(df_cohort, "X_local", n_components=20)
+print(df_ica_I)
 df_corr_AB_Tau = subject_cross_correlation(df_cohort, "ABeta_local", "Tau_local")
 df_corr_AB_I   = subject_cross_correlation(df_cohort, "ABeta_local", "I_local")
 df_corr_AB_X   = subject_cross_correlation(df_cohort, "ABeta_local", "X_local")
 df_corr_Tau_I  = subject_cross_correlation(df_cohort, "Tau_local", "I_local")
 df_corr_Tau_X  = subject_cross_correlation(df_cohort, "Tau_local", "X_local")
 
-# --- 2. Compute subject-level basic stats ---
-# df_stats = (
-#     df_cohort.groupby("subject")
-#     .agg(
-#         {f: ["mean"] for f in ["ABeta_local", "Tau_local", "I_local", "X_local"]} |
-#         {"cohort": "first"}  # <- add cohort here
-#     )
-# )
-df_stats = df_cohort.copy()
+#--- 2. Compute subject-level basic stats ---
+df_stats = (
+    df_cohort.groupby("subject")
+    .agg(
+        {f: ["mean"] for f in ["ABeta_local", "Tau_local", "I_local", "X_local"]} |
+        {"cohort": "first"}  # <- add cohort here
+    )
+)
+
 df_stats.columns = ["_".join(c) if c[0] != "cohort" else "cohort" for c in df_stats.columns]
 df_stats = df_stats.reset_index()
 
