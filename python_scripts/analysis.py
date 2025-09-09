@@ -1137,13 +1137,13 @@ df_corr_Tau_I  = subject_cross_correlation(df_cohort, "Tau_local", "I_local")
 df_corr_Tau_X  = subject_cross_correlation(df_cohort, "Tau_local", "X_local")
 
 # --- 2. Compute subject-level basic stats ---
-df_stats = (
-    df_cohort.groupby("subject")
-    .agg(
-        {f: ["mean"] for f in ["ABeta_local", "Tau_local", "I_local", "X_local"]} |
-        {"cohort": "first"}  # <- add cohort here
-    )
-)
+# df_stats = (
+#     df_cohort.groupby("subject")
+#     .agg(
+#         {f: ["mean"] for f in ["ABeta_local", "Tau_local", "I_local", "X_local"]} |
+#         {"cohort": "first"}  # <- add cohort here
+#     )
+# )
 df_stats.columns = ["_".join(c) if c[0] != "cohort" else "cohort" for c in df_stats.columns]
 df_stats = df_stats.reset_index()
 
