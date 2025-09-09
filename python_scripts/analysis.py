@@ -1038,7 +1038,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from collections import defaultdict, Counter
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, FastICA
 
 
 from sklearn.ensemble import RandomForestClassifier
@@ -1064,6 +1064,29 @@ def subject_pca_features(df, feature, n_components=1):
         index=df["subject"].unique(),
         columns=[f"{feature}_PC{i+1}" for i in range(n_components)]
     )
+
+def subject_ica_features(df_long, measure_col, n_components=20):
+    """
+    Pivots the long dataframe to (subjects x parcels) and runs ICA.
+    The transform gives the component scores (the "mixing matrix") for each subject.
+    Returns a wide DataFrame (subjects x components).
+    """
+    # Pivot to get the right shape for ICA: (n_subjects, n_features)
+    data_matrix = df_long.pivot(index='subject', columns='parcel', values=measure_col)
+    
+    # Initialize and run ICA
+    ica = FastICA(n_components=n_components, random_state=42, max_iter=1000, whiten='unit-variance')
+    
+    # The transform gives us the component scores for each subject
+    subject_component_scores = ica.fit_transform(data_matrix)
+
+    # Store these new features in a DataFrame
+    return pd.DataFrame(
+        subject_component_scores, 
+        index=data_matrix.index, # Use subject IDs as index
+        columns=[f'{measure_col}_IC_{i}' for i in range(n_components)]
+    )
+   
 
 
 def subject_cross_correlation(df, f1, f2):
@@ -1103,6 +1126,10 @@ df_pca_AB = subject_pca_features(df_cohort, "ABeta_local")
 df_pca_Tau = subject_pca_features(df_cohort, "Tau_local")
 df_pca_I = subject_pca_features(df_cohort, "I_local")
 df_pca_X = subject_pca_features(df_cohort, "X_local")
+df_ica_AB = subject_ica_features(df_cohort, "ABeta_local", n_components=20)
+df_ica_Tau = subject_ica_features(df_cohort, "Tau_local", n_components=20)
+df_ica_I = subject_ica_features(df_cohort, "I_local", n_components=20)
+df_ica_X = subject_ica_features(df_cohort, "X_local", n_components=20)
 df_corr_AB_Tau = subject_cross_correlation(df_cohort, "ABeta_local", "Tau_local")
 df_corr_AB_I   = subject_cross_correlation(df_cohort, "ABeta_local", "I_local")
 df_corr_AB_X   = subject_cross_correlation(df_cohort, "ABeta_local", "X_local")
@@ -1122,10 +1149,14 @@ df_stats = df_stats.reset_index()
 
 # --- 3. Merge PCA features ---
 df_subject_features = df_stats.copy()
-df_subject_features = df_subject_features.merge(df_pca_AB, left_on="subject", right_index=True)
-df_subject_features = df_subject_features.merge(df_pca_Tau, left_on="subject", right_index=True)
-df_subject_features = df_subject_features.merge(df_pca_I, left_on="subject", right_index=True)
-df_subject_features = df_subject_features.merge(df_pca_X, left_on="subject", right_index=True)
+# df_subject_features = df_subject_features.merge(df_pca_AB, left_on="subject", right_index=True)
+# df_subject_features = df_subject_features.merge(df_pca_Tau, left_on="subject", right_index=True)
+# df_subject_features = df_subject_features.merge(df_pca_I, left_on="subject", right_index=True)
+# df_subject_features = df_subject_features.merge(df_pca_X, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_ica_AB, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_ica_Tau, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_ica_I, left_on="subject", right_index=True)
+df_subject_features = df_subject_features.merge(df_ica_X, left_on="subject", right_index=True)
 
 # --- 4. Merge inter-feature correlations ---
 # for df_corr in [df_corr_AB_Tau, df_corr_AB_I, df_corr_AB_X, df_corr_Tau_I, df_corr_Tau_X]:
