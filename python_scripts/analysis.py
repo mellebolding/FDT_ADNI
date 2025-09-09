@@ -1108,7 +1108,7 @@ def subject_ica_features(df_long, measure_col, n_components=20):
         node_coords,
         node_size=10,
         title=f'Connectome of Independent Component {ic_index + 1}',
-        node_labels=parcel_labels,
+        #node_labels=parcel_labels,
         edge_cmap='viridis',
         edge_threshold='20%' # Only show top 20% of edges
     )
