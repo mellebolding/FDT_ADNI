@@ -268,19 +268,39 @@ for cohort_idx, (AB, Tau, I, X) in enumerate(
     })
     df_list.append(df)
 df_parcel = pd.concat(df_list, ignore_index=True)
-df_stats = (
-    df_parcel.groupby("subject")
-    .agg(
-        {f: ["mean"] for f in ["ABeta_local", "Tau_local", "I_local", "X_local"]} |
-        {"cohort": "first"}  # <- add cohort here
-    )
+# --- Subject-level PET + FDT parcel features (wide) ---
+df_wide = df_parcel.pivot(
+    index="subject",
+    columns="parcel",
+    values=["ABeta_local", "Tau_local", "I_local", "X_local"]
 )
-df_stats.columns = ["_".join(c) if c[0] != "cohort" else "cohort" for c in df_stats.columns]
-df_stats = df_stats.reset_index()
-df_combined = df_parcel.merge(df_stats, on="subject", suffixes=("", "_subj"))
-df_combined = df_combined.drop(columns="cohort_subj")
+df_wide.columns = [f"{feat}_parcel{p}" for feat, p in df_wide.columns]
 
-print(df_combined.head())
+# --- Subject-level averages + cohort ---
+df_means = (
+    df_parcel.groupby("subject")
+    .agg({
+        "ABeta_local": "mean",
+        "Tau_local": "mean",
+        "I_local": "mean",
+        "X_local": "mean",
+        "cohort": "first"
+    })
+    .rename(columns={
+        "ABeta_local": "ABeta_local_mean",
+        "Tau_local": "Tau_local_mean",
+        "I_local": "I_local_mean",
+        "X_local": "X_local_mean",
+        "cohort": "group"
+    })
+)
+
+# --- Combine into final subject-level dataframe ---
+df_subject = df_wide.merge(df_means, left_index=True, right_index=True).reset_index()
+
+print(df_subject.shape)
+print(df_subject.head())
+
 
 
 ### ML CLASSIFIER
