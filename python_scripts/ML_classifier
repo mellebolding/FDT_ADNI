@@ -275,9 +275,10 @@ df_stats = (
         {"cohort": "first"}  # <- add cohort here
     )
 )
-#df_stats.columns = ["_".join(c) if c[0] != "cohort" else "cohort" for c in df_stats.columns]
+df_stats.columns = ["_".join(c) if c[0] != "cohort" else "cohort" for c in df_stats.columns]
 df_stats = df_stats.reset_index()
 df_combined = df_parcel.merge(df_stats, on="subject", suffixes=("", "_subj"))
+df_combined = df_combined.drop(columns="cohort_subj")
 
 print(df_combined.head())
 
