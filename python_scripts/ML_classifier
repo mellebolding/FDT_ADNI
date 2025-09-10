@@ -378,7 +378,7 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
         )
         model = Pipeline([
             ("feature_selection", rf),
-            ("svm", SVC(kernel="poly", C=1, gamma="scale", class_weight="balanced", random_state=42))
+            ("svm", SVC(kernel="rbf", C=1, gamma="scale", class_weight="balanced", random_state=42))
         ])
     else:
         raise ValueError("Invalid algorithm_type. Choose 'SVM', 'RF', or 'RF+SVM'.")
