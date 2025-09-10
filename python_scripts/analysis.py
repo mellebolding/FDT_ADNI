@@ -1062,8 +1062,6 @@ def subject_pca_features(df, feature, n_components=5):
     X_spca = spca.fit_transform(X)  # subject × component scores
     components = spca.components_   # component × (parcel × feature) loadings
 
-    print("Component scores shape:", X_spca.shape)
-    print("Component loadings shape:", components.shape)
     
     pca = PCA(n_components=n_components, random_state=42)
     comps = pca.fit_transform(mat)  # shape (n_subjects, n_components)
@@ -1522,8 +1520,8 @@ df_scores = pd.DataFrame(X_spca, index=df_wide.index, columns=[f"Comp{i+1}" for 
 df_scores["group"] = df_subject_features.set_index("subject").loc[df_wide.index, "cohort"]
 
 for c in df_scores.columns[:-1]:
-    g0 = df_scores[df_scores["group"] == 0][c]
-    g1 = df_scores[df_scores["group"] == 1][c]
+    g0 = df_scores[df_scores["group"] == 1][c]
+    g1 = df_scores[df_scores["group"] == 2][c]
     stat, p = ttest_ind(g0, g1)
     print(f"{c}: t={stat:.2f}, p={p:.4f}")
 
