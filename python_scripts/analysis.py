@@ -1136,7 +1136,7 @@ df_ica_I,comI = subject_ica_features(df_cohort, "I_local", n_components=20)
 df_ica_X,comX = subject_ica_features(df_cohort, "X_local", n_components=20)
 
 
-print(np.sort(comAB[0])[:5])
+print(np.sort(comAB[0])[:15])
 df_corr_AB_Tau = subject_cross_correlation(df_cohort, "ABeta_local", "Tau_local")
 df_corr_AB_I   = subject_cross_correlation(df_cohort, "ABeta_local", "I_local")
 df_corr_AB_X   = subject_cross_correlation(df_cohort, "ABeta_local", "X_local")
