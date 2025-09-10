@@ -267,6 +267,7 @@ for cohort_idx, (AB, Tau, I, X) in enumerate(
         "cohort": cohort_idx
     })
     df_list.append(df)
+df_list = pd.concat(df_list, ignore_index=True)
 df_stats = (
     df_list.groupby("subject")
     .agg(
