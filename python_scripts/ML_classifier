@@ -267,9 +267,9 @@ for cohort_idx, (AB, Tau, I, X) in enumerate(
         "cohort": cohort_idx
     })
     df_list.append(df)
-df_list = pd.concat(df_list, ignore_index=True)
+df_parcel = pd.concat(df_list, ignore_index=True)
 df_stats = (
-    df_list.groupby("subject")
+    df_parcel.groupby("subject")
     .agg(
         {f: ["mean"] for f in ["ABeta_local", "Tau_local", "I_local", "X_local"]} |
         {"cohort": "first"}  # <- add cohort here
@@ -277,8 +277,9 @@ df_stats = (
 )
 df_stats.columns = ["_".join(c) if c[0] != "cohort" else "cohort" for c in df_stats.columns]
 df_stats = df_stats.reset_index()
+df_combined = df_parcel.merge(df_stats, on="subject", suffixes=("", "_subj"))
 
-print(df_stats.head())
+print(df_combined.head())
 
 
 ### ML CLASSIFIER
