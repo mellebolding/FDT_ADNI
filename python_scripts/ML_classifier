@@ -349,7 +349,7 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
     if algorithm_type == "SVM":
         model = Pipeline([
             ("feature_selection", SelectKBest(f_classif, k=int(np.sqrt(n_features)))),
-            ("svm", SVC(kernel="rbf", random_state=42))
+            ("svm", SVC(kernel="rbf", C=1000, random_state=42))
         ])
     elif algorithm_type == "RF":
 
@@ -357,13 +357,13 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
         max_features = int(np.sqrt(n_features))
 
         rf_selector = SelectFromModel(
-            RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=42),
+            RandomForestClassifier(n_estimators=10, criterion="entropy", random_state=42),
             max_features=max_features,
             threshold=-np.inf
         )
 
         rf_classifier = RandomForestClassifier(
-            n_estimators=500, criterion="entropy", random_state=42, class_weight="balanced"
+            n_estimators=10, criterion="entropy", random_state=42, class_weight="balanced"
         )
 
         model = Pipeline([
@@ -378,7 +378,7 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
         )
         model = Pipeline([
             ("feature_selection", rf),
-            ("svm", SVC(kernel="rbf", C=1.0, gamma="scale", class_weight="balanced", random_state=42))
+            ("svm", SVC(kernel="rbf", C=100, gamma="scale", class_weight="balanced", random_state=42))
         ])
     else:
         raise ValueError("Invalid algorithm_type. Choose 'SVM', 'RF', or 'RF+SVM'.")
