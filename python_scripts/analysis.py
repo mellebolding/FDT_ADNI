@@ -1520,7 +1520,7 @@ df_scores = pd.DataFrame(X_spca, index=df_wide.index, columns=[f"Comp{i+1}" for 
 df_scores["group"] = df_subject_features.set_index("subject").loc[df_wide.index, "cohort"]
 
 for c in df_scores.columns[:-1]:
-    g0 = df_scores[df_scores["group"] == 1][c]
+    g0 = df_scores[df_scores["group"] == 0][c]
     g1 = df_scores[df_scores["group"] == 2][c]
     stat, p = ttest_ind(g0, g1)
     print(f"{c}: t={stat:.2f}, p={p:.4f}")
