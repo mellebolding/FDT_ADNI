@@ -349,7 +349,7 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
     if algorithm_type == "SVM":
         model = Pipeline([
             ("feature_selection", SelectKBest(f_classif, k=int(np.sqrt(n_features)))),
-            ("svm", SVC(kernel="linear", random_state=42))
+            ("svm", SVC(kernel="rbf", random_state=42))
         ])
     elif algorithm_type == "RF":
 
@@ -390,7 +390,7 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
 
     print(f"Leave-One-Out CV Accuracy: {np.mean(scores):.4f}")
 
-ML_classifier("RF+SVM", "BOTH", df_subject.rename(columns={"cohort": "group"}), n_features=1482)
+ML_classifier("RF+SVM", "BOTH", df_subject.rename(columns={"cohort": "group"}), n_features=148)
 ML_classifier("RF+SVM", "PET", df_subject.rename(columns={"cohort": "group"}), n_features=722)
 ML_classifier("RF+SVM", "FDT", df_subject.rename(columns={"cohort": "group"}), n_features=760)
 
