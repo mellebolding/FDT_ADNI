@@ -353,7 +353,7 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
         ])
     elif algorithm_type == "RF":
 
-        n_features = X.shape[1]
+        #n_features = X.shape[1]
         max_features = int(np.sqrt(n_features))
 
         rf_selector = SelectFromModel(
@@ -372,13 +372,13 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
         ])
     elif algorithm_type == "RF+SVM":
         rf = SelectFromModel(
-        RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=42),
+        RandomForestClassifier(n_estimators=10, criterion="entropy", random_state=42),
         max_features=int(np.sqrt(n_features)),  # select top 20 features
         threshold=-np.inf  # allow explicit max_features selection
         )
         model = Pipeline([
             ("feature_selection", rf),
-            ("svm", SVC(kernel="rbf", C=10, gamma="scale", class_weight="balanced", random_state=42))
+            ("svm", SVC(kernel="poly", C=1, gamma="scale", class_weight="balanced", random_state=42))
         ])
     else:
         raise ValueError("Invalid algorithm_type. Choose 'SVM', 'RF', or 'RF+SVM'.")
