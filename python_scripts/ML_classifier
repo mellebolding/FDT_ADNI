@@ -372,7 +372,7 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
         ])
     elif algorithm_type == "RF+SVM":
         rf = SelectFromModel(
-        RandomForestClassifier(n_estimators=200, criterion="entropy", random_state=42),
+        RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=42),
         max_features=int(np.sqrt(n_features)),  # select top 20 features
         threshold=-np.inf  # allow explicit max_features selection
         )
