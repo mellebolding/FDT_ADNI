@@ -41,7 +41,7 @@ import ADNI_A
 from sklearn.model_selection import LeaveOneOut
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
-from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.feature_selection import SelectKBest, f_classif, SelectFromModel
 from sklearn.pipeline import Pipeline
 from sklearn.inspection import permutation_importance
 
@@ -288,8 +288,11 @@ print(df_combined.head())
 # - Classify HC/MCI/AD using (1) SVM (with top-k F1 features), (2) RF, and (3) using RF+SVM
 # - Use (1) empirical PET data (parcel values + global average), (2) FDT metrics (first I, then I+X; again parcel values + global), and (3) both
 # - Needs to be configurable and general enough to be used for other datasets as well
+# number of PET features: 360+360+1+1 = 722 -> sqrt = 27
+# number of FDT features: 379+379+1+1 = 760 -> sqrt = 28
+# number of PET+FDT features: 722+760 = 1482 -> sqrt = 39
 
-def ML_classifier(algorithm_type, data_type, data, k_features=10):
+def ML_classifier(algorithm_type, data_type, data, n_features):
     """
     Parameters
     ----------
@@ -307,26 +310,55 @@ def ML_classifier(algorithm_type, data_type, data, k_features=10):
     None
         Prints classification accuracy and feature importance
     """
-    
+    if data_type == "PET":
+        feature_cols = [col for col in data.columns if "ABeta" in col or "Tau" in col]
+    elif data_type == "FDT":
+        feature_cols = [col for col in data.columns if "I_local" in col or "X_local" in col]
+    elif data_type == "BOTH":
+        feature_cols = [col for col in data.columns if any(f in col for f in ["ABeta", "Tau", "I_local", "X_local"])]
+    else:
+        raise ValueError("Invalid data_type. Choose 'PET', 'FDT', or 'BOTH'.")
 
-    # Prepare data
-    X = data.drop(columns=["subject", "group"]).values
+    X = data[feature_cols].values 
     y = data["group"].values
+
 
     loo = LeaveOneOut()
     scores = []
 
     if algorithm_type == "SVM":
         model = Pipeline([
-            ("feature_selection", SelectKBest(f_classif, k=k_features)),
+            ("feature_selection", SelectKBest(f_classif, k=int(np.sqrt(n_features)))),
             ("svm", SVC(kernel="linear", random_state=42))
         ])
     elif algorithm_type == "RF":
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
-    elif algorithm_type == "RF+SVM":
+
+        n_features = X.shape[1]
+        max_features = int(np.sqrt(n_features))
+
+        rf_selector = SelectFromModel(
+            RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=42),
+            max_features=max_features,
+            threshold=-np.inf
+        )
+
+        rf_classifier = RandomForestClassifier(
+            n_estimators=500, criterion="entropy", random_state=42, class_weight="balanced"
+        )
+
         model = Pipeline([
-            ("feature_selection", SelectKBest(f_classif, k=k_features)),
-            ("rf", RandomForestClassifier(n_estimators=100, random_state=42))
+            ("feature_selection", rf_selector),
+            ("rf", rf_classifier)
+        ])
+    elif algorithm_type == "RF+SVM":
+        rf = SelectFromModel(
+        RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=42),
+        max_features=int(np.sqrt(n_features)),  # select top 20 features
+        threshold=-np.inf  # allow explicit max_features selection
+        )
+        model = Pipeline([
+            ("feature_selection", rf),
+            ("svm", SVC(kernel="rbf", C=1.0, gamma="scale", class_weight="balanced", random_state=42))
         ])
     else:
         raise ValueError("Invalid algorithm_type. Choose 'SVM', 'RF', or 'RF+SVM'.")
@@ -338,8 +370,4 @@ def ML_classifier(algorithm_type, data_type, data, k_features=10):
 
     print(f"Leave-One-Out CV Accuracy: {np.mean(scores):.4f}")
 
-    # Feature importance (only for RF and RF+SVM)
-    if algorithm_type in ["RF", "RF+SVM"]:
-        rf = model.named_steps["rf"] if algorithm_type == "RF+SVM" else model
-        rf.fit(X, y)
-        perm_importance = permutation
+ML_classifier("SVM", "PET", df_stats.rename(columns={"cohort": "group"}), n_features=722)
