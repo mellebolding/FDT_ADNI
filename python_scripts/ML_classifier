@@ -275,6 +275,8 @@ df_stats = (
         {"cohort": "first"}  # <- add cohort here
     )
 )
+df_stats.columns = ["_".join(c) if c[0] != "cohort" else "cohort" for c in df_stats.columns]
+df_stats = df_stats.reset_index()
 
 print(df_stats.head())
 
