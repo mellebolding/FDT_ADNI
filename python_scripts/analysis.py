@@ -1180,8 +1180,8 @@ df_subject_features = df_subject_features.merge(df_ica_X, left_on="subject", rig
 #     df_subject_features = df_subject_features.merge(df_corr, left_on="subject", right_index=True)
 
 # --- Final dataframe ---
-pd.set_option("display.max_rows", None)
-print(df_subject_features)
+#pd.set_option("display.max_rows", None)
+#print(df_subject_features)
 
 # ------------------------------------------------------------------
 # EXPECTED INPUT
@@ -1347,7 +1347,7 @@ for train_idx, test_idx in loo.split(X):
     rf.fit(X[train_idx], y[train_idx])
     scores.append(rf.score(X[test_idx], y[test_idx]))
 
-print("Leave-One-Out CV Accuracy:", np.mean(scores))
+#print("Leave-One-Out CV Accuracy:", np.mean(scores))
 
 # --- Fit on full dataset for feature importance ---
 rf.fit(X, y)
@@ -1361,8 +1361,8 @@ importance = pd.DataFrame({
     "importance_std": perm_importance.importances_std
 }).sort_values("importance_mean", ascending=False)
 
-print("\nPermutation importance:")
-print(importance)
+#print("\nPermutation importance:")
+#print(importance)
 
 def run_subjectwise_lasso_logreg(
     df,
@@ -1483,3 +1483,47 @@ def hierarchical_model(ABeta_local, Tau_local, ABeta_global, Tau_global, subject
 # mcmc = MCMC(nuts_kernel, num_warmup=1000, num_samples=2000, num_chains=2)
 # mcmc.run(jax.random.PRNGKey(0), ABeta_local, Tau_local, ABeta_global, Tau_global, subject_idx_array, FDT_I)
 # mcmc.print_summary()
+
+import numpy as np
+import pandas as pd
+from sklearn.decomposition import SparsePCA
+from scipy.stats import ttest_ind
+
+# --- 1. Reshape data: subject × (parcel × feature) ---
+df_wide = (
+    df_cohort.pivot(index="subject", columns="parcel", values=["ABeta_local", "Tau_local", "I_local", "X_local"])
+)
+df_wide.columns = [f"{feat}_parcel{p}" for feat, p in df_wide.columns]
+X = df_wide.values  # shape: n_subjects × (n_parcels * 4)
+
+print("Data shape for SparsePCA:", X.shape)
+
+# --- 2. Run Sparse PCA ---
+n_components = 5   # number of subnetworks
+alpha = 1          # sparsity (increase for fewer parcels per component)
+
+spca = SparsePCA(n_components=n_components, alpha=alpha, random_state=42)
+X_spca = spca.fit_transform(X)     # subject × component scores
+components = spca.components_      # component × (parcel × feature) loadings
+
+print("Component scores shape:", X_spca.shape)
+print("Component loadings shape:", components.shape)
+
+# --- 3. Inspect top contributing parcels/features ---
+for comp_idx in range(n_components):
+    loading_vec = components[comp_idx]
+    top_idx = np.argsort(np.abs(loading_vec))[::-1][:10]  # top 10 features
+    top_features = [df_wide.columns[i] for i in top_idx]
+    print(f"\nTop features for Component {comp_idx+1}:")
+    print(top_features)
+
+# --- 4. Group-level statistical testing ---
+df_scores = pd.DataFrame(X_spca, index=df_wide.index, columns=[f"Comp{i+1}" for i in range(n_components)])
+df_scores["group"] = df_subject_features.set_index("subject").loc[df_wide.index, "cohort"]
+
+for c in df_scores.columns[:-1]:
+    g0 = df_scores[df_scores["group"] == 0][c]
+    g1 = df_scores[df_scores["group"] == 1][c]
+    stat, p = ttest_ind(g0, g1)
+    print(f"{c}: t={stat:.2f}, p={p:.4f}")
+
