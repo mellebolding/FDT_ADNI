@@ -38,12 +38,13 @@ import nibabel as nib
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 import ADNI_A
-from sklearn.model_selection import LeaveOneOut
+from sklearn.model_selection import LeaveOneOut, train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.feature_selection import SelectKBest, f_classif, SelectFromModel
 from sklearn.pipeline import Pipeline
 from sklearn.inspection import permutation_importance
+from sklearn.metrics import accuracy_score, classification_report
 
 ### Loads data from npz file ######################################
 def load_appended_records(filepath, filters=None, verbose=False):
@@ -312,7 +313,7 @@ print(df_subject.head())
 # number of FDT features: 379+379+1+1 = 760 -> sqrt = 28
 # number of PET+FDT features: 722+760 = 1482 -> sqrt = 39
 
-def ML_classifier(algorithm_type, data_type, data, n_features):
+def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
     """
     Parameters
     ----------
@@ -341,10 +342,6 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
 
     X = data[feature_cols].values 
     y = data["group"].values
-
-
-    loo = LeaveOneOut()
-    scores = []
 
     if algorithm_type == "SVM":
         model = Pipeline([
@@ -378,15 +375,39 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
         )
         model = Pipeline([
             ("feature_selection", rf),
-            ("svm", SVC(kernel="rbf", C=1, gamma=0.1, class_weight="balanced", random_state=42))
+            ("svm", SVC(kernel="rbf", C=1, gamma="scale", class_weight="balanced", random_state=42))
         ])
     else:
         raise ValueError("Invalid algorithm_type. Choose 'SVM', 'RF', or 'RF+SVM'.")
 
-    # Leave-One-Out Cross-Validation
-    for train_idx, test_idx in loo.split(X):
-        model.fit(X[train_idx], y[train_idx])
-        scores.append(model.score(X[test_idx], y[test_idx]))
+    if validation_type == "LOO":
+        from sklearn.model_selection import LeaveOneOut
+        loo = LeaveOneOut()
+        scores = []
+        for train_idx, test_idx in loo.split(X):
+            model.fit(X[train_idx], y[train_idx])
+            scores.append(model.score(X[test_idx], y[test_idx]))
+        print(f"Leave-One-Out CV Accuracy: {np.mean(scores):.4f}")
+
+    elif validation_type == "TEST/TRAIN":
+        subjects = data["subject"].unique()
+        # Stratified split by cohort at the subject level
+        train_subjects, test_subjects = train_test_split(
+            subjects, test_size=0.2, random_state=42,
+            stratify=data.loc[data["subject"].isin(subjects), "cohort"]
+        )
+        X_train = data.loc[data["subject"].isin(train_subjects), feature_cols].values
+        y_train = data.loc[data["subject"].isin(train_subjects), "cohort"].values
+        X_test = data.loc[data["subject"].isin(test_subjects), feature_cols].values
+        y_test = data.loc[data["subject"].isin(test_subjects), "cohort"].values
+        
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        print("Test Accuracy:", accuracy_score(y_test, y_pred))
+        print(classification_report(y_test, y_pred))
+    
+    else:
+        raise ValueError("Invalid validation_type. Choose 'LOO' or 'TEST/TRAIN'.")
 
     print(f"Leave-One-Out CV Accuracy: {np.mean(scores):.4f}")
 
