@@ -1498,7 +1498,7 @@ print("Data shape for SparsePCA:", X.shape)
 
 # --- 2. Run Sparse PCA ---
 n_components = 5   # number of subnetworks
-alpha = 0.1          # sparsity (increase for fewer parcels per component)
+alpha = 0.01          # sparsity (increase for fewer parcels per component)
 
 spca = SparsePCA(n_components=n_components, alpha=alpha, random_state=42)
 X_spca = spca.fit_transform(X)     # subject × component scores
