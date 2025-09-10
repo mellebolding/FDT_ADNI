@@ -391,3 +391,6 @@ def ML_classifier(algorithm_type, data_type, data, n_features):
     print(f"Leave-One-Out CV Accuracy: {np.mean(scores):.4f}")
 
 ML_classifier("RF+SVM", "BOTH", df_subject.rename(columns={"cohort": "group"}), n_features=722)
+ML_classifier("RF+SVM", "PET", df_subject.rename(columns={"cohort": "group"}), n_features=722)
+ML_classifier("RF+SVM", "FDT", df_subject.rename(columns={"cohort": "group"}), n_features=760)
+
