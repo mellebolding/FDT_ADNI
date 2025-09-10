@@ -1038,7 +1038,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from collections import defaultdict, Counter
-from sklearn.decomposition import PCA, FastICA
+from sklearn.decomposition import PCA, FastICA, SparsePCA
 
 
 from sklearn.ensemble import RandomForestClassifier
@@ -1048,13 +1048,22 @@ from sklearn.model_selection import LeaveOneOut
 rng = np.random.default_rng(42)
 
 
-def subject_pca_features(df, feature, n_components=1):
+def subject_pca_features(df, feature, n_components=5):
     """
     Extract first n_components of parcel-wise distribution of 'feature' across subjects.
     Returns dataframe: subject × components
     """
     # pivot: rows=subject, cols=parcel values of the feature
     mat = df.pivot(index="subject", columns="parcel", values=feature).to_numpy()
+
+    alpha = 1         # sparsity parameter (larger = sparser)
+
+    spca = SparsePCA(n_components=n_components, alpha=alpha, random_state=42)
+    X_spca = spca.fit_transform(X)  # subject × component scores
+    components = spca.components_   # component × (parcel × feature) loadings
+
+    print("Component scores shape:", X_spca.shape)
+    print("Component loadings shape:", components.shape)
     
     pca = PCA(n_components=n_components, random_state=42)
     comps = pca.fit_transform(mat)  # shape (n_subjects, n_components)
