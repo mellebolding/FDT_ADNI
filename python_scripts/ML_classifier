@@ -411,14 +411,18 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
         
         X_subject = subject_groups["subject"].values
         y_subject = subject_groups["group"].values
-        
+
         skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        
         scores = []
+        all_preds = []
+        all_true = []
+        all_subjects = []
 
-        for train_subj_idx, test_subj_idx in skf.split(X_subject, y_subject):
-            train_subjects = X_subject[train_subj_idx]
-            test_subjects = X_subject[test_subj_idx]
+        for fold, (train_idx, test_idx) in enumerate(skf.split(X_subject, y_subject)):
+            train_subjects, test_subjects = X_subject[train_idx], X_subject[test_idx]
 
+            # parcel-level train/test sets
             X_train = data.loc[data["subject"].isin(train_subjects), feature_cols].values
             y_train = data.loc[data["subject"].isin(train_subjects), "group"].values
             X_test = data.loc[data["subject"].isin(test_subjects), feature_cols].values
@@ -426,15 +430,34 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
 
             model.fit(X_train, y_train)
             y_pred = model.predict(X_test)
-            scores.append(accuracy_score(y_test, y_pred))
-        
-            print("\nClassification Report:")
-            print(classification_report(y_test, y_pred, target_names=["HC", "MCI", "AD"]))
-        cm = confusion_matrix(y_test, y_pred)
-        disp = ConfusionMatrixDisplay(cm, display_labels=["HC", "MCI", "AD"])
-        disp.plot()
-    print(f"Stratified 5-fold CV Accuracy: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
 
+            scores.append(accuracy_score(y_test, y_pred))
+
+            # store results
+            all_preds.extend(y_pred)
+            all_true.extend(y_test)
+            all_subjects.extend(data.loc[data["subject"].isin(test_subjects), "subject"].values)
+
+        print(f"\nStratified {5}-Fold CV Accuracy: {np.mean(scores):.4f}")
+        
+        # Global report
+        print("\nClassification Report (parcel-level):")
+        print(classification_report(all_true, all_preds))
+
+        print("\nConfusion Matrix (rows=true, cols=pred):")
+        print(confusion_matrix(all_true, all_preds))
+
+        # Subject-level aggregation (majority vote)
+        results_df = pd.DataFrame({
+            "subject": all_subjects,
+            "true": all_true,
+            "pred": all_preds
+        })
+        subj_preds = (
+            results_df.groupby("subject")
+            .agg(true=("true", "first"), pred=("pred", lambda x: x.value_counts().idxmax()))
+        )
+        print("\nSubject-level accuracy (majority vote):", accuracy_score(subj_preds["true"], subj_preds["pred"]))
     if algorithm_type in ["RF", "RF+SVM"]:
     # After fitting the model
         if algorithm_type == "RF":
