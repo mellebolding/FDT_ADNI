@@ -38,7 +38,7 @@ import nibabel as nib
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 import ADNI_A
-from sklearn.model_selection import LeaveOneOut, train_test_split
+from sklearn.model_selection import LeaveOneOut, train_test_split, StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.feature_selection import SelectKBest, f_classif, SelectFromModel
@@ -405,22 +405,30 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
             scores.append(model.score(X[test_idx], y[test_idx]))
         print(f"Leave-One-Out CV Accuracy: {np.mean(scores):.4f}")
 
-    elif validation_type == "TEST/TRAIN":
+    elif validation_type == "CV":
         subjects = data["subject"].unique()
-        # Stratified split by cohort at the subject level
-        train_subjects, test_subjects = train_test_split(
-            subjects, test_size=0.2, random_state=42,
-            stratify=data.loc[data["subject"].isin(subjects), "group"]
-        )
-        X_train = data.loc[data["subject"].isin(train_subjects), feature_cols].values
-        y_train = data.loc[data["subject"].isin(train_subjects), "group"].values
-        X_test = data.loc[data["subject"].isin(test_subjects), feature_cols].values
-        y_test = data.loc[data["subject"].isin(test_subjects), "group"].values
+        subject_groups = data.drop_duplicates("subject")[["subject", "group"]]
         
-        model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
-        print("Test Accuracy:", accuracy_score(y_test, y_pred))
-        print(classification_report(y_test, y_pred))
+        X_subject = subject_groups["subject"].values
+        y_subject = subject_groups["group"].values
+        
+        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        scores = []
+
+        for train_subj_idx, test_subj_idx in skf.split(X_subject, y_subject):
+            train_subjects = X_subject[train_subj_idx]
+            test_subjects = X_subject[test_subj_idx]
+
+            X_train = data.loc[data["subject"].isin(train_subjects), feature_cols].values
+            y_train = data.loc[data["subject"].isin(train_subjects), "group"].values
+            X_test = data.loc[data["subject"].isin(test_subjects), feature_cols].values
+            y_test = data.loc[data["subject"].isin(test_subjects), "group"].values
+
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            scores.append(accuracy_score(y_test, y_pred))
+
+    print(f"Stratified 5-fold CV Accuracy: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
 
     if algorithm_type in ["RF", "RF+SVM"]:
     # After fitting the model
