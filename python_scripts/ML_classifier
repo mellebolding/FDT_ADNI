@@ -364,13 +364,9 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
             ("svm", SVC(kernel="rbf", C=1000, random_state=42))
         ])
     elif algorithm_type == "RF":
-
-        #n_features = X.shape[1]
-        max_features = int(np.sqrt(n_features))
-
         rf_selector = SelectFromModel(
             RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=42),
-            max_features=max_features,
+            max_features=int(np.sqrt(n_features)),
             threshold=-np.inf
         )
 
