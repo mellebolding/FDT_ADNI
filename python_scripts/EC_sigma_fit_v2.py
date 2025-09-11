@@ -89,6 +89,7 @@ from numba import njit, prange, objmode
 import time
 import p_values as p_values
 import statannotations_permutation
+from LinHopf_EC_Sig_A_fit_adam_numba import LinHopf_Ceff_sigma_a_fitting_adam
 
 
 def append_to_npz(filename, **new_data):
@@ -378,7 +379,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
 
 ##### Base parameters settings ######
 
-NPARCELLS = 379 # max 379
+NPARCELLS = 37 # max 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
 A_FITTING = False
@@ -528,8 +529,17 @@ for COND in range(3):
     Ceff_ini = SC_N.copy()
 
     start_time = time.time()
+    # Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
+    #                             LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+    #                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+    #                             fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
+    #                             fit_a=A_FITTING,
+    #                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
+    #                             MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
+    #                             Ceff_norm=Ceff_norm, maxC=maxC,
+    #                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
     Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
-                                LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+                                LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
                                 fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                 fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
                                 fit_a=A_FITTING,
@@ -595,8 +605,16 @@ for COND in range(3):
         SC_N *= 0.2
         if SIGMA_FITTING: sigma_ini = sigma_group_list[COND].copy()
 
+        # Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
+        #                                     LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
+        #                                     fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+        #                                     fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,fit_a=A_FITTING,
+        #                                     epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma*10, epsCOVtau_sigma=epsCOVtau_sigma*10,
+        #                                     MAXiter=MAXiter+10000, error_tol=error_tol, patience=patience+5, learning_rate_factor=learning_rate_factor,
+        #                                     Ceff_norm=Ceff_norm, maxC=maxC,
+        #                                     iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
-                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
+                                            LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,fit_a=A_FITTING,
                                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma*10, epsCOVtau_sigma=epsCOVtau_sigma*10,
