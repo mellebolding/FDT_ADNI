@@ -379,19 +379,6 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
         ])
     else:
         raise ValueError("Invalid algorithm_type. Choose 'SVM', 'RF', or 'RF+SVM'.")
-    
-    if algorithm_type in ["RF", "RF+SVM"]:
-    # After fitting the model
-        if algorithm_type == "RF":
-            rf_model = model.named_steps["rf"]
-        else:  # RF+SVM
-            rf_model = model.named_steps["feature_selection"].estimator_
-
-            importances = rf_model.feature_importances_
-            feat_imp = sorted(zip(feature_cols, importances), key=lambda x: -x[1])[:20]
-            print("\nTop features by RF importance:")
-            for f, imp in feat_imp:
-                print(f"{f}: {imp:.4f}")
 
 
     if validation_type == "LOO":
@@ -419,6 +406,19 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
         y_pred = model.predict(X_test)
         print("Test Accuracy:", accuracy_score(y_test, y_pred))
         print(classification_report(y_test, y_pred))
+
+    if algorithm_type in ["RF", "RF+SVM"]:
+    # After fitting the model
+        if algorithm_type == "RF":
+            rf_model = model.named_steps["rf"]
+        else:  # RF+SVM
+            rf_model = model.named_steps["feature_selection"].estimator_
+
+            importances = rf_model.feature_importances_
+            feat_imp = sorted(zip(feature_cols, importances), key=lambda x: -x[1])[:20]
+            print("\nTop features by RF importance:")
+            for f, imp in feat_imp:
+                print(f"{f}: {imp:.4f}")
     
     else:
         raise ValueError("Invalid validation_type. Choose 'LOO' or 'TEST/TRAIN'.")
