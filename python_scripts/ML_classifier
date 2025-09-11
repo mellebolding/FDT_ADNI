@@ -405,7 +405,7 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
             scores.append(model.score(X[test_idx], y[test_idx]))
         print(f"Leave-One-Out CV Accuracy: {np.mean(scores):.4f}")
 
-    elif validation_type == "CV":
+    elif validation_type == "TEST/TRAIN":
         subjects = data["subject"].unique()
         subject_groups = data.drop_duplicates("subject")[["subject", "group"]]
         
