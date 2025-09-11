@@ -430,9 +430,9 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
         
             print("\nClassification Report:")
             print(classification_report(y_test, y_pred, target_names=["HC", "MCI", "AD"]))
-            cm = confusion_matrix(y_test, y_pred)
-            disp = ConfusionMatrixDisplay(cm, display_labels=["HC", "MCI", "AD"])
-            disp.plot()
+        cm = confusion_matrix(y_test, y_pred)
+        disp = ConfusionMatrixDisplay(cm, display_labels=["HC", "MCI", "AD"])
+        disp.plot()
     print(f"Stratified 5-fold CV Accuracy: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
 
     if algorithm_type in ["RF", "RF+SVM"]:
