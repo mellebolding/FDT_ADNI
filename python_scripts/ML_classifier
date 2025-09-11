@@ -314,8 +314,8 @@ df_means = (
 # --- Combine into final subject-level dataframe ---
 df_subject = df_wide.merge(df_means, left_index=True, right_index=True).reset_index()
 
-print(df_subject.shape)
-print(df_subject.head())
+#print(df_subject.shape)
+#print(df_subject.head())
 
 
 
@@ -476,7 +476,7 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
         raise ValueError("Invalid validation_type. Choose 'LOO' or 'TEST/TRAIN'.")
 
 
-ML_classifier("RF+SVM", "BOTH", "TEST/TRAIN", df_subject.rename(columns={"cohort": "group"}), n_features=1482)
+ML_classifier("RF+SVM", "BOTH", "LOO", df_subject.rename(columns={"cohort": "group"}), n_features=1482)
 #ML_classifier("RF+SVM", "PET", "TEST/TRAIN", df_subject.rename(columns={"cohort": "group"}), n_features=722)
-ML_classifier("RF+SVM", "FDT", "TEST/TRAIN", df_subject.rename(columns={"cohort": "group"}), n_features=760)
+ML_classifier("RF+SVM", "FDT", "LOO", df_subject.rename(columns={"cohort": "group"}), n_features=760)
 
