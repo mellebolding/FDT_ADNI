@@ -543,10 +543,8 @@ for COND in range(3):
                                 fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                 fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
                                 fit_a=A_FITTING,
-                                epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
-                                MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
-                                Ceff_norm=Ceff_norm, maxC=maxC,
-                                iter_check=iter_check, plot_evol=False, plot_evol_last=False)
+                                learning_rate_Ceff=epsFC_Ceff, learning_rate_sigma=epsFC_sigma)
+
     end_time = time.time()
     
     ## save the results
@@ -617,10 +615,7 @@ for COND in range(3):
                                             LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,fit_a=A_FITTING,
-                                            epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma*10, epsCOVtau_sigma=epsCOVtau_sigma*10,
-                                            MAXiter=MAXiter+10000, error_tol=error_tol, patience=patience+5, learning_rate_factor=learning_rate_factor,
-                                            Ceff_norm=Ceff_norm, maxC=maxC,
-                                            iter_check=iter_check, plot_evol=False, plot_evol_last=False)
+                                            learning_rate_Ceff=epsFC_Ceff, learning_rate_sigma=epsFC_sigma)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
 
         a_list_sub_temp.append(a_sub[sub])
