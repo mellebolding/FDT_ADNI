@@ -151,6 +151,20 @@ def load_PET_data(NPARCELLS):
     Tau_burden = [np.array(HC_Tau)[:,:NPARCELLS,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
     return ABeta_burden, Tau_burden
 
+def map_feature_to_parcel(feature_name, parcel_dict):
+    """
+    Convert feature names like 'ABeta_local_23' into 'ABeta_local_Right_V1'
+    using the provided Parcel_names dictionary.
+    """
+    import re
+    match = re.search(r"_(\d+)$", feature_name)  # look for trailing _<number>
+    if match:
+        parcel_id = int(match.group(1))
+        if parcel_id in parcel_dict:
+            return feature_name.replace(f"_{parcel_id}", f"_{parcel_dict[parcel_id]}")
+    return feature_name
+
+
 # Dictionary mapping parcel indices (1-based) to their names
 Parcel_names = {
     1: "Right_V1", 2: "Right_MST", 3: "Right_V6", 4: "Right_V2", 5: "Right_V3", 6: "Right_V4", 7: "Right_V8",
@@ -418,7 +432,8 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
             feat_imp = sorted(zip(feature_cols, importances), key=lambda x: -x[1])[:20]
             print("\nTop features by RF importance:")
             for f, imp in feat_imp:
-                print(f"{f}: {imp:.4f}")
+                f_mapped = map_feature_to_parcel(f, Parcel_names)
+                print(f"{f_mapped}: {imp:.4f}")
     
     else:
         raise ValueError("Invalid validation_type. Choose 'LOO' or 'TEST/TRAIN'.")
