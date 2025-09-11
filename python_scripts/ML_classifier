@@ -394,12 +394,12 @@ def ML_classifier(algorithm_type, data_type, validation_type, data, n_features):
         # Stratified split by cohort at the subject level
         train_subjects, test_subjects = train_test_split(
             subjects, test_size=0.2, random_state=42,
-            stratify=data.loc[data["subject"].isin(subjects), "cohort"]
+            stratify=data.loc[data["subject"].isin(subjects), "group"]
         )
         X_train = data.loc[data["subject"].isin(train_subjects), feature_cols].values
-        y_train = data.loc[data["subject"].isin(train_subjects), "cohort"].values
+        y_train = data.loc[data["subject"].isin(train_subjects), "group"].values
         X_test = data.loc[data["subject"].isin(test_subjects), feature_cols].values
-        y_test = data.loc[data["subject"].isin(test_subjects), "cohort"].values
+        y_test = data.loc[data["subject"].isin(test_subjects), "group"].values
         
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
