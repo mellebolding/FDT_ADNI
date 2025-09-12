@@ -471,13 +471,14 @@ for lr_sig in lrs_sigma:
         a_list_group_adam.append(a_group_adam)
         Ceff_group_list_adam.append(Ceff_group_adam)
         sigma_group_list_adam.append(sigma_group_adam)
+        print('Final errors:', error_iter_group[-1], error_iter_group_adam[-1])
         #print('sigma_group', sigma_group-sigma_group_adam)
 
-        show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
-                errorFC_iter_group_adam, errorCOVtau_iter_group, 
-                errorCOVtau_iter_group_adam, sigma_group, sigma_group_adam,
-                sigma_ini, a_group, a_group_adam, FCemp_group, FCsim_group, 
-                FCsim_group_adam, label="group")
+        # show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
+        #         errorFC_iter_group_adam, errorCOVtau_iter_group, 
+        #         errorCOVtau_iter_group_adam, sigma_group, sigma_group_adam,
+        #         sigma_ini, a_group, a_group_adam, FCemp_group, FCsim_group, 
+        #         FCsim_group_adam, label="group")
 
 ####### Subject level #######
 # Ceff_means = []
