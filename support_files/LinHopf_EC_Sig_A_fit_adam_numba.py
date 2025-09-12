@@ -240,10 +240,10 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
                 sigma_new = np.maximum(sigma_new, 0)
             
             ### sigma re-normalization ###
-            _, COVsim, _, _ = hopf_int(Ceff_new, f_diff, sigma_new, a_new)
-            COVsim_diag = np.diag(COVsim)
-            normalization_factor = np.sum(COVemp_diag) / np.sum(COVsim_diag)
-            sigma_new *= np.sqrt(normalization_factor)
+            # _, COVsim, _, _ = hopf_int(Ceff_new, f_diff, sigma_new, a_new)
+            # COVsim_diag = np.diag(COVsim)
+            # normalization_factor = np.sum(COVemp_diag) / np.sum(COVsim_diag)
+            # sigma_new *= np.sqrt(normalization_factor)
         
         if fit_a:
             a_previous = a_new.copy()
