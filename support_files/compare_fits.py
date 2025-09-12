@@ -382,7 +382,7 @@ epsFC_Ceff = 4e-4
 epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
-lr_Ceff = [1e-3]
+lrs_Ceff = [1e-3]
 lrs_sigma = [1e-1]
 lrs_a = [5e-4]
 beta1 = 0.9
@@ -405,7 +405,7 @@ AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
 
 for lr_sig in lrs_sigma:
     for lr_a in lrs_a:
-        for lr_Ceff in lrs_a:
+        for lr_Ceff in lrs_Ceff:
             error = 0
 
             TSemp_zsc_list = [] # store the zscored TS for each group
