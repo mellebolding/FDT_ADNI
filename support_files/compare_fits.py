@@ -383,14 +383,14 @@ epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
 lrs_Ceff = 1e-3
-lrs_sigma = 1e-1
+lrs_sigma = 5e-1
 lrs_a = 5e-4
 beta1 = 0.9
 beta2 = 0.999
 epsilon = 1e-8
 MAXiter = 10000
 error_tol = 1e-3
-patience = 3
+patience = 5
 learning_rate_factor = 1.0
 
 # Calculate the mean SC matrices per group
