@@ -187,6 +187,7 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
             if no_improvement_count > patience:
                 print(f"No improvement for {no_improvement_count} checks, stopping early")
                 Ceff_fit, sigma_fit, a_fit = best_params
+                error_iter.append(best_error)
                 break
                 
             error_old = error_now
