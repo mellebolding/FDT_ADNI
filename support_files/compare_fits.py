@@ -378,19 +378,19 @@ maxC=maxC
 iter_check=iter_check_group
 
 ## Learning rate settings
-epsFC_Ceff = 1e-5
+epsFC_Ceff = 1e-4
 epsCOVtau_Ceff = 1e-5
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
-lr_Ceff = 1e-5
-lr_sig = 1e-5
+lr_Ceff = 1e-3
+lr_sig = 1e-4
 lr_a = 1e-5
 beta1 = 0.9
 beta2 = 0.999
 epsilon = 1e-8
 MAXiter = 10000
 error_tol = 1e-3
-patience = 3
+patience = 5
 learning_rate_factor = 1.0
 
 # Calculate the mean SC matrices per group
