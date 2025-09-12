@@ -288,7 +288,7 @@ def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
     # plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-NPARCELLS = 37 # max 379
+NPARCELLS = 90 # max 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
 A_FITTING = True
