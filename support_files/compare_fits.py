@@ -389,8 +389,8 @@ beta1 = 0.9
 beta2 = 0.999
 epsilon = 1e-8
 MAXiter = 10000
-error_tol = 1e-2
-patience = 5
+error_tol = 1e-3
+patience = 10
 learning_rate_factor = 1.0
 
 # Calculate the mean SC matrices per group
