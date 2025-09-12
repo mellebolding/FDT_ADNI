@@ -382,6 +382,12 @@ epsFC_Ceff = 4e-4
 epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
+lr_Ceff = 1e-3
+lr_sig = 1e-4
+lr_a = 1e-5
+beta1 = 0.9
+beta2 = 0.999
+epsilon = 1e-8
 MAXiter = 10000
 error_tol = 1e-3
 patience = 5
@@ -450,8 +456,9 @@ for COND in range(3):
                                 LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
                                 fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                 fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
-                                fit_a=A_FITTING,
-                                learning_rate_Ceff=epsFC_Ceff, learning_rate_sigma=epsFC_sigma)
+                                fit_a=A_FITTING,learning_rate_Ceff=lr_Ceff, learning_rate_sigma=lr_sig, learning_rate_a=lr_a,
+                                beta1=beta1, beta2=beta2, epsilon=epsilon,
+                                MAXiter=MAXiter, error_tol=error_tol, patience=patience)
 
     end_time = time.time()
     
