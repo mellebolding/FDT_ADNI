@@ -257,7 +257,7 @@ def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
     if sigma_2 is not None:
         plt.plot(range(1, NPARCELLS+1), sigma_2, '.-', color='tab:orange', alpha=1, label='sigma fit Adam normalized')
         plt.axhline(np.mean(sigma_2), color='tab:orange', linestyle='--', label=f'{np.mean(sigma_2):.5f}')
-    plt.axhline(np.mean(sigma), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_group):.5f}')
+    plt.axhline(np.mean(sigma), color='tab:blue', linestyle='--', label=f'{np.mean(sigma):.5f}')
     plt.xlabel('Parcels')
     ticks = np.arange(1, NPARCELLS + 1)
     labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
