@@ -550,7 +550,8 @@ for COND in range(3):
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
         tot_sub_error += error_iter_sub_aux[-1]
-    print('Final error:',  tot_sub_error,'lr_sigma:', lrs_sigma, 'lr_Ceff:', lrs_Ceff, 'lr_a:', lrs_a)
+        tot_sub_error_adam += error_iter_sub_aux_adam[-1]
+    print('Final error:',  tot_sub_error,'adam:', tot_sub_error_adam)
 #         # show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
 #     a_list_sub.append(np.array(a_list_sub_temp))
 #     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
