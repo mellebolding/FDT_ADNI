@@ -288,7 +288,7 @@ def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
     # plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-NPARCELLS = 50 # max 379
+NPARCELLS = 40 # max 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
 A_FITTING = True
@@ -550,7 +550,7 @@ for COND in range(3):
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
         tot_sub_error += error_iter_sub_aux[-1]
-    print('Final error:',  tot_sub_error,'lr_sigma:', lr_sig, 'lr_Ceff:', lr_Ceff, 'lr_a:', lr_a)
+    print('Final error:',  tot_sub_error,'lr_sigma:', lrs_sigma, 'lr_Ceff:', lrs_Ceff, 'lr_a:', lrs_a)
 #         # show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
 #     a_list_sub.append(np.array(a_list_sub_temp))
 #     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
