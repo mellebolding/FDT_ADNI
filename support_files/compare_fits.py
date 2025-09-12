@@ -390,7 +390,7 @@ beta2 = 0.999
 epsilon = 1e-8
 MAXiter = 10000
 error_tol = 1e-3
-patience = 10
+patience = 3
 learning_rate_factor = 1.0
 
 # Calculate the mean SC matrices per group
@@ -448,15 +448,15 @@ for lr_sig in lrs_sigma:
                 SC_N *= 0.2
                 Ceff_ini = SC_N.copy()
                 start_time = time.time()
-                # Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
-                #                             LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
-                #                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
-                #                             fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
-                #                             fit_a=A_FITTING,
-                #                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
-                #                             MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
-                #                             Ceff_norm=Ceff_norm, maxC=maxC,
-                #                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
+                Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
+                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+                                            fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+                                            fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
+                                            fit_a=A_FITTING,
+                                            epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
+                                            MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
+                                            Ceff_norm=Ceff_norm, maxC=maxC,
+                                            iter_check=iter_check, plot_evol=False, plot_evol_last=False)
                 Ceff_group_adam, sigma_group_adam, a_group_adam, FCemp_group_adam, FCsim_group_adam, error_iter_group_adam, errorFC_iter_group_adam, errorCOVtau_iter_group_adam, = \
                                             LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
@@ -475,14 +475,14 @@ for lr_sig in lrs_sigma:
                 Ceff_group_list_adam.append(Ceff_group_adam)
                 sigma_group_list_adam.append(sigma_group_adam)
                 error += error_iter_group_adam[-1]
-            print('Final error:',  error,'lr_sigma:', lr_sig, 'lr_Ceff:', lr_Ceff, 'lr_a:', lr_a)
+            #print('Final error:',  error,'lr_sigma:', lr_sig, 'lr_Ceff:', lr_Ceff, 'lr_a:', lr_a)
                 #print('sigma_group', sigma_group-sigma_group_adam)
 
-                # show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
-                #         errorFC_iter_group_adam, errorCOVtau_iter_group, 
-                #         errorCOVtau_iter_group_adam, sigma_group, sigma_group_adam,
-                #         sigma_ini, a_group, a_group_adam, FCemp_group, FCsim_group, 
-                #         FCsim_group_adam, label="group")
+                show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
+                        errorFC_iter_group_adam, errorCOVtau_iter_group, 
+                        errorCOVtau_iter_group_adam, sigma_group, sigma_group_adam,
+                        sigma_ini, a_group, a_group_adam, FCemp_group, FCsim_group, 
+                        FCsim_group_adam, label="group")
 
 ####### Subject level #######
 # Ceff_means = []
