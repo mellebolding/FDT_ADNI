@@ -13,7 +13,7 @@ repo_root = os.path.abspath(os.path.join(script_dir, '..'))
 os.chdir(repo_root)
 
 sys.path.insert(0, repo_root)
-sys.path.insert(0, os.path.join(repo_root, 'support_files'))
+#sys.path.insert(0, os.path.join(repo_root, 'support_files'))
 sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 
 base_folder = os.path.join(repo_root, 'ADNI-A_DATA')
