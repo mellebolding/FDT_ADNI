@@ -222,7 +222,7 @@ def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
         if error_iter_2 is not None:
             plt.plot(np.arange(1, len(error_iter_2) + 1) * 100, error_iter_2, 'o--', color='tab:blue', label='Error Adam @100 iter')
             plt.plot(np.arange(1, len(errorFC_iter_2) + 1) * 100, errorFC_iter_2, 's--', color='tab:orange', label='Error FC Adam @100 iter')
-            plt.plot(np.arange(1, len(errorCOVtau_iter_2) + 1) * 100, errorCOVtau_iter_2, '^-', color='tab:green', label='Error COVtau Adam @100 iter')
+            plt.plot(np.arange(1, len(errorCOVtau_iter_2) + 1) * 100, errorCOVtau_iter_2, '^--', color='tab:green', label='Error COVtau Adam @100 iter')
 
         plt.xlabel('Iteration')
         plt.ylabel('Error')
@@ -254,6 +254,9 @@ def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), sigma_ini, '.--', color='gray', alpha=0.5, label='Initial guess')
     plt.plot(range(1, NPARCELLS+1), sigma, '.-', color='tab:blue', alpha=1, label='sigma fit normalized')
+    if sigma_2 is not None:
+        plt.plot(range(1, NPARCELLS+1), sigma_2, '.-', color='tab:orange', alpha=1, label='sigma fit Adam normalized')
+        plt.axhline(np.mean(sigma_2), color='tab:orange', linestyle='--', label=f'{np.mean(sigma_2):.5f}')
     plt.axhline(np.mean(sigma), color='tab:blue', linestyle='--', label=f'{np.mean(sigma_group):.5f}')
     plt.xlabel('Parcels')
     ticks = np.arange(1, NPARCELLS + 1)
@@ -272,6 +275,9 @@ def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), a_ini, '.--', color='gray', alpha=0.5, label='Initial value')
     plt.plot(range(1, NPARCELLS+1), a, '.-', color='tab:blue', alpha=1, label='a fit normalized')
+    if a_2 is not None:
+        plt.plot(range(1, NPARCELLS+1), a_2, '.-', color='tab:orange', alpha=1, label='a fit Adam normalized')
+        plt.axhline(np.mean(a_2), color='tab:orange', linestyle='--', label=f'{np.mean(a_2):.5f}')
     plt.axhline(np.mean(a), color='tab:red', linestyle='--', label=f'{np.mean(a):.5f}')
     plt.xlabel('Parcels')
     ticks = np.arange(1, NPARCELLS + 1)
@@ -285,7 +291,7 @@ def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
 NPARCELLS = 37 # max 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
-A_FITTING = False
+A_FITTING = True
 
 
 ###### Loading the data ######
