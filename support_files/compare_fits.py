@@ -530,14 +530,14 @@ for COND in range(3):
         SC_N *= 0.2
         #if SIGMA_FITTING: sigma_ini = sigma_group_list[COND].copy()
 
-        Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
-                                            LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
-                                            fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
-                                            fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,fit_a=A_FITTING,
-                                            epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma*10, epsCOVtau_sigma=epsCOVtau_sigma*10,
-                                            MAXiter=MAXiter, error_tol=error_tol, patience=patience+5, learning_rate_factor=learning_rate_factor,
-                                            Ceff_norm=Ceff_norm, maxC=maxC,
-                                            iter_check=iter_check, plot_evol=False, plot_evol_last=False)
+        # Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
+        #                                     LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
+        #                                     fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+        #                                     fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,fit_a=A_FITTING,
+        #                                     epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma*10, epsCOVtau_sigma=epsCOVtau_sigma*10,
+        #                                     MAXiter=MAXiter, error_tol=error_tol, patience=patience+5, learning_rate_factor=learning_rate_factor,
+        #                                     Ceff_norm=Ceff_norm, maxC=maxC,
+        #                                     iter_check=iter_check, plot_evol=False, plot_evol_last=False)
         Ceff_sub_adam[sub], sigma_sub_adam[sub], a_sub_adam[sub], FCemp_sub_adam[sub], FCsim_sub_adam[sub], error_iter_sub_aux_adam, errorFC_iter_sub_aux_adam, errorCOVtau_iter_sub_aux_adam = \
                                             LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
@@ -545,15 +545,16 @@ for COND in range(3):
                                             learning_rate_Ceff=lrs_Ceff, learning_rate_sigma=lrs_sigma, learning_rate_a=lrs_a,
                                             beta1=beta1, beta2=beta2, epsilon=epsilon,
                                             MAXiter=MAXiter, error_tol=error_tol, patience=patience)
-        error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
+        error_iter_sub[sub, :len(error_iter_sub_aux_adam)] = error_iter_sub_aux_adam
 
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
-        tot_sub_error += error_iter_sub_aux[-1]
+        #tot_sub_error += error_iter_sub_aux[-1]
         tot_sub_error_adam += error_iter_sub_aux_adam[-1]
+        print(error_iter_sub_aux_adam[-1], subj_id, COND)
+        show_error(error_iter_sub_aux_adam, None, errorFC_iter_sub_aux_adam, None, errorCOVtau_iter_sub_aux_adam, None, sigma_sub[sub], None, sigma_ini, a_sub[sub], None, FCemp_sub[sub], FCsim_sub[sub], None, label=f"subj{sub}")
     print('Final error:',  tot_sub_error,'adam:', tot_sub_error_adam)
-#         # show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
-#     a_list_sub.append(np.array(a_list_sub_temp))
+# a_list_sub.append(np.array(a_list_sub_temp))
 #     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
 
