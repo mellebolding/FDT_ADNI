@@ -234,10 +234,10 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
                                                      learning_rate_sigma, beta1, beta2, epsilon, iter)
             
             # Apply constraints
-            if sigma_reset:
-                sigma_new = np.where(sigma_new < 0, sigma_ini, sigma_new)
-            else:
-                sigma_new = np.maximum(sigma_new, 0)
+            # if sigma_reset:
+            #     sigma_new = np.where(sigma_new < 0, sigma_ini, sigma_new)
+            # else:
+            #     sigma_new = np.maximum(sigma_new, 0)
             
             ### sigma re-normalization ###
             # _, COVsim, _, _ = hopf_int(Ceff_new, f_diff, sigma_new, a_new)
