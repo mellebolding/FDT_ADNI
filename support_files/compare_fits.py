@@ -473,7 +473,7 @@ for lr_sig in lrs_sigma:
                 a_list_group_adam.append(a_group_adam)
                 Ceff_group_list_adam.append(Ceff_group_adam)
                 sigma_group_list_adam.append(sigma_group_adam)
-                print('Final error:',  error_iter_group_adam[-1], 'lr_sigma:', lr_sig, 'lr_Ceff:', lr_Ceff, 'lr_a:', lr_a)
+                print('Final error:',  error_iter_group_adam[-1], 'cond:', COND,'lr_sigma:', lr_sig, 'lr_Ceff:', lr_Ceff, 'lr_a:', lr_a)
                 #print('sigma_group', sigma_group-sigma_group_adam)
 
                 # show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
