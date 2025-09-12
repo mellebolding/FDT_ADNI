@@ -378,12 +378,12 @@ maxC=maxC
 iter_check=iter_check_group
 
 ## Learning rate settings
-epsFC_Ceff = 4e-4
+epsFC_Ceff = 1e-4
 epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
 lr_Ceff = 1e-3
-lr_sig = 1e-4
+lr_sig = 1e-5
 lr_a = 1e-5
 beta1 = 0.9
 beta2 = 0.999
