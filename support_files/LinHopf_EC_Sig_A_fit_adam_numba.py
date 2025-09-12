@@ -4,9 +4,6 @@ from scipy.linalg import expm, solve_sylvester
 from scipy.signal import correlate
 from numba import njit, prange, jit
 
-import numpy as np
-from numba import njit, prange
-
 def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=-0.02, Tau=1,
                                      fit_Ceff=True, competitive_coupling=False,
                                      fit_sigma=True, sigma_reset=False,
@@ -15,24 +12,45 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
                                      beta1=0.9, beta2=0.999, epsilon=1e-8,
                                      MAXiter=10000, error_tol=5e-4, patience=3,
                                      Ceff_norm=True, maxC=0.2,
-                                     iter_check=50, plot_evol=False, plot_evol_last=False,
-                                     # New parameters for improved fitting
-                                     sigma_scale=2.0, a_scale=1.5, 
-                                     sigma_lr_multiplier=2.0, sigma_variance_regularization=0.001,
-                                     gradient_clip_Ceff=1.0, gradient_clip_sigma=0.5, gradient_clip_a=0.1,
-                                     disable_sigma_normalization=False):
+                                     iter_check=50, plot_evol=False, plot_evol_last=False):
     """
-    Improved fitting with enhanced sigma variance handling.
+    Fits the "averaged" G.Cij matrix AND the sigma values using the FC with Adam optimizer.
     
-    New Parameters:
-        sigma_scale: Scaling factor for sigma gradients (default: 2.0)
-        a_scale: Scaling factor for a gradients (default: 1.5)
-        sigma_lr_multiplier: Learning rate multiplier for sigma (default: 2.0)
-        sigma_variance_regularization: Regularization weight for sigma variance (default: 0.001)
-        gradient_clip_Ceff: Gradient clipping threshold for Ceff (default: 1.0)
-        gradient_clip_sigma: Gradient clipping threshold for sigma (default: 0.5)
-        gradient_clip_a: Gradient clipping threshold for a (default: 0.1)
-        disable_sigma_normalization: If True, skip sigma renormalization (default: False)
+    Parameters:
+        tsdata: Empirical Time Series data (3D array: [NSUB, NPARCELS, timepoints] or 2D array: [NPARCELS, timepoints])
+        C: Structural connectivity matrix
+        NPARCELS: Number of parcels
+        TR: Repetition time
+        f_diff: Nodes frequencies
+        sigma: Noise variance
+        a: bifurcation parameter
+        Tau: Time lag
+        fit_Ceff: Flag for fitting Ceff
+        competitive_coupling: Flag for competitive coupling
+        fit_sigma: Flag for fitting sigma
+        sigma_reset: Flag for resetting sigma to sigma_ini if sigma_new < 0
+        fit_a: Flag for fitting a
+        learning_rate_Ceff: Learning rate for Ceff (Adam)
+        learning_rate_sigma: Learning rate for sigma (Adam)
+        learning_rate_a: Learning rate for a (Adam)
+        beta1: Adam parameter for first moment
+        beta2: Adam parameter for second moment
+        epsilon: Adam parameter for numerical stability
+        MAXiter: Maximum number of iterations
+        error_tol: Tolerance for convergence
+        patience: Number cycles before stopping
+        Ceff_norm: Flag for normalizing the Ceff
+        maxC: Normalization factor for Ceff
+        iter_check: Number of iterations to check error
+        plot_evol: Flag for plotting evolution of error
+
+    Returns:
+        Ceff_fit: Effective connectivity matrix
+        sigma_fit: Standard deviation of noise
+        a_fit: Bifurcation parameters
+        FCemp: Empirical functional connectivity matrix
+        FCsim: Simulated functional connectivity matrix
+        error_iter: List of errors at every iter_check iterations
     """
 
     indexN = np.arange(NPARCELS)  # Cortical areas
@@ -105,13 +123,9 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
     errorFC_iter = []
     errorCOVtau_iter = []
     error_iter = []
-    regularization_iter = []
     patience_counter = 0
     best_error = 1e5
     no_improvement_count = 0
-
-    # Effective learning rate for sigma
-    effective_sigma_lr = learning_rate_sigma * sigma_lr_multiplier
 
     for iter in range(1, MAXiter + 1):
         ### Check for non-finite values ###
@@ -137,12 +151,7 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
             errorCOVtau_now = np.mean((COVtauemp - COVtausim) ** 2)
             errorCOVtau_iter.append(errorCOVtau_now)
 
-            # Add regularization term for sigma variance
-            sigma_variance = np.var(sigma_new)
-            regularization_term = sigma_variance_regularization / (sigma_variance + 1e-8)
-            regularization_iter.append(regularization_term)
-
-            error_now = errorFC_now + errorCOVtau_now + regularization_term
+            error_now = errorFC_now + errorCOVtau_now
             error_iter.append(error_now)
 
             # Early stopping if error increases
@@ -187,25 +196,19 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
             if plot_evol:
                 _plot_evolution(error_iter, errorFC_iter, errorCOVtau_iter, 
                               sigma_previous, sigma_new, iter_check, N,
-                              learning_rate_Ceff, effective_sigma_lr)
+                              learning_rate_Ceff, learning_rate_sigma)
 
-        ### Compute improved gradients ###
-        (grad_Ceff_FC, grad_Ceff_COVtau, 
-         grad_sigma_FC, grad_sigma_COVtau,
-         grad_a_FC, grad_a_COVtau) = compute_weighted_gradients(
-            C, FCemp, FCsim, COVtauemp, COVtausim,
-            weight_FC=1.0, weight_COVtau=1.0,
-            sigma_scale=sigma_scale, a_scale=a_scale
-        )
+        ### Compute gradients ###
+        grad_Ceff_FC, grad_Ceff_COVtau = compute_Ceff_gradients(C, FCemp, FCsim, COVtauemp, COVtausim)
+        grad_sigma_FC, grad_sigma_COVtau = compute_sigma_gradients(FCemp, FCsim, COVtauemp, COVtausim, N)
+        grad_a_FC, grad_a_COVtau = compute_a_gradients(FCemp, FCsim, COVtauemp, COVtausim, N)
 
-        ### Improved Adam updates ###
+        ### Adam updates ###
         if fit_Ceff:
             Ceff_previous = Ceff_new.copy()
             grad_Ceff = grad_Ceff_FC + grad_Ceff_COVtau
-            Ceff_new, m_Ceff, v_Ceff = improved_adam_update(
-                Ceff_new, grad_Ceff, m_Ceff, v_Ceff,
-                learning_rate_Ceff, beta1, beta2, epsilon, iter, gradient_clip_Ceff
-            )
+            Ceff_new, m_Ceff, v_Ceff = adam_update(Ceff_new, grad_Ceff, m_Ceff, v_Ceff,
+                                                   learning_rate_Ceff, beta1, beta2, epsilon, iter)
             
             # Apply constraints
             if not competitive_coupling:
@@ -227,43 +230,26 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
         if fit_sigma:
             sigma_previous = sigma_new.copy()
             grad_sigma = grad_sigma_FC + grad_sigma_COVtau
-            
-            # Add gradient from regularization term
-            sigma_variance = np.var(sigma_new)
-            if sigma_variance > 1e-8:
-                # Gradient of regularization term w.r.t. each sigma parameter
-                mean_sigma = np.mean(sigma_new)
-                reg_grad = -sigma_variance_regularization / (sigma_variance**2) * 2 * (sigma_new - mean_sigma) / N
-                grad_sigma += reg_grad
-            
-            sigma_new, m_sigma, v_sigma = improved_adam_update(
-                sigma_new, grad_sigma, m_sigma, v_sigma,
-                effective_sigma_lr, beta1, beta2, epsilon, iter, gradient_clip_sigma
-            )
+            sigma_new, m_sigma, v_sigma = adam_update(sigma_new, grad_sigma, m_sigma, v_sigma,
+                                                     learning_rate_sigma, beta1, beta2, epsilon, iter)
             
             # Apply constraints
             if sigma_reset:
                 sigma_new = np.where(sigma_new < 0, sigma_ini, sigma_new)
             else:
-                sigma_new = np.maximum(sigma_new, 1e-6)  # Prevent too small values
+                sigma_new = np.maximum(sigma_new, 0)
             
-            ### Optional sigma re-normalization ###
-            if not disable_sigma_normalization:
-                _, COVsim, _, _ = hopf_int(Ceff_new, f_diff, sigma_new, a_new)
-                COVsim_diag = np.diag(COVsim)
-                normalization_factor = np.sum(COVemp_diag) / np.sum(COVsim_diag)
-                # Apply normalization more conservatively to maintain variance
-                conservative_factor = 0.7  # Blend factor to preserve variance
-                sigma_new *= (np.sqrt(normalization_factor) * conservative_factor + 
-                             (1 - conservative_factor))
+            ### sigma re-normalization ###
+            _, COVsim, _, _ = hopf_int(Ceff_new, f_diff, sigma_new, a_new)
+            COVsim_diag = np.diag(COVsim)
+            normalization_factor = np.sum(COVemp_diag) / np.sum(COVsim_diag)
+            sigma_new *= np.sqrt(normalization_factor)
         
         if fit_a:
             a_previous = a_new.copy()
             grad_a = grad_a_FC + grad_a_COVtau
-            a_new, m_a, v_a = improved_adam_update(
-                a_new, grad_a, m_a, v_a,
-                learning_rate_a, beta1, beta2, epsilon, iter, gradient_clip_a
-            )
+            a_new, m_a, v_a = adam_update(a_new, grad_a, m_a, v_a,
+                                         learning_rate_a, beta1, beta2, epsilon, iter)
             
             # Apply constraints (clip to reasonable range)
             a_new = np.clip(a_new, -0.1, -0.001)
@@ -280,135 +266,29 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
     if plot_evol_last:
         _plot_evolution(error_iter, errorFC_iter, errorCOVtau_iter, 
                       sigma_previous, sigma_new, iter_check, N,
-                      learning_rate_Ceff, effective_sigma_lr)
+                      learning_rate_Ceff, learning_rate_sigma)
 
     return Ceff_fit, sigma_fit, a_fit, FCemp, FCsim, error_iter, errorFC_iter, errorCOVtau_iter
 
 
 @njit
-def improved_adam_update(param, grad, m, v, lr, beta1, beta2, eps, t, grad_clip=None):
-    """
-    Improved Adam optimizer with gradient clipping and better numerical stability
-    """
-    # Gradient clipping for stability
-    if grad_clip is not None:
-        grad_norm = np.sqrt(np.sum(grad * grad))
-        if grad_norm > grad_clip:
-            grad = grad * (grad_clip / grad_norm)
-    
-    # Update biased first moment estimate
-    m_new = beta1 * m + (1 - beta1) * grad
-    
-    # Update biased second raw moment estimate  
-    v_new = beta2 * v + (1 - beta2) * grad * grad
-    
-    # Compute bias-corrected first moment estimate
-    m_hat = m_new / (1 - beta1**t)
-    
-    # Compute bias-corrected second raw moment estimate
-    v_hat = v_new / (1 - beta2**t)
-    
-    # Update parameters with improved numerical stability
-    param_new = param - lr * m_hat / (np.sqrt(v_hat) + eps)
-    
-    return param_new, m_new, v_new
-
-
-@njit(parallel=True)
-def compute_weighted_gradients(C, FCemp, FCsim, COVtauemp, COVtausim, 
-                              weight_FC=1.0, weight_COVtau=1.0, 
-                              sigma_scale=1.0, a_scale=1.0):
-    """
-    Compute gradients with proper weighting and scaling
-    """
-    N = C.shape[0]
-    
-    # Ceff gradients
-    grad_Ceff_FC = np.zeros_like(C)
-    grad_Ceff_COVtau = np.zeros_like(C)
-    
-    for i in prange(N):
-        for j in range(N):
-            if C[i, j] > 0 or j == N - i - 1:
-                grad_Ceff_FC[i, j] = -weight_FC * (FCemp[i, j] - FCsim[i, j])
-                grad_Ceff_COVtau[i, j] = -weight_COVtau * (COVtauemp[i, j] - COVtausim[i, j])
-    
-    # Sigma gradients with scaling
-    grad_sigma_FC = np.zeros(N)
-    grad_sigma_COVtau = np.zeros(N)
-    
-    for i in prange(N):
-        # More sophisticated gradient computation for sigma
-        fc_diff = FCemp[i, :] - FCsim[i, :]
-        covtau_diff = COVtauemp[i, :] - COVtausim[i, :]
-        
-        # Scale gradients to encourage larger variance
-        grad_sigma_FC[i] = -weight_FC * sigma_scale * np.sum(fc_diff)
-        grad_sigma_COVtau[i] = -weight_COVtau * sigma_scale * np.sum(covtau_diff)
-    
-    # A parameter gradients with scaling
-    grad_a_FC = np.zeros(N)
-    grad_a_COVtau = np.zeros(N)
-    
-    for i in prange(N):
-        fc_diff = FCemp[i, :] - FCsim[i, :]
-        covtau_diff = COVtauemp[i, :] - COVtausim[i, :]
-        
-        grad_a_FC[i] = -weight_FC * a_scale * np.sum(fc_diff)
-        grad_a_COVtau[i] = -weight_COVtau * a_scale * np.sum(covtau_diff)
-    
-    return (grad_Ceff_FC, grad_Ceff_COVtau, 
-            grad_sigma_FC, grad_sigma_COVtau,
-            grad_a_FC, grad_a_COVtau)
-
-
-# Keep the original gradient functions for compatibility
-@njit(parallel=True)
-def compute_Ceff_gradients(C, FCemp, FCsim, COVtauemp, COVtausim):
-    """Original Ceff gradients function for compatibility"""
-    N = C.shape[0]
-    grad_FC = np.zeros_like(C)
-    grad_COVtau = np.zeros_like(C)
-    
-    for i in prange(N):
-        for j in range(N):
-            if C[i, j] > 0 or j == N - i - 1:
-                grad_FC[i, j] = -(FCemp[i, j] - FCsim[i, j])
-                grad_COVtau[i, j] = -(COVtauemp[i, j] - COVtausim[i, j])
-    
-    return grad_FC, grad_COVtau
-
-
-@njit(parallel=True)
-def compute_sigma_gradients(FCemp, FCsim, COVtauemp, COVtausim, N):
-    """Original sigma gradients function for compatibility"""
-    grad_FC = np.zeros(N)
-    grad_COVtau = np.zeros(N)
-    
-    for i in prange(N):
-        grad_FC[i] = -np.sum(FCemp[i, :] - FCsim[i, :])
-        grad_COVtau[i] = -np.sum(COVtauemp[i, :] - COVtausim[i, :])
-    
-    return grad_FC, grad_COVtau
-
-
-@njit(parallel=True)
-def compute_a_gradients(FCemp, FCsim, COVtauemp, COVtausim, N):
-    """Original a gradients function for compatibility"""
-    grad_FC = np.zeros(N)
-    grad_COVtau = np.zeros(N)
-    
-    for i in prange(N):
-        grad_FC[i] = -np.sum(FCemp[i, :] - FCsim[i, :])
-        grad_COVtau[i] = -np.sum(COVtauemp[i, :] - COVtausim[i, :])
-    
-    return grad_FC, grad_COVtau
-
-
-@njit
 def adam_update(param, grad, m, v, lr, beta1, beta2, eps, t):
     """
-    Original Adam optimizer update step for compatibility
+    Adam optimizer update step (numba-compiled for speed)
+    
+    Parameters:
+        param: Current parameter values
+        grad: Gradients
+        m: First moment estimate
+        v: Second moment estimate
+        lr: Learning rate
+        beta1: Exponential decay rate for first moment
+        beta2: Exponential decay rate for second moment
+        eps: Small constant for numerical stability
+        t: Time step (iteration number)
+    
+    Returns:
+        Updated parameter, first moment, second moment
     """
     # Update biased first moment estimate
     m_new = beta1 * m + (1 - beta1) * grad
@@ -426,6 +306,48 @@ def adam_update(param, grad, m, v, lr, beta1, beta2, eps, t):
     param_new = param - lr * m_hat / (np.sqrt(v_hat) + eps)
     
     return param_new, m_new, v_new
+
+
+@njit(parallel=True)
+def compute_Ceff_gradients(C, FCemp, FCsim, COVtauemp, COVtausim):
+    """Compute gradients for Ceff matrix"""
+    N = C.shape[0]
+    grad_FC = np.zeros_like(C)
+    grad_COVtau = np.zeros_like(C)
+    
+    for i in prange(N):
+        for j in range(N):
+            if C[i, j] > 0 or j == N - i - 1:
+                grad_FC[i, j] = -(FCemp[i, j] - FCsim[i, j])
+                grad_COVtau[i, j] = -(COVtauemp[i, j] - COVtausim[i, j])
+    
+    return grad_FC, grad_COVtau
+
+
+@njit(parallel=True)
+def compute_sigma_gradients(FCemp, FCsim, COVtauemp, COVtausim, N):
+    """Compute gradients for sigma parameters"""
+    grad_FC = np.zeros(N)
+    grad_COVtau = np.zeros(N)
+    
+    for i in prange(N):
+        grad_FC[i] = -np.sum(FCemp[i, :] - FCsim[i, :])
+        grad_COVtau[i] = -np.sum(COVtauemp[i, :] - COVtausim[i, :])
+    
+    return grad_FC, grad_COVtau
+
+
+@njit(parallel=True)
+def compute_a_gradients(FCemp, FCsim, COVtauemp, COVtausim, N):
+    """Compute gradients for a parameters"""
+    grad_FC = np.zeros(N)
+    grad_COVtau = np.zeros(N)
+    
+    for i in prange(N):
+        grad_FC[i] = -np.sum(FCemp[i, :] - FCsim[i, :])
+        grad_COVtau[i] = -np.sum(COVtauemp[i, :] - COVtausim[i, :])
+    
+    return grad_FC, grad_COVtau
 
 
 def _plot_evolution(error_iter, errorFC_iter, errorCOVtau_iter, 
