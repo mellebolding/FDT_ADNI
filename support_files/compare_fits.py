@@ -389,7 +389,7 @@ beta1 = 0.9
 beta2 = 0.999
 epsilon = 1e-8
 MAXiter = 10000
-error_tol = 1e-4
+error_tol = 1e-2
 patience = 5
 learning_rate_factor = 1.0
 
