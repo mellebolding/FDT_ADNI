@@ -1,7 +1,3 @@
-###############################################
-# Script for fitting Ceff, sigma and bifurcation params at group and subject level
-###############################################
-
 import os
 import sys
 
@@ -23,131 +19,28 @@ sys.path.insert(0, os.path.join(repo_root, 'DataLoaders'))
 base_folder = os.path.join(repo_root, 'ADNI-A_DATA')
 connectome_dir = os.path.join(base_folder, 'connectomes')
 results_dir = os.path.join(repo_root, 'Result_plots')
-#ECgroup_subfolder = os.path.join(results_dir, 'EC_group')
-Ceff_sigma_subfolder = os.path.join(results_dir, 'Ceff_sigma_results')
-#ECsub_subfolder = os.path.join(results_dir, 'EC_sub')
-#FCgroup_subfolder = os.path.join(results_dir, 'FC_group')
-#FCsub_subfolder = os.path.join(results_dir, 'FC_sub')
-#sigma_subfolder = os.path.join(results_dir, 'sig_sub')
-#sigma_group_subfolder = os.path.join(results_dir, 'sig_group')
-#FDT_parcel_subfolder = os.path.join(results_dir, 'FDT_parcel')
-#FDT_subject_subfolder = os.path.join(results_dir, 'FDT_sub')
-#Inorm1_group_subfolder = os.path.join(results_dir, 'Inorm1_group')
-#Inorm2_group_subfolder = os.path.join(results_dir, 'Inorm2_group')
-#Inorm1_sub_subfolder = os.path.join(results_dir, 'Inorm1_sub')
-#Inorm2_sub_subfolder = os.path.join(results_dir, 'Inorm2_sub')
-#training_dir = os.path.join(results_dir, 'training_conv')
-error_fitting_group_subfolder = os.path.join(results_dir, 'error_fitting_group')
-error_fitting_sub_subfolder = os.path.join(results_dir, 'error_fitting_sub')
-os.makedirs(results_dir, exist_ok=True)
-# os.makedirs(ECgroup_subfolder, exist_ok=True)
-# os.makedirs(ECsub_subfolder, exist_ok=True)
-# os.makedirs(FCgroup_subfolder, exist_ok=True)
-os.makedirs(Ceff_sigma_subfolder, exist_ok=True)
-# os.makedirs(FCsub_subfolder, exist_ok=True)
-# os.makedirs(sigma_subfolder, exist_ok=True)
-# os.makedirs(sigma_group_subfolder, exist_ok=True)
-# os.makedirs(FDT_parcel_subfolder, exist_ok=True)
-# os.makedirs(FDT_subject_subfolder, exist_ok=True)
-# os.makedirs(Inorm1_group_subfolder, exist_ok=True)
-# os.makedirs(Inorm2_group_subfolder, exist_ok=True)
-# os.makedirs(Inorm1_sub_subfolder, exist_ok=True)
-# os.makedirs(Inorm2_sub_subfolder, exist_ok=True)
-# os.makedirs(training_dir, exist_ok=True)
-os.makedirs(error_fitting_group_subfolder, exist_ok=True)
-os.makedirs(error_fitting_sub_subfolder, exist_ok=True)
 
-
-#### Importing necessary packages and functions ####
-
-from functions_FDT_numba_v9 import *
+from LinHopf_EC_Sig_A_fit_adam_numba import LinHopf_Ceff_sigma_a_fitting_adam
+import ADNI_A
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, filtfilt
 from scipy.signal import detrend as scipy_detrend
-from functions_FC_v3 import *
-from functions_LinHopf_Ceff_sigma_fit_v6 import LinHopf_Ceff_sigma_fitting_numba
-from function_LinHopf_Ceff_sigma_a_fit import LinHopf_Ceff_sigma_a_fitting_numba
-from function_LinHopf_Ceff_sigma_a_fit import from_PET_to_a_global
-import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
 from scipy.linalg import expm
 import pandas as pd
 import scipy.integrate as integrate
 from scipy.linalg import solve_continuous_lyapunov
 from DataLoaders.baseDataLoader import DataLoader
-import ADNI_A
-from functions_boxplots_WN3_v0 import *
-from functions_violinplots_WN3_v0 import *
-from functions_violinplots_v2 import *
-from functions_FDT_numba_v9 import construct_matrix_A, Integrate_Langevin_ND_Optimized, closest_valid_M
 import filterps
-import functions_boxplots_WN3_v0
 from typing import Union
 from numba import njit, prange, objmode
 import time
 import p_values as p_values
 import statannotations_permutation
-from LinHopf_EC_Sig_A_fit_adam_numba import LinHopf_Ceff_sigma_a_fitting_adam
-
-
-def append_to_npz(filename, **new_data):
-    """
-    Appends new variables to an existing .npz file or creates one if it doesn't exist.
-
-    Parameters:
-    - filename (str): Path to the .npz file.
-    - new_data (dict): Keyword arguments representing variables to add.
-    """
-    if os.path.exists(filename):
-        # Load existing data
-        existing_data = dict(np.load(filename))
-    else:
-        existing_data = {}
-
-    # Update with new variables
-    existing_data.update(new_data)
-
-    # Save back to file
-    np.savez(filename, **existing_data)
-
-def clear_npz_file(folder, filename):
-    """
-    Clears the contents of a .npz file by overwriting it with an empty 'records' array.
-    """
-    os.makedirs(folder, exist_ok=True)
-    filepath = os.path.join(folder, filename)
-    # Save an empty records array, overwriting any existing file
-    np.savez(filepath, records=np.array([], dtype=object))
-
-
-def append_record_to_npz(folder, filename, **record):
-    """
-    Appends a record (dict) to a 'records' array in a .npz file located in `folder`.
-    Creates the folder and file if they don't exist.
-
-    Parameters
-    ----------
-    folder : str
-        Path to the subfolder where the file will be saved.
-    filename : str
-        Name of the .npz file (e.g., 'Ceff_sigma_results.npz').
-    record : dict
-        Arbitrary key-value pairs to store (arrays, strings, numbers, etc.).
-    """
-    os.makedirs(folder, exist_ok=True)  # ensure subfolder exists
-    filepath = os.path.join(folder, filename)
-
-    if os.path.exists(filepath):
-        existing_data = dict(np.load(filepath, allow_pickle=True))
-        records = list(existing_data.get("records", []))
-    else:
-        records = []
-
-    records.append(record)
-    np.savez(filepath, records=np.array(records, dtype=object))
-
+from functions_FC_v3 import plot_FC_matrices, plot_FC_matrix
+from function_LinHopf_Ceff_sigma_a_fit import from_PET_to_a_global
 
 def zscore_time_series(data, mode='parcel', detrend=False):
     """
@@ -316,9 +209,9 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     """
     
     if error_iter is not None:
-        figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
-        if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, figure_name)
-        else: save_path = os.path.join(error_fitting_sub_subfolder, figure_name)
+        # figure_name = f"error_iter_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+        # if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, figure_name)
+        # else: save_path = os.path.join(error_fitting_sub_subfolder, figure_name)
         plt.figure(figsize=(8,5))
         plt.plot(np.arange(1, len(error_iter) + 1) * 100, error_iter, 'o-', color='tab:blue', label='Error @100 iter')
         plt.plot(np.arange(1, len(errorFC_iter) + 1) * 100, errorFC_iter, 's-', color='tab:orange', label='Error FC @100 iter')
@@ -328,24 +221,24 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
         plt.title(f"Error Curves - Group {group_names[COND]}")
         plt.legend(loc='upper right', fontsize=10)
         plt.grid(True)
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        # plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
         
 
     ## plotting the FC and Ceff matrices
-    fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
-    if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
-    else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
-    plot_FC_matrices(FCemp, FCsim, title1="FCemp", title2="FCsim", save_path=save_path, size=1, dpi=300)
-    fig_name = f"Diff_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
-    if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
-    else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
-    plot_FC_matrix(FCsim-FCemp, title="diff FCsim-FCemp", size=1.1, save_path=save_path,dpi=300)
+    # fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+    # if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
+    # else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
+    plot_FC_matrices(FCemp, FCsim, title1="FCemp", title2="FCsim", size=1, dpi=300)
+    # fig_name = f"Diff_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+    # if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
+    # else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
+    plot_FC_matrix(FCsim-FCemp, title="diff FCsim-FCemp", size=1.1, dpi=300)
 
     ## plot the sigma
-    fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
-    if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
-    else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
+    # fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+    # if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
+    # else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), sigma_ini, '.--', color='gray', alpha=0.5, label='Initial guess')
     plt.plot(range(1, NPARCELLS+1), sigma, '.-', color='tab:blue', alpha=1, label='sigma fit normalized')
@@ -355,14 +248,14 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
     plt.xticks(ticks, labels)
     plt.legend()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    # plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
     ## plot the a
     a_ini = -0.02 * np.ones(NPARCELLS)
-    fig_name = f"bifur_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
-    if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
-    else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
+    # fig_name = f"bifur_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
+    # if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
+    # else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
     plt.figure(figsize=(np.clip(NPARCELLS, 8, 12), 4))
     plt.plot(range(1, NPARCELLS+1), a_ini, '.--', color='gray', alpha=0.5, label='Initial value')
     plt.plot(range(1, NPARCELLS+1), a, '.-', color='tab:blue', alpha=1, label='a fit normalized')
@@ -372,12 +265,8 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
     plt.xticks(ticks, labels)
     plt.legend()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    # plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
-#############################################################
-
-
-##### Base parameters settings ######
 
 NPARCELLS = 37 # max 379
 CEFF_FITTING = True
@@ -437,7 +326,6 @@ protein_index = min(NPARCELLS,360)
 ABeta_burden = [np.array(HC_ABeta)[:,:protein_index,0], np.array(MCI_ABeta)[:,:NPARCELLS,0], np.array(AD_ABeta)[:,:NPARCELLS,0]]
 Tau_burden = [np.array(HC_Tau)[:,:protein_index,0], np.array(MCI_Tau)[:,:NPARCELLS,0], np.array(AD_Tau)[:,:NPARCELLS,0]]
 
-
 ### Set parameters
 Tau = 1
 TR = 2
@@ -477,9 +365,6 @@ error_tol = 1e-3
 patience = 5
 learning_rate_factor = 1.0
 
-# Clear the previous file
-clear_npz_file(Ceff_sigma_subfolder, f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz")
-
 # Calculate the mean SC matrices per group
 HC_SC_matrices = np.array(list(HC_SC.values()))
 HC_SC_avg = np.mean(HC_SC_matrices, axis=0)
@@ -487,7 +372,6 @@ MCI_SC_matrices = np.array(list(MCI_SC.values()))  # Shape: (Nsubjects, NPARCELL
 MCI_SC_avg = np.mean(MCI_SC_matrices, axis=0)
 AD_SC_matrices = np.array(list(AD_SC.values()))  # Shape: (Nsubjects, NPARCELLS, NPARCELLS)
 AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
-
 
 ####### Group level #######
 TSemp_zsc_list = [] # store the zscored TS for each group
@@ -553,17 +437,7 @@ for COND in range(3):
     sigma_group_list.append(sigma_group)
     print('sigma_group', sigma_group)
 
-    append_record_to_npz(
-    Ceff_sigma_subfolder,
-    f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
-    level="group",
-    condition=f"{COND}",
-    sigma=sigma_group,
-    Ceff=Ceff_group,
-    omega=omega)
-
     show_error(error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, sigma_group, sigma_ini, a_group, FCemp_group, FCsim_group, label="group")
-
 
 ####### Subject level #######
 Ceff_means = []
@@ -620,15 +494,7 @@ for COND in range(3):
 
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
-        append_record_to_npz(
-        Ceff_sigma_subfolder,
-        f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
-        level="subject",
-        condition=f"{COND}",
-        subject=f"S{sub}",
-        sigma=sigma_sub[sub],
-        Ceff=Ceff_sub[sub],
-        omega=omega)
+        
         show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
     a_list_sub.append(np.array(a_list_sub_temp))
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
@@ -665,17 +531,3 @@ results = out["results"]
 coef_matrix = out["coef_matrix"]
 print("Coefficient matrix:\n", coef_matrix)
 print("Statistical results of the fit:\n", results)
-
-append_record_to_npz(
-        Ceff_sigma_subfolder,
-        f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
-        level="subject",
-        a = a_sub_recombined,
-        original_a = a_list_sub)
-
-append_record_to_npz(
-        Ceff_sigma_subfolder,
-        f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
-        level="group",
-        a = a_group_recombined,
-        original_a = np.array(a_list_group))
