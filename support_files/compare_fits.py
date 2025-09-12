@@ -21,6 +21,7 @@ connectome_dir = os.path.join(base_folder, 'connectomes')
 results_dir = os.path.join(repo_root, 'Result_plots')
 
 from LinHopf_EC_Sig_A_fit_adam_numba import LinHopf_Ceff_sigma_a_fitting_adam
+from function_LinHopf_Ceff_sigma_a_fit import LinHopf_Ceff_sigma_a_fitting_numba
 import ADNI_A
 import scipy.io
 import numpy as np
@@ -202,7 +203,9 @@ def calc_a_values(a_list_sub, a_list_group, ABeta_burden, Tau_burden):
         "results": results
     }
 
-def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, FCemp, FCsim, label):
+def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
+                errorCOVtau_iter, errorCOVtau_iter_2, sigma, sigma_2, sigma_ini,
+                  a, a_2, FCemp, FCsim, FC_sim_2, label):
     """
     Want to give an indication of the fitting quality?
     options to show: final error, FC fit, COVtau fit, sigma fit, a fit
@@ -216,11 +219,17 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
         plt.plot(np.arange(1, len(error_iter) + 1) * 100, error_iter, 'o-', color='tab:blue', label='Error @100 iter')
         plt.plot(np.arange(1, len(errorFC_iter) + 1) * 100, errorFC_iter, 's-', color='tab:orange', label='Error FC @100 iter')
         plt.plot(np.arange(1, len(errorCOVtau_iter) + 1) * 100, errorCOVtau_iter, '^-', color='tab:green', label='Error COVtau @100 iter')
+        if error_iter_2 is not None:
+            plt.plot(np.arange(1, len(error_iter_2) + 1) * 100, error_iter_2, 'o--', color='tab:blue', label='Error Adam @100 iter')
+            plt.plot(np.arange(1, len(errorFC_iter_2) + 1) * 100, errorFC_iter_2, 's--', color='tab:orange', label='Error FC Adam @100 iter')
+            plt.plot(np.arange(1, len(errorCOVtau_iter_2) + 1) * 100, errorCOVtau_iter_2, '^-', color='tab:green', label='Error COVtau Adam @100 iter')
+
         plt.xlabel('Iteration')
         plt.ylabel('Error')
         plt.title(f"Error Curves - Group {group_names[COND]}")
         plt.legend(loc='upper right', fontsize=10)
         plt.grid(True)
+        plt.show()
         # plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
         
@@ -229,11 +238,14 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     # fig_name = f"FCmatrices_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
     # if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
     # else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
-    plot_FC_matrices(FCemp, FCsim, title1="FCemp", title2="FCsim", size=1, dpi=300)
+    
+    #plot_FC_matrices(FCemp, FCsim, title1="FCemp", title2="FCsim", size=1, dpi=300)
+    
     # fig_name = f"Diff_a{A_FITTING}_N{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
     # if label == 'group': save_path = os.path.join(error_fitting_group_subfolder, fig_name)
     # else: save_path = os.path.join(error_fitting_sub_subfolder, fig_name)
-    plot_FC_matrix(FCsim-FCemp, title="diff FCsim-FCemp", size=1.1, dpi=300)
+    
+    #plot_FC_matrix(FCsim-FCemp, title="diff FCsim-FCemp", size=1.1, dpi=300)
 
     ## plot the sigma
     # fig_name = f"sigma_fit_a{A_FITTING}_N_{NPARCELLS}_{label}_{group_names[COND]}_{NOISE_TYPE}.png"
@@ -248,6 +260,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
     plt.xticks(ticks, labels)
     plt.legend()
+    plt.show()
     # plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
@@ -265,6 +278,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
     labels = [str(ticks[0])] + [''] * (len(ticks) - 2) + [str(ticks[-1])]
     plt.xticks(ticks, labels)
     plt.legend()
+    plt.show()
     # plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
@@ -319,6 +333,8 @@ group_names = ['HC', 'MCI', 'AD']
 group_sizes = {'HC': len(HC_IDs), 'MCI': len(MCI_IDs), 'AD': len(AD_IDs)}
 a_list_group = []
 a_list_sub = []
+a_list_group_adam = []
+a_list_sub_adam = []
 
 ### Prepare the PET data
 # Use only the first 360 regions as the subcortical regions do not have PET data
@@ -377,6 +393,8 @@ AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
 TSemp_zsc_list = [] # store the zscored TS for each group
 Ceff_group_list = [] # store the fitted Ceff for each group
 sigma_group_list = [] # store the fitted sigma for each group
+Ceff_group_list_adam = [] # store the fitted Ceff for each group
+sigma_group_list_adam = [] # store the fitted sigma for each group
 for COND in range(3):
     if COND == 0: ## --> HC
         f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
@@ -413,16 +431,16 @@ for COND in range(3):
     Ceff_ini = SC_N.copy()
 
     start_time = time.time()
-    # Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
-    #                             LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
-    #                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
-    #                             fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
-    #                             fit_a=A_FITTING,
-    #                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
-    #                             MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
-    #                             Ceff_norm=Ceff_norm, maxC=maxC,
-    #                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
     Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
+                                LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+                                fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+                                fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
+                                fit_a=A_FITTING,
+                                epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
+                                MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
+                                Ceff_norm=Ceff_norm, maxC=maxC,
+                                iter_check=iter_check, plot_evol=False, plot_evol_last=False)
+    Ceff_group_adam, sigma_group_adam, a_group_adam, FCemp_group_adam, FCsim_group_adam, error_iter_group_adam, errorFC_iter_group_adam, errorCOVtau_iter_group_adam, = \
                                 LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
                                 fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                 fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
@@ -435,9 +453,16 @@ for COND in range(3):
     a_list_group.append(a_group)
     Ceff_group_list.append(Ceff_group)
     sigma_group_list.append(sigma_group)
-    print('sigma_group', sigma_group)
+    a_list_group_adam.append(a_group_adam)
+    Ceff_group_list_adam.append(Ceff_group_adam)
+    sigma_group_list_adam.append(sigma_group_adam)
+    print('sigma_group', sigma_group-sigma_group_adam)
 
-    show_error(error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, sigma_group, sigma_ini, a_group, FCemp_group, FCsim_group, label="group")
+    show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
+               errorFC_iter_group_adam, errorCOVtau_iter_group, 
+               errorCOVtau_iter_group_adam, sigma_group, sigma_group_adam,
+               sigma_ini, a_group, a_group_adam, FCemp_group, FCsim_group, 
+               FCsim_group_adam, label="group")
 
 ####### Subject level #######
 Ceff_means = []
@@ -495,7 +520,7 @@ for COND in range(3):
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
         
-        show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
+        # show_error(error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux, sigma_sub[sub], sigma_ini, a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], label=f"subj{sub}")
     a_list_sub.append(np.array(a_list_sub_temp))
     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
 
