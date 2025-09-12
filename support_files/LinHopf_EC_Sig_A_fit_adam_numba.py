@@ -155,14 +155,14 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
             error_iter.append(error_now)
 
             # Early stopping if error increases
-            if error_old < error_now:
-                Ceff_fit = Ceff_previous
-                sigma_fit = sigma_previous
-                a_fit = a_previous
-                break
+            # if error_old < error_now:
+            #     Ceff_fit = Ceff_previous
+            #     sigma_fit = sigma_previous
+            #     a_fit = a_previous
+            #     break
                 
-            # Convergence check
-            error_tol_now = (error_old - error_now) / error_now if error_now > 0 else 0
+            # # Convergence check
+            # error_tol_now = (error_old - error_now) / error_now if error_now > 0 else 0
             
             # Check for improvement
             if error_now < best_error:
@@ -171,19 +171,19 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
             else:
                 no_improvement_count += 1
             
-            # Convergence criteria
-            if error_tol_now < error_tol or np.abs(error_tol_old - error_tol_now) < error_tol/10:
-                patience_counter += 1
-                if patience_counter >= patience:
-                    Ceff_fit = Ceff_new
-                    sigma_fit = sigma_new
-                    a_fit = a_new
-                    break
-            else:
-                patience_counter = 0
+            # # Convergence criteria
+            # if error_tol_now < error_tol or np.abs(error_tol_old - error_tol_now) < error_tol/10:
+            #     patience_counter += 1
+            #     if patience_counter >= patience:
+            #         Ceff_fit = Ceff_new
+            #         sigma_fit = sigma_new
+            #         a_fit = a_new
+            #         break
+            # else:
+            #     patience_counter = 0
                 
             # Additional stopping if no improvement for too long
-            if no_improvement_count > patience * 2:
+            if no_improvement_count > patience:
                 print(f"No improvement for {no_improvement_count} checks, stopping early")
                 Ceff_fit = Ceff_new
                 sigma_fit = sigma_new
