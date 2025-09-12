@@ -542,7 +542,7 @@ for COND in range(3):
                                             LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc_list[COND][sub], SC_N, NPARCELLS, TR, f_diff[sub], sigma_ini, Tau=Tau,
                                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
                                             fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,fit_a=A_FITTING,
-                                            learning_rate_Ceff=lr_Ceff, learning_rate_sigma=lr_sig, learning_rate_a=lr_a,
+                                            learning_rate_Ceff=lrs_Ceff, learning_rate_sigma=lrs_sigma, learning_rate_a=lrs_a,
                                             beta1=beta1, beta2=beta2, epsilon=epsilon,
                                             MAXiter=MAXiter, error_tol=error_tol, patience=patience)
         error_iter_sub[sub, :len(error_iter_sub_aux)] = error_iter_sub_aux
