@@ -552,7 +552,7 @@ for COND in range(3):
         #tot_sub_error += error_iter_sub_aux[-1]
         tot_sub_error_adam += error_iter_sub_aux_adam[-1]
         print(error_iter_sub_aux_adam[-1], subj_id, COND)
-        show_error(error_iter_sub_aux_adam, None, errorFC_iter_sub_aux_adam, None, errorCOVtau_iter_sub_aux_adam, None, sigma_sub_adam[sub], None, sigma_ini, a_sub_adam[sub], None, FCemp_sub_adam[sub], FCsim_sub_adam[sub], None, label=f"subj{sub}")
+        #show_error(error_iter_sub_aux_adam, None, errorFC_iter_sub_aux_adam, None, errorCOVtau_iter_sub_aux_adam, None, sigma_sub_adam[sub], None, sigma_ini, a_sub_adam[sub], None, FCemp_sub_adam[sub], FCsim_sub_adam[sub], None, label=f"subj{sub}")
     print('Final error:',  tot_sub_error,'adam:', tot_sub_error_adam)
 # a_list_sub.append(np.array(a_list_sub_temp))
 #     Ceff_means.append(np.mean(np.array(Ceff_sub_temp), axis=0))
