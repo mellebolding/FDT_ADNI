@@ -191,7 +191,7 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
                 break
                 
             error_old = error_now
-            error_tol_old = error_tol_now
+            #error_tol_old = error_tol_now
 
             if plot_evol:
                 _plot_evolution(error_iter, errorFC_iter, errorCOVtau_iter, 
