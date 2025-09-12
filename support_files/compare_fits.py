@@ -383,8 +383,8 @@ epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
 lr_Ceff = 1e-3
-lrs_sigma = [1e-2,1e-1,1,10,50]
-lr_a = 1e-4
+lrs_sigma = [1e-1,1,10,50]
+lrs_a = [1e-2,1e-1,1,10,50]
 beta1 = 0.9
 beta2 = 0.999
 epsilon = 1e-8
@@ -404,8 +404,8 @@ AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
 ####### Group level #######
 
 for lr_sig in lrs_sigma:
-    for lr_a in lrs_sigma:
-        for lr_Ceff in lrs_sigma:
+    for lr_a in lrs_a:
+        for lr_Ceff in lrs_a:
             error = 0
 
             TSemp_zsc_list = [] # store the zscored TS for each group
