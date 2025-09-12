@@ -223,7 +223,7 @@ def show_error(error_iter, error_iter_2, errorFC_iter, errorFC_iter_2,
             plt.plot(np.arange(1, len(error_iter_2) + 1) * 100, error_iter_2, 'o--', color='tab:blue', label='Error Adam @100 iter')
             plt.plot(np.arange(1, len(errorFC_iter_2) + 1) * 100, errorFC_iter_2, 's--', color='tab:orange', label='Error FC Adam @100 iter')
             plt.plot(np.arange(1, len(errorCOVtau_iter_2) + 1) * 100, errorCOVtau_iter_2, '^--', color='tab:green', label='Error COVtau Adam @100 iter')
-
+            print('Final errors:', error_iter[-1], error_iter_2[-1])
         plt.xlabel('Iteration')
         plt.ylabel('Error')
         plt.title(f"Error Curves - Group {group_names[COND]}")
@@ -383,7 +383,7 @@ epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
 lr_Ceff = 1e-3
-lr_sig = 1e-5
+lr_sig = 1e-3
 lr_a = 1e-5
 beta1 = 0.9
 beta2 = 0.999
@@ -469,7 +469,7 @@ for COND in range(3):
     a_list_group_adam.append(a_group_adam)
     Ceff_group_list_adam.append(Ceff_group_adam)
     sigma_group_list_adam.append(sigma_group_adam)
-    print('sigma_group', sigma_group-sigma_group_adam)
+    #print('sigma_group', sigma_group-sigma_group_adam)
 
     show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
                errorFC_iter_group_adam, errorCOVtau_iter_group, 
