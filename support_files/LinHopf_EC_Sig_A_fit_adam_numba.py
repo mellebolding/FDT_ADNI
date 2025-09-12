@@ -252,7 +252,7 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
                                          learning_rate_a, beta1, beta2, epsilon, iter)
             
             # Apply constraints (clip to reasonable range)
-            a_new = np.clip(a_new, -0.1, -0.001)
+            a_new = np.clip(a_new, -0.5, -0.001)
 
     if iter == MAXiter:
         print('Reached max. iterations:', MAXiter)
