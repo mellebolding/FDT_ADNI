@@ -379,7 +379,7 @@ iter_check=iter_check_group
 
 ## Learning rate settings
 epsFC_Ceff = 1e-4
-epsCOVtau_Ceff = 1e-5
+epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
 lr_Ceff = 1e-3
