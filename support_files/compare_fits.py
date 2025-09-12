@@ -406,6 +406,7 @@ AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
 for lr_sig in lrs_sigma:
     for lr_a in lrs_sigma:
         for lr_Ceff in lrs_sigma:
+            error = 0
 
             TSemp_zsc_list = [] # store the zscored TS for each group
             Ceff_group_list = [] # store the fitted Ceff for each group
@@ -473,7 +474,8 @@ for lr_sig in lrs_sigma:
                 a_list_group_adam.append(a_group_adam)
                 Ceff_group_list_adam.append(Ceff_group_adam)
                 sigma_group_list_adam.append(sigma_group_adam)
-                print('Final error:',  error_iter_group_adam[-1], 'cond:', COND,'lr_sigma:', lr_sig, 'lr_Ceff:', lr_Ceff, 'lr_a:', lr_a)
+                error += error_iter_group_adam[-1]
+            print('Final error:',  error,'lr_sigma:', lr_sig, 'lr_Ceff:', lr_Ceff, 'lr_a:', lr_a)
                 #print('sigma_group', sigma_group-sigma_group_adam)
 
                 # show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
