@@ -383,7 +383,7 @@ epsCOVtau_Ceff = 1e-4
 epsFC_sigma = 8e-5
 epsCOVtau_sigma = 3e-5
 lr_Ceff = 1e-3
-lrs_sigma = [1e-4,1e-3,1e-2,1e-1]
+lrs_sigma = [1e-4,1e-3,1e-2,1e-1,1]
 lr_a = 1e-4
 beta1 = 0.9
 beta2 = 0.999
@@ -404,81 +404,83 @@ AD_SC_avg = np.mean(AD_SC_matrices, axis=0)
 ####### Group level #######
 
 for lr_sig in lrs_sigma:
-    print(lr_sig)
-    TSemp_zsc_list = [] # store the zscored TS for each group
-    Ceff_group_list = [] # store the fitted Ceff for each group
-    sigma_group_list = [] # store the fitted sigma for each group
-    Ceff_group_list_adam = [] # store the fitted Ceff for each group
-    sigma_group_list_adam = [] # store the fitted sigma for each group
-    for COND in range(3):
-        if COND == 0: ## --> HC
-            f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
-            ts_gr = HC_MRI
-            ID = HC_IDs
-            SC = HC_SC_avg  # Use the average SC of the HC group
+    for lr_a in lrs_sigma:
+        for lr_Ceff in lrs_sigma:
 
-        elif COND == 1: ## --> MCI
-            f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
-            ts_gr = MCI_MRI
-            ID = MCI_IDs
-            SC = MCI_SC_avg  # Use the average SC of the MCI group
+            TSemp_zsc_list = [] # store the zscored TS for each group
+            Ceff_group_list = [] # store the fitted Ceff for each group
+            sigma_group_list = [] # store the fitted sigma for each group
+            Ceff_group_list_adam = [] # store the fitted Ceff for each group
+            sigma_group_list_adam = [] # store the fitted sigma for each group
+            for COND in range(3):
+                if COND == 0: ## --> HC
+                    f_diff = calc_H_freq(HC_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
+                    ts_gr = HC_MRI
+                    ID = HC_IDs
+                    SC = HC_SC_avg  # Use the average SC of the HC group
 
-        elif COND == 2: ## --> AD
-            f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
-            ts_gr = AD_MRI
-            ID = AD_IDs
-            SC = AD_SC_avg  # Use the average SC of the AD group
-        
-        f_diff = f_diff[:NPARCELLS] # frequencies of group
-        omega = 2 * np.pi * f_diff
+                elif COND == 1: ## --> MCI
+                    f_diff = calc_H_freq(MCI_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
+                    ts_gr = MCI_MRI
+                    ID = MCI_IDs
+                    SC = MCI_SC_avg  # Use the average SC of the MCI group
 
-        ### Generates a "group" TS with the same length for all subjects
-        min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
-        ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
-        for sub in range(len(ID)):
-            subj_id = ID[sub]
-            ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
-        TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
-        TSemp_zsc_list.append(TSemp_zsc)
-        SC_N = SC[:NPARCELLS, :NPARCELLS]
-        SC_N /= np.max(SC_N)
-        SC_N *= 0.2
-        Ceff_ini = SC_N.copy()
-        start_time = time.time()
-        Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
-                                    LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
-                                    fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
-                                    fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
-                                    fit_a=A_FITTING,
-                                    epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
-                                    MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
-                                    Ceff_norm=Ceff_norm, maxC=maxC,
-                                    iter_check=iter_check, plot_evol=False, plot_evol_last=False)
-        Ceff_group_adam, sigma_group_adam, a_group_adam, FCemp_group_adam, FCsim_group_adam, error_iter_group_adam, errorFC_iter_group_adam, errorCOVtau_iter_group_adam, = \
-                                    LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
-                                    fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
-                                    fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
-                                    fit_a=A_FITTING,learning_rate_Ceff=lr_Ceff, learning_rate_sigma=lr_sig, learning_rate_a=lr_a,
-                                    beta1=beta1, beta2=beta2, epsilon=epsilon,
-                                    MAXiter=MAXiter, error_tol=error_tol, patience=patience)
+                elif COND == 2: ## --> AD
+                    f_diff = calc_H_freq(AD_MRI, 3000, filterps.FiltPowSpetraVersion.v2021)[0]
+                    ts_gr = AD_MRI
+                    ID = AD_IDs
+                    SC = AD_SC_avg  # Use the average SC of the AD group
+                
+                f_diff = f_diff[:NPARCELLS] # frequencies of group
+                omega = 2 * np.pi * f_diff
 
-        end_time = time.time()
-        
-        ## save the results
-        a_list_group.append(a_group)
-        Ceff_group_list.append(Ceff_group)
-        sigma_group_list.append(sigma_group)
-        a_list_group_adam.append(a_group_adam)
-        Ceff_group_list_adam.append(Ceff_group_adam)
-        sigma_group_list_adam.append(sigma_group_adam)
-        print('Final errors:', error_iter_group[-1], error_iter_group_adam[-1])
-        #print('sigma_group', sigma_group-sigma_group_adam)
+                ### Generates a "group" TS with the same length for all subjects
+                min_ntimes = min(ts_gr[subj_id].shape[0] for subj_id in ID)
+                ts_gr_arr = np.zeros((len(ID), NPARCELLS, min_ntimes))
+                for sub in range(len(ID)):
+                    subj_id = ID[sub]
+                    ts_gr_arr[sub,:,:] = ts_gr[subj_id][:min_ntimes,:NPARCELLS].T.copy() 
+                TSemp_zsc = zscore_time_series(ts_gr_arr, mode='global', detrend=True)[:,:NPARCELLS,:].copy() #mode: parcel, global, none
+                TSemp_zsc_list.append(TSemp_zsc)
+                SC_N = SC[:NPARCELLS, :NPARCELLS]
+                SC_N /= np.max(SC_N)
+                SC_N *= 0.2
+                Ceff_ini = SC_N.copy()
+                start_time = time.time()
+                # Ceff_group, sigma_group, a_group, FCemp_group, FCsim_group, error_iter_group, errorFC_iter_group, errorCOVtau_iter_group, = \
+                #                             LinHopf_Ceff_sigma_a_fitting_numba(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+                #                             fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+                #                             fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
+                #                             fit_a=A_FITTING,
+                #                             epsFC_Ceff=epsFC_Ceff, epsCOVtau_Ceff=epsCOVtau_Ceff, epsFC_sigma=epsFC_sigma, epsCOVtau_sigma=epsCOVtau_sigma,
+                #                             MAXiter=MAXiter, error_tol=error_tol, patience=patience, learning_rate_factor=learning_rate_factor,
+                #                             Ceff_norm=Ceff_norm, maxC=maxC,
+                #                             iter_check=iter_check, plot_evol=False, plot_evol_last=False)
+                Ceff_group_adam, sigma_group_adam, a_group_adam, FCemp_group_adam, FCsim_group_adam, error_iter_group_adam, errorFC_iter_group_adam, errorCOVtau_iter_group_adam, = \
+                                            LinHopf_Ceff_sigma_a_fitting_adam(TSemp_zsc, Ceff_ini, NPARCELLS, TR, f_diff, sigma_ini, Tau=Tau,
+                                            fit_Ceff=fit_Ceff, competitive_coupling=competitive_coupling, 
+                                            fit_sigma=SIGMA_FITTING, sigma_reset=sigma_reset,
+                                            fit_a=A_FITTING,learning_rate_Ceff=lr_Ceff, learning_rate_sigma=lr_sig, learning_rate_a=lr_a,
+                                            beta1=beta1, beta2=beta2, epsilon=epsilon,
+                                            MAXiter=MAXiter, error_tol=error_tol, patience=patience)
 
-        # show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
-        #         errorFC_iter_group_adam, errorCOVtau_iter_group, 
-        #         errorCOVtau_iter_group_adam, sigma_group, sigma_group_adam,
-        #         sigma_ini, a_group, a_group_adam, FCemp_group, FCsim_group, 
-        #         FCsim_group_adam, label="group")
+                end_time = time.time()
+                
+                ## save the results
+                # a_list_group.append(a_group)
+                # Ceff_group_list.append(Ceff_group)
+                # sigma_group_list.append(sigma_group)
+                a_list_group_adam.append(a_group_adam)
+                Ceff_group_list_adam.append(Ceff_group_adam)
+                sigma_group_list_adam.append(sigma_group_adam)
+                print('Final error:',  error_iter_group_adam[-1], 'lr_sigma:', lr_sig, 'lr_Ceff:', lr_Ceff, 'lr_a:', lr_a)
+                #print('sigma_group', sigma_group-sigma_group_adam)
+
+                # show_error(error_iter_group, error_iter_group_adam, errorFC_iter_group, 
+                #         errorFC_iter_group_adam, errorCOVtau_iter_group, 
+                #         errorCOVtau_iter_group_adam, sigma_group, sigma_group_adam,
+                #         sigma_ini, a_group, a_group_adam, FCemp_group, FCsim_group, 
+                #         FCsim_group_adam, label="group")
 
 ####### Subject level #######
 # Ceff_means = []
