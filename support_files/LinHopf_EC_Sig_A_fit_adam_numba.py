@@ -122,6 +122,8 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
     error_tol_old = 1e5
     errorFC_iter = []
     errorCOVtau_iter = []
+    corrFC_iter = []
+    corrCOVtau_iter = []
     error_iter = []
     patience_counter = 0
     best_error = 1e5
@@ -150,7 +152,11 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
             errorFC_iter.append(errorFC_now)
             errorCOVtau_now = np.mean((COVtauemp - COVtausim) ** 2)
             errorCOVtau_iter.append(errorCOVtau_now)
-
+            i, j = np.triu_indices_from(FCemp, k=1)
+            corrFC_now = np.corrcoef(FCemp[i, j], FCsim[i, j])[0, 1]
+            corrCOVtau_now = np.corrcoef(COVtauemp[i, j], COVtausim[i, j])[0, 1]
+            corrFC_iter.append(corrFC_now)
+            corrCOVtau_iter.append(corrCOVtau_now)
             error_now = errorFC_now + errorCOVtau_now
             error_iter.append(error_now)
 
@@ -167,6 +173,8 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
             # Check for improvement
             if error_now < best_error:
                 best_error = error_now
+                best_corrFC = corrFC_now
+                best_corrCOVtau = corrCOVtau_now
                 best_params = (Ceff_new.copy(), sigma_new.copy(), a_new.copy())
                 no_improvement_count = 0
             else:
@@ -188,6 +196,7 @@ def LinHopf_Ceff_sigma_a_fitting_adam(tsdata, C, NPARCELS, TR, f_diff, sigma, a=
                 #print(f"No improvement for {no_improvement_count} checks, stopping early")
                 Ceff_fit, sigma_fit, a_fit = best_params
                 error_iter.append(best_error)
+                print('corrFC:', best_corrFC, 'corrCOVtau:', best_corrCOVtau)
                 break
                 
             error_old = error_now
