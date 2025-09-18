@@ -465,8 +465,8 @@ iter_check=iter_check_group
 
 ## Learning rate settings
 lr_Ceff = 1e-3
-lr_sigma = 1e-1
-lr_a = 1e-5#5e-4
+lr_sigma = 1e-2
+lr_a = 5e-4
 beta1 = 0.85
 beta2 = 0.995
 epsilon = 1e-8
