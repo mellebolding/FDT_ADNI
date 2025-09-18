@@ -567,14 +567,17 @@ for COND in range(3):
         ts_gr = HC_MRI
         ID = HC_IDs
         SCs = HC_SC
+        EC_gr = Ceff_group_list[COND]
     elif COND == 1: ## --> MCI
         ts_gr = MCI_MRI
         ID = MCI_IDs
         SCs = MCI_SC
+        EC_gr = Ceff_group_list[COND]
     elif COND == 2: ## --> AD
         ts_gr = AD_MRI
         ID = AD_IDs
         SCs = AD_SC
+        EC_gr = Ceff_group_list[COND]
 
     
     Ceff_sub = np.zeros((len(ID), NPARCELLS, NPARCELLS))
@@ -591,9 +594,10 @@ for COND in range(3):
     for sub in range(len(ID)):
         subj_id = ID[sub]
         omega = 2 * np.pi * f_diff[sub,:NPARCELLS] # omega per subject
-        SC_N = SCs[subj_id][:NPARCELLS, :NPARCELLS]
-        SC_N /= np.max(SC_N)
-        SC_N *= 0.2
+        # SC_N = SCs[subj_id][:NPARCELLS, :NPARCELLS]
+        # SC_N /= np.max(SC_N)
+        # SC_N *= 0.2
+        SC_N = EC_gr
         if SIGMA_FITTING: sigma_ini = sigma_group_list[COND].copy()
 
         Ceff_sub[sub], sigma_sub[sub], a_sub[sub], FCemp_sub[sub], FCsim_sub[sub], error_iter_sub_aux, errorFC_iter_sub_aux, errorCOVtau_iter_sub_aux = \
