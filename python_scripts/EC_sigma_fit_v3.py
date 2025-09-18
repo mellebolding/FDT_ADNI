@@ -607,7 +607,7 @@ for COND in range(3):
 
         a_list_sub_temp.append(a_sub[sub])
         Ceff_sub_temp.append(Ceff_sub[sub])
-        tot_sub_error_adam += error_iter_sub_aux[-1]
+        tot_sub_error += error_iter_sub_aux[-1]
         print(error_iter_sub_aux[-1], subj_id, COND)
 
         append_record_to_npz(
