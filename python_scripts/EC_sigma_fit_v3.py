@@ -635,37 +635,39 @@ for COND in range(3):
 
 
 ##### Fitting a values to PET data #####
-a_sub_cortical = [arr[:, :protein_index] for arr in a_list_sub]   # cortical parcels
-a_sub_subcort = [arr[:, protein_index:] for arr in a_list_sub]    # subcortical parcels (19)
-a_group_cortical = [arr[:protein_index] for arr in a_list_group]
-a_group_subcortical = [arr[protein_index:] for arr in a_list_group]
+# a_sub_cortical = [arr[:, :protein_index] for arr in a_list_sub]   # cortical parcels
+# a_sub_subcort = [arr[:, protein_index:] for arr in a_list_sub]    # subcortical parcels (19)
+# a_group_cortical = [arr[:protein_index] for arr in a_list_group]
+# a_group_subcortical = [arr[protein_index:] for arr in a_list_group]
 
-out = calc_a_values(a_sub_cortical, a_group_cortical, ABeta_burden, Tau_burden)
-predicted_a = out["predicted_a"]
-predicted_a_group = out["predicted_a_group"]
-if protein_index > 360: 
-    a_sub_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a, a_sub_subcort)]
-    a_group_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a_group, a_group_subcortical)]
-else:
-    a_sub_recombined = predicted_a
-    a_group_recombined = predicted_a_group
+# out = calc_a_values(a_sub_cortical, a_group_cortical, ABeta_burden, Tau_burden)
+# predicted_a = out["predicted_a"]
+# predicted_a_group = out["predicted_a_group"]
+# if protein_index > 360: 
+#     a_sub_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a, a_sub_subcort)]
+#     a_group_recombined = [np.hstack((cort, subc)) for cort, subc in zip(predicted_a_group, a_group_subcortical)]
+# else:
+#     a_sub_recombined = predicted_a
+#     a_group_recombined = predicted_a_group
 
 
-results = out["results"]
-coef_matrix = out["coef_matrix"]
-print("Coefficient matrix:\n", coef_matrix)
-print("Statistical results of the fit:\n", results)
-
-append_record_to_npz(
-        Ceff_sigma_subfolder,
-        f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
-        level="subject",
-        a = a_sub_recombined,
-        original_a = a_list_sub)
+# results = out["results"]
+# coef_matrix = out["coef_matrix"]
+# print("Coefficient matrix:\n", coef_matrix)
+# print("Statistical results of the fit:\n", results)
 
 append_record_to_npz(
         Ceff_sigma_subfolder,
         f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
-        level="group",
-        a = a_group_recombined,
-        original_a = np.array(a_list_group))
+        level="subject"#,
+        # a = a_sub_recombined,
+        # original_a = a_list_sub
+        )
+
+append_record_to_npz(
+        Ceff_sigma_subfolder,
+        f"Ceff_sigma_a{A_FITTING}_N{NPARCELLS}_{NOISE_TYPE}.npz",
+        level="group"#,
+        # a = a_group_recombined,
+        # original_a = np.array(a_list_group)
+        )
