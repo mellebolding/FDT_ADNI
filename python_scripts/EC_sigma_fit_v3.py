@@ -451,7 +451,7 @@ sigma_mean = 0.45
 sigma_ini = sigma_mean * np.ones(NPARCELLS)
 if SIGMA_FITTING: NOISE_TYPE = 'hetero'
 else: NOISE_TYPE = 'homo'
-COMPETITIVE_COUPLING = True
+COMPETITIVE_COUPLING = False
 CEFF_NORMALIZATION = True
 maxC = 0.2
 iter_check_group = 100
@@ -466,7 +466,7 @@ iter_check=iter_check_group
 ## Learning rate settings
 lr_Ceff = 1e-3
 lr_sigma = 1e-1
-lr_a = 5e-4
+lr_a = 1e-5#5e-4
 beta1 = 0.85
 beta2 = 0.995
 epsilon = 1e-8
