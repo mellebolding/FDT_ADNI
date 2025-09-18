@@ -375,7 +375,7 @@ def show_error(error_iter, errorFC_iter, errorCOVtau_iter, sigma, sigma_ini, a, 
 
 ##### Base parameters settings ######
 
-NPARCELLS = 379 # max 379
+NPARCELLS = 45 # max 379
 CEFF_FITTING = True
 SIGMA_FITTING = True
 A_FITTING = True
